@@ -14,6 +14,19 @@ RUN composer install \
 
 # Copy the rest of the source so the autoloader can be generated
 COPY . .
+
+# Ensure Laravel's writable directories exist before any artisan command runs
+# (they may be empty in git and stripped from the build context).
+RUN mkdir -p \
+        bootstrap/cache \
+        storage/app/public \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/framework/testing \
+        storage/logs \
+    && chmod -R ug+rwX bootstrap/cache storage
+
 RUN composer dump-autoload --optimize --no-dev
 
 
