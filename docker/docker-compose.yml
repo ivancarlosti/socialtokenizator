@@ -1,0 +1,54 @@
+services:
+  app:
+    image: ghcr.io/ivancarlosti/socialtokenizator:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      # Host port from .env (PORT=8767 by default) -> container's nginx on 80
+      - "${PORT:-8767}:80"
+    networks:
+      - internal
+    # --- If you front this with a reverse proxy (Traefik / nginx-proxy / Caddy)
+    #     attach to its external network here, e.g.:
+    #
+    # networks:
+    #   - internal
+    #   - proxy
+    #
+    # And uncomment Traefik labels (replace example.com):
+    #
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.socialtokenizator.rule=Host(`${DOMAIN}`)"
+    #   - "traefik.http.routers.socialtokenizator.entrypoints=websecure"
+    #   - "traefik.http.routers.socialtokenizator.tls.certresolver=le"
+    #   - "traefik.http.services.socialtokenizator.loadbalancer.server.port=80"
+
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      # Bind-mount, created automatically on first run; not committed to repo.
+      - ./mysql:/var/lib/mysql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+networks:
+  internal: {}
+  # Uncomment if attaching to an existing reverse proxy network:
+  # proxy:
+  #   external: true
