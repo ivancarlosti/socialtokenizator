@@ -2,8 +2,8 @@
 
 @section('content')
     <section class="text-center mb-10">
-        <h1 class="text-3xl font-semibold text-white">Random pick</h1>
-        <p class="text-neutral-400 mt-1 text-sm">Refresh for another image, or search above.</p>
+        <h1 class="text-3xl font-semibold text-white">{{ __('messages.home_heading') }}</h1>
+        <p class="text-neutral-400 mt-1 text-sm">{{ __('messages.home_subheading') }}</p>
     </section>
 
     @if($image)
@@ -27,15 +27,15 @@
                     </div>
                 @endif
                 <div class="mt-3 text-xs text-neutral-500">
-                    <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}">View detail →</a>
+                    <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}">{{ __('messages.view_detail') }}</a>
                 </div>
             </div>
         </article>
     @else
         <div class="text-center text-neutral-400 py-16 border border-dashed border-neutral-700 rounded">
-            No images yet.
+            {{ __('messages.home_no_images') }}
             @if($isAdmin)
-                <a href="{{ route('admin.upload.create') }}" class="text-emerald-400">Upload the first one.</a>
+                <a href="{{ route('admin.upload.create') }}" class="text-emerald-400">{{ __('messages.home_upload_first') }}</a>
             @endif
         </div>
     @endif

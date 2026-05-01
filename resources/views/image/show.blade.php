@@ -6,7 +6,7 @@
         : config('app.name');
     $shortDesc = $image->description
         ? \Illuminate\Support\Str::limit($image->description, 200)
-        : 'Shared via '.config('app.name');
+        : __('messages.shared_via', ['app' => config('app.name')]);
     $shareUrl = url()->current();
     $imgUrl = $image->public_url;
 @endphp
@@ -42,7 +42,7 @@
             @if($image->description)
                 <p class="text-neutral-100 text-base leading-relaxed whitespace-pre-line">{{ $image->description }}</p>
             @else
-                <p class="text-neutral-500 italic">No description.</p>
+                <p class="text-neutral-500 italic">{{ __('messages.image_no_description') }}</p>
             @endif
 
             @if($image->tags->isNotEmpty())
@@ -58,7 +58,7 @@
 
             @if($image->sources->isNotEmpty())
                 <div class="mt-6">
-                    <h2 class="text-sm uppercase tracking-wide text-neutral-400 mb-2">Sources</h2>
+                    <h2 class="text-sm uppercase tracking-wide text-neutral-400 mb-2">{{ __('messages.image_sources') }}</h2>
                     <ul class="space-y-1 text-sm">
                         @foreach($image->sources as $src)
                             <li>
@@ -75,26 +75,26 @@
                 <a target="_blank" rel="noopener"
                    href="https://twitter.com/intent/tweet?url={{ urlencode($shareUrl) }}&text={{ urlencode($shortDesc) }}"
                    class="inline-flex items-center gap-2 bg-black border border-neutral-700 hover:border-white text-white px-3 py-1.5 rounded text-sm">
-                    Share on X
+                    {{ __('messages.share_on_x') }}
                 </a>
                 <a target="_blank" rel="noopener"
                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}"
                    class="inline-flex items-center gap-2 bg-[#1877F2] hover:brightness-110 text-white px-3 py-1.5 rounded text-sm">
-                    Share on Facebook
+                    {{ __('messages.share_on_facebook') }}
                 </a>
                 <button type="button" onclick="navigator.clipboard.writeText('{{ $shareUrl }}')"
                         class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-3 py-1.5 rounded text-sm">
-                    Copy link
+                    {{ __('messages.copy_link') }}
                 </button>
             </div>
 
             @if($isAdmin)
                 <form method="post" action="{{ route('admin.images.destroy', ['uuid' => $image->uuid]) }}"
-                      onsubmit="return confirm('Delete this image?');"
+                      onsubmit="return confirm('{{ __('messages.confirm_delete_image') }}');"
                       class="mt-6">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-xs text-red-400 hover:text-red-300">Delete image</button>
+                    <button type="submit" class="text-xs text-red-400 hover:text-red-300">{{ __('messages.delete_image') }}</button>
                 </form>
             @endif
         </div>

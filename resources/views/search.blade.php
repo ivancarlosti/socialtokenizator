@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Search — '.config('app.name'))
+@section('title', __('messages.search_placeholder').' — '.config('app.name'))
 
 @section('content')
     <h1 class="text-2xl font-semibold text-white">
-        {{ $q !== '' ? 'Results for "'.$q.'"' : 'All images' }}
+        {{ $q !== '' ? __('messages.search_results_for', ['q' => $q]) : __('messages.search_all_images') }}
     </h1>
-    <p class="text-neutral-500 text-sm mt-1">{{ $images->total() }} match{{ $images->total() === 1 ? '' : 'es' }}</p>
+    <p class="text-neutral-500 text-sm mt-1">{{ trans_choice('messages.search_match', $images->total(), ['count' => $images->total()]) }}</p>
 
     @if($images->isEmpty())
         <div class="text-center text-neutral-400 py-16 border border-dashed border-neutral-700 rounded mt-6">
-            Nothing matched. Try a different term.
+            {{ __('messages.search_empty') }}
         </div>
     @else
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">

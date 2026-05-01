@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login — '.config('app.name'))
+@section('title', __('messages.login').' — '.config('app.name'))
 
 @section('meta')
     @if($recaptchaSiteKey)
@@ -10,7 +10,7 @@
 
 @section('content')
     <div class="max-w-sm mx-auto bg-neutral-900 border border-neutral-800 rounded p-6">
-        <h1 class="text-xl font-semibold text-white">Admin login</h1>
+        <h1 class="text-xl font-semibold text-white">{{ __('messages.admin_login') }}</h1>
 
         @if($errors->any())
             <div class="mt-3 bg-red-900/30 border border-red-700 text-red-200 rounded px-3 py-2 text-sm">
@@ -21,12 +21,12 @@
         <form method="post" action="{{ route('auth.login') }}" class="mt-4 space-y-3">
             @csrf
             <div>
-                <label class="block text-sm text-neutral-300 mb-1">Login</label>
+                <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.login_field') }}</label>
                 <input type="text" name="login" autocomplete="username" required value="{{ old('login') }}"
                        class="w-full bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">
             </div>
             <div>
-                <label class="block text-sm text-neutral-300 mb-1">Password</label>
+                <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.password') }}</label>
                 <input type="password" name="password" autocomplete="current-password" required
                        class="w-full bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">
             </div>
@@ -36,7 +36,7 @@
             @endif
 
             <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded">
-                Sign in
+                {{ __('messages.sign_in') }}
             </button>
         </form>
     </div>

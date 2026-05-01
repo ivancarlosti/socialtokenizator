@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Auth\AuthMethodResolver;
+use App\Models\Setting;
+use App\Support\Locales;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -30,10 +32,31 @@ class AppServiceProvider extends ServiceProvider
         }
 
         View::composer('*', function ($view) {
+            $logoKey    = $this->safeSetting('site_logo_key');
+            $faviconKey = $this->safeSetting('site_favicon_key');
+
             $view->with([
-                'authMethod' => AuthMethodResolver::current(),
-                'isAdmin' => AuthMethodResolver::isAdmin(),
+                'authMethod'       => AuthMethodResolver::current(),
+                'isAdmin'          => AuthMethodResolver::isAdmin(),
+                'siteLogoUrl'      => Setting::publicUrl($logoKey),
+                'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
+                'currentLocale'    => app()->getLocale(),
+                'supportedLocales' => Locales::supported(),
             ]);
         });
+    }
+
+    /**
+     * Read a setting safely. Returns null if the settings table doesn't exist
+     * yet (e.g. before migrations run) or any other read error occurs.
+     */
+    private function safeSetting(string $key): ?string
+    {
+        try {
+            $value = Setting::get($key);
+            return is_string($value) ? $value : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
