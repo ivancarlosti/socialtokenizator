@@ -40,7 +40,7 @@
 
         <div class="p-5">
             @if($image->description)
-                <p class="text-neutral-100 text-base leading-relaxed whitespace-pre-line">{{ $image->description }}</p>
+                <p class="text-neutral-100 text-base leading-relaxed">{!! nl2br(e($image->description)) !!}</p>
             @else
                 <p class="text-neutral-500 italic">{{ __('messages.image_no_description') }}</p>
             @endif
@@ -73,7 +73,7 @@
 
             <div class="mt-6 flex flex-wrap gap-2">
                 <a target="_blank" rel="noopener"
-                   href="https://twitter.com/intent/tweet?url={{ urlencode($shareUrl) }}&text={{ urlencode($shortDesc) }}"
+                   href="https://x.com/intent/post?url={{ urlencode($shareUrl) }}&text={{ urlencode($shortDesc) }}"
                    class="inline-flex items-center gap-2 bg-black border border-neutral-700 hover:border-white text-white px-3 py-1.5 rounded text-sm">
                     {{ __('messages.share_on_x') }}
                 </a>
@@ -81,6 +81,11 @@
                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}"
                    class="inline-flex items-center gap-2 bg-[#1877F2] hover:brightness-110 text-white px-3 py-1.5 rounded text-sm">
                     {{ __('messages.share_on_facebook') }}
+                </a>
+                <a target="_blank" rel="noopener"
+                   href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode($shareUrl) }}"
+                   class="inline-flex items-center gap-2 bg-[#0A66C2] hover:brightness-110 text-white px-3 py-1.5 rounded text-sm">
+                    {{ __('messages.share_on_linkedin') }}
                 </a>
                 <button type="button" onclick="navigator.clipboard.writeText('{{ $shareUrl }}')"
                         class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-3 py-1.5 rounded text-sm">

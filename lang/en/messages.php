@@ -28,6 +28,7 @@ return [
     'image_sources'        => 'Sources',
     'share_on_x'           => 'Share on X',
     'share_on_facebook'    => 'Share on Facebook',
+    'share_on_linkedin'    => 'Share on LinkedIn',
     'copy_link'            => 'Copy link',
     'delete_image'         => 'Delete image',
     'confirm_delete_image' => 'Delete this image?',

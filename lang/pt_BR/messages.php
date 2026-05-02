@@ -28,6 +28,7 @@ return [
     'image_sources'        => 'Fontes',
     'share_on_x'           => 'Compartilhar no X',
     'share_on_facebook'    => 'Compartilhar no Facebook',
+    'share_on_linkedin'    => 'Compartilhar no LinkedIn',
     'copy_link'            => 'Copiar link',
     'delete_image'         => 'Excluir imagem',
     'confirm_delete_image' => 'Excluir esta imagem?',
