@@ -13,9 +13,9 @@ class SettingsController extends Controller
 {
     public function edit()
     {
-        $footerLinks = [];
+        $footerLinkRows = [];
         for ($i = 1; $i <= 3; $i++) {
-            $footerLinks[] = [
+            $footerLinkRows[] = [
                 'label' => Setting::get("footer_link_{$i}_label", ''),
                 'url'   => Setting::get("footer_link_{$i}_url", ''),
             ];
@@ -26,7 +26,7 @@ class SettingsController extends Controller
             'faviconUrl'     => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'  => Setting::get('default_locale', config('app.locale')),
             'locales'        => Locales::supported(),
-            'footerLinks'    => $footerLinks,
+            'footerLinkRows' => $footerLinkRows,
         ]);
     }
 

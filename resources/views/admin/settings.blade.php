@@ -69,7 +69,7 @@
             <label class="block text-sm text-neutral-300 mb-2">{{ __('messages.settings_footer_links') }}</label>
             <p class="text-xs text-neutral-500 mb-3">{{ __('messages.settings_footer_links_help') }}</p>
             <div class="space-y-2">
-                @foreach($footerLinks as $i => $link)
+                @foreach($footerLinkRows as $i => $link)
                     <div class="flex gap-2">
                         <input type="text" name="footer_links[{{ $i }}][label]"
                                value="{{ old('footer_links.'.$i.'.label', $link['label']) }}"

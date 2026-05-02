@@ -30,7 +30,20 @@ RUN mkdir -p \
 RUN composer dump-autoload --optimize --no-dev
 
 
-# ---------- Stage 2: Runtime ----------
+# ---------- Stage 2: Tailwind CSS build ----------
+FROM node:20-alpine AS assets
+
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund
+COPY tailwind.config.js ./
+COPY resources/css ./resources/css
+COPY resources/views ./resources/views
+COPY app ./app
+RUN npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --minify
+
+
+# ---------- Stage 3: Runtime ----------
 FROM php:8.3-fpm-alpine AS runtime
 
 ENV APP_ENV=production \
@@ -79,6 +92,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Application
 WORKDIR /var/www/html
 COPY --from=vendor /app /var/www/html
+COPY --from=assets /app/public/css/app.css /var/www/html/public/css/app.css
 
 RUN set -eux; \
     chown -R www-data:www-data /var/www/html; \

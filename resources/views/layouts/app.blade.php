@@ -37,12 +37,7 @@
         <link rel="canonical" href="{{ $defaultUrl }}">
     @endif
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #0b0b0d; color: #e5e7eb; }
-        a { color: #93c5fd; }
-        a:hover { color: #bfdbfe; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) ?: '0' }}">
 </head>
 <body class="min-h-screen">
     <header class="border-b border-neutral-800">
