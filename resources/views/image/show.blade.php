@@ -94,13 +94,17 @@
             </div>
 
             @if($isAdmin)
-                <form method="post" action="{{ route('admin.images.destroy', ['uuid' => $image->uuid]) }}"
-                      onsubmit="return confirm('{{ __('messages.confirm_delete_image') }}');"
-                      class="mt-6">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-xs text-red-400 hover:text-red-300">{{ __('messages.delete_image') }}</button>
-                </form>
+                <div class="mt-6 flex items-center gap-4">
+                    <a href="{{ route('admin.images.edit', ['uuid' => $image->uuid]) }}"
+                       class="text-xs text-emerald-400 hover:text-emerald-300">{{ __('messages.edit_image') }}</a>
+                    <form method="post" action="{{ route('admin.images.destroy', ['uuid' => $image->uuid]) }}"
+                          onsubmit="return confirm('{{ __('messages.confirm_delete_image') }}');"
+                          class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-xs text-red-400 hover:text-red-300">{{ __('messages.delete_image') }}</button>
+                    </form>
+                </div>
             @endif
         </div>
     </article>

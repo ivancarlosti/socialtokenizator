@@ -14,7 +14,7 @@
             </a>
             <div class="p-4">
                 @if($image->description)
-                    <p class="text-neutral-200">{{ \Illuminate\Support\Str::limit($image->description, 240) }}</p>
+                    <p class="text-neutral-200">{!! nl2br(e(\Illuminate\Support\Str::limit($image->description, 240))) !!}</p>
                 @endif
                 @if($image->tags->isNotEmpty())
                     <div class="mt-3 flex flex-wrap gap-2">

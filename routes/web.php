@@ -33,6 +33,8 @@ if ($method === AuthMethodResolver::KEYCLOAK) {
 Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('/', [UploadController::class, 'create'])->name('admin.upload.create');
     Route::post('/upload', [UploadController::class, 'store'])->name('admin.upload.store');
+    Route::get('/images/{uuid}/edit', [UploadController::class, 'edit'])->name('admin.images.edit');
+    Route::put('/images/{uuid}', [UploadController::class, 'update'])->name('admin.images.update');
     Route::delete('/images/{uuid}', [UploadController::class, 'destroy'])->name('admin.images.destroy');
     Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');

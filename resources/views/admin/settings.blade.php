@@ -64,6 +64,28 @@
             </select>
         </div>
 
+        {{-- Footer links --}}
+        <div>
+            <label class="block text-sm text-neutral-300 mb-2">{{ __('messages.settings_footer_links') }}</label>
+            <p class="text-xs text-neutral-500 mb-3">{{ __('messages.settings_footer_links_help') }}</p>
+            <div class="space-y-2">
+                @foreach($footerLinks as $i => $link)
+                    <div class="flex gap-2">
+                        <input type="text" name="footer_links[{{ $i }}][label]"
+                               value="{{ old('footer_links.'.$i.'.label', $link['label']) }}"
+                               placeholder="{{ __('messages.settings_footer_link_label') }}"
+                               maxlength="60"
+                               class="w-1/3 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">
+                        <input type="url" name="footer_links[{{ $i }}][url]"
+                               value="{{ old('footer_links.'.$i.'.url', $link['url']) }}"
+                               placeholder="https://…"
+                               maxlength="1024"
+                               class="flex-1 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
         <div class="pt-2">
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded">
                 {{ __('messages.settings_save') }}

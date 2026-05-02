@@ -108,9 +108,16 @@
     </main>
 
     <footer class="border-t border-neutral-800 mt-12">
-        <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-neutral-500 flex justify-between">
+        <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-neutral-500 flex justify-between gap-4 flex-wrap">
             <span>{{ config('app.name') }}</span>
-            <span>auth: {{ $authMethod }}</span>
+            @if(!empty($footerLinks))
+                <nav class="flex items-center gap-4">
+                    @foreach($footerLinks as $link)
+                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
+                           class="text-neutral-400 hover:text-white">{{ $link['label'] }}</a>
+                    @endforeach
+                </nav>
+            @endif
         </div>
     </footer>
 </body>

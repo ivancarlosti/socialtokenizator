@@ -35,6 +35,15 @@ class AppServiceProvider extends ServiceProvider
             $logoKey    = $this->safeSetting('site_logo_key');
             $faviconKey = $this->safeSetting('site_favicon_key');
 
+            $footerLinks = [];
+            for ($i = 1; $i <= 3; $i++) {
+                $label = $this->safeSetting("footer_link_{$i}_label");
+                $url   = $this->safeSetting("footer_link_{$i}_url");
+                if ($label && $url) {
+                    $footerLinks[] = ['label' => $label, 'url' => $url];
+                }
+            }
+
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
                 'isAdmin'          => AuthMethodResolver::isAdmin(),
@@ -42,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
                 'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
                 'currentLocale'    => app()->getLocale(),
                 'supportedLocales' => Locales::supported(),
+                'footerLinks'      => $footerLinks,
             ]);
         });
     }

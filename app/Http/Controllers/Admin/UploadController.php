@@ -82,6 +82,59 @@ class UploadController extends Controller
             ->with('status', 'Image uploaded.');
     }
 
+    public function edit(string $uuid)
+    {
+        $image = Image::with(['tags', 'sources'])->where('uuid', $uuid)->firstOrFail();
+        return view('admin.edit', [
+            'image'   => $image,
+            'tagList' => $image->tags->pluck('name')->implode(', '),
+        ]);
+    }
+
+    public function update(Request $request, string $uuid)
+    {
+        $image = Image::where('uuid', $uuid)->firstOrFail();
+
+        $validated = $request->validate([
+            'description' => ['nullable', 'string', 'max:5000'],
+            'tags' => ['nullable', 'string', 'max:500'],
+            'sources' => ['nullable', 'array'],
+            'sources.*.url' => ['nullable', 'url', 'max:1024'],
+            'sources.*.label' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        DB::transaction(function () use ($image, $validated) {
+            $image->update([
+                'description' => $validated['description'] ?? null,
+            ]);
+
+            $tagIds = [];
+            foreach (explode(',', (string) ($validated['tags'] ?? '')) as $rawTag) {
+                $name = Tag::normalize($rawTag);
+                if ($name === '') continue;
+                $tag = Tag::firstOrCreate(['name' => $name]);
+                $tagIds[$tag->id] = true;
+            }
+            $image->tags()->sync(array_keys($tagIds));
+
+            $image->sources()->delete();
+            $position = 0;
+            foreach ($validated['sources'] ?? [] as $row) {
+                $url = trim((string) ($row['url'] ?? ''));
+                if ($url === '') continue;
+                Source::create([
+                    'image_id' => $image->id,
+                    'url' => $url,
+                    'label' => trim((string) ($row['label'] ?? '')) ?: null,
+                    'position' => $position++,
+                ]);
+            }
+        });
+
+        return redirect()->route('image.show', ['uuid' => $image->uuid])
+            ->with('status', __('messages.image_updated'));
+    }
+
     public function destroy(string $uuid)
     {
         $image = Image::where('uuid', $uuid)->firstOrFail();
