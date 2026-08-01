@@ -1,5 +1,7 @@
+name: socialtokenizator
+
 services:
-  app:
+  socialtokenizator:
     image: ghcr.io/ivancarlosti/.socialtokenizator:latest
     restart: unless-stopped
     env_file:
