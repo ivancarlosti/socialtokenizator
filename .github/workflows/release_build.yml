@@ -1,20 +1,20 @@
-name: Build, Push, Publish
+# ──────────────────────────────────────────────
+# DEPRECATED — superseded by:
+#   .github/workflows/semantic-release.yml  (version + release)
+#   .github/workflows/build.yml             (Docker + ZIP)
+#
+# Kept for reference. All triggers disabled.
+# ──────────────────────────────────────────────
+
+name: Build, Push, Publish (DEPRECATED)
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-  schedule:
-    - cron: '28 5 * * *'
-  workflow_run:
-    workflows: ["Sync Repo"]
-    types:
-      - completed
+  workflow_dispatch:  # manual only, for emergency fallback
 
 jobs:
   release:
     name: Build & Release
+    if: false  # disabled — use semantic-release.yml + build.yml instead
     runs-on: ubuntu-latest
     permissions:
       contents: write
