@@ -3,8 +3,10 @@ name: socialtokenizator
 services:
   socialtokenizator:
     image: ghcr.io/ivancarlosti/.socialtokenizator:latest
-    restart: unless-stopped
     env_file:
       - .env
     ports:
       - "${PORT:-8080}:80"
+    restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway

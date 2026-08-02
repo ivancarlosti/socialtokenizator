@@ -63,7 +63,8 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
                                                            │ MySQL (TCP)
                                                            ▼
                                             ┌──────────────────────────────┐
-                                            │  mysql container (compose)   │
+                                            │   external MySQL / MariaDB   │
+                                            │        (you provide)         │
                                             └──────────────────────────────┘
 
                                Cloudflare R2 (object storage, public read URL)
@@ -73,6 +74,7 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
 
 - The app container exposes only port **80** internally; the host port (default `8767`) is set by `PORT`.
 - Image bytes never live in the container or in MySQL — only the R2 object key + metadata.
+- The compose file does **not** include a MySQL service — you point the app at an existing database via `DB_HOST`.
 
 ---
 
@@ -105,7 +107,7 @@ docker compose pull
 docker compose up -d
 ```
 
-Visit `http://<host>:8767` (or your proxied domain). On first boot the app waits for MySQL, runs migrations, then starts serving.
+Visit `http://<host>:8767` (or your proxied domain). On first boot the app waits for the database to be reachable, runs migrations, then starts serving.
 
 ---
 
@@ -124,8 +126,7 @@ All variables live in `/docker/.env`. The full template with comments is `/docke
 | `DOMAIN` | Used by reverse-proxy snippets (Traefik labels, etc.) |
 | `LOG_CHANNEL` / `LOG_LEVEL` | Logs go to container stderr by default |
 | `SESSION_SECURE_COOKIE` | `true` when serving over HTTPS |
-| `DB_HOST` … `DB_PASSWORD` | MySQL connection (the compose `mysql` service uses these) |
-| `MYSQL_ROOT_PASSWORD` | Root password for the MySQL container itself |
+| `DB_HOST` … `DB_PASSWORD` | MySQL connection — point these at your external database server |
 | `FILESYSTEM_DISK` | Always `r2` for production |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 API token credentials |
 | `R2_BUCKET` | Bucket name |
@@ -165,7 +166,7 @@ After changing `.env`, restart: `docker compose up -d` (Compose recreates the co
    - **Custom domain (recommended)**
      - Bucket → **Settings** → **Public access** → **Connect Domain** → enter a subdomain you control on Cloudflare (e.g. `images.socialtokenizator.example.com`). Cloudflare provisions DNS + TLS.
      - Set `R2_PUBLIC_URL=https://images.socialtokenizator.example.com`.
-   - **`r2.dev` subdomain (quick, not for production traffic)**
+   - **`r2.dev` subdomain (quick, not for production use)**
      - Bucket → **Settings** → **Public access** → enable **Allow Access** for the `pub-…r2.dev` URL.
      - Set `R2_PUBLIC_URL=https://pub-xxxxxxxx.r2.dev`.
 
@@ -300,14 +301,14 @@ Migrations run automatically on container start.
 ### Logs
 
 ```bash
-docker compose logs -f app
+docker compose logs -f socialtokenizator
 ```
 
 PHP-FPM, nginx, and the entrypoint script all stream to the container's stdout/stderr.
 
 ### Backups
 
-- **MySQL** — back up the bind-mounted `./mysql` directory (or use `mysqldump` from the container).
+- **MySQL** — back up your external database using `mysqldump` or your preferred backup tool.
 - **Images** — they live in R2; use Cloudflare R2's lifecycle / replication tools, or `rclone` against the S3 endpoint, depending on your retention plan.
 
 ### Verifying social-share previews
@@ -325,8 +326,8 @@ Both tools should show the image and description from your image detail page.
 
 | Symptom | Likely cause / fix |
 |---|---|
-| `502 Bad Gateway` on first boot | The app is still waiting for MySQL. `docker compose logs app` should show `Waiting for MySQL…`. Wait ~20 s. |
-| `SQLSTATE[HY000] [2002]` | MySQL never became reachable. Check `MYSQL_ROOT_PASSWORD` matches between MySQL service env and the healthcheck. |
+| `502 Bad Gateway` on first boot | The app is still waiting for the database. `docker compose logs socialtokenizator` should show `Waiting for MySQL…`. Wait ~20 s. |
+| `SQLSTATE[HY000] [2002]` | Database never became reachable. Check `DB_HOST`, `DB_PORT`, `DB_USERNAME`, and `DB_PASSWORD` in your `.env`. |
 | Images return `403` from R2 | Bucket public access not configured. Either enable the `r2.dev` URL or attach a custom domain. Re-check `R2_PUBLIC_URL`. |
 | Images upload but display broken | `R2_PUBLIC_URL` mismatch with where the bucket is actually served. Open the image in a new tab — the URL should load directly. |
 | OG/Twitter previews stale | Social platforms cache aggressively. Use the *Sharing Debugger* / *Card Validator* and click "scrape again". |
