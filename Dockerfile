@@ -10,7 +10,8 @@ RUN composer install \
         --no-scripts \
         --no-autoloader \
         --no-interaction \
-        --prefer-dist
+        --prefer-dist \
+        --no-security-blocking
 
 # Copy the rest of the source so the autoloader can be generated
 COPY . .
