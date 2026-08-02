@@ -1,16 +1,16 @@
 # socialtokenizator
 
 <!-- buttons -->
-[![Stars](https://img.shields.io/github/stars/ivancarlosti/socialtokenizator?label=⭐%20Stars&color=gold&style=flat)](https://github.com/ivancarlosti/socialtokenizator/stargazers)
-[![Watchers](https://img.shields.io/github/watchers/ivancarlosti/socialtokenizator?label=Watchers&style=flat&color=red)](https://github.com/sponsors/ivancarlosti)
-[![Forks](https://img.shields.io/github/forks/ivancarlosti/socialtokenizator?label=Forks&style=flat&color=ff69b4)](https://github.com/sponsors/ivancarlosti)
-[![Downloads](https://img.shields.io/github/downloads/ivancarlosti/socialtokenizator/total?label=Downloads&color=success)](https://github.com/ivancarlosti/socialtokenizator/releases)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ivancarlosti/socialtokenizator?label=Activity)](https://github.com/ivancarlosti/socialtokenizator/pulse)
-[![GitHub Issues](https://img.shields.io/github/issues/ivancarlosti/socialtokenizator?label=Issues&color=orange)](https://github.com/ivancarlosti/socialtokenizator/issues)  
-[![License](https://img.shields.io/github/license/ivancarlosti/socialtokenizator?label=License)](LICENSE)
-[![GitHub last commit](https://img.shields.io/github/last-commit/ivancarlosti/socialtokenizator?label=Last%20Commit)](https://github.com/ivancarlosti/socialtokenizator/commits)
-[![Security](https://img.shields.io/badge/Security-View%20Here-purple)](https://github.com/ivancarlosti/socialtokenizator/security)
-[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-2.1-4baaaa)](https://github.com/ivancarlosti/socialtokenizator?tab=coc-ov-file)
+[![Stars](https://img.shields.io/github/stars/ivancarlosti/.socialtokenizator?label=⭐%20Stars&color=gold&style=flat)](https://github.com/ivancarlosti/.socialtokenizator/stargazers)
+[![Watchers](https://img.shields.io/github/watchers/ivancarlosti/.socialtokenizator?label=Watchers&style=flat&color=red)](https://github.com/sponsors/ivancarlosti)
+[![Forks](https://img.shields.io/github/forks/ivancarlosti/.socialtokenizator?label=Forks&style=flat&color=ff69b4)](https://github.com/sponsors/ivancarlosti)
+[![Downloads](https://img.shields.io/github/downloads/ivancarlosti/.socialtokenizator/total?label=Downloads&color=success)](https://github.com/ivancarlosti/.socialtokenizator/releases)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ivancarlosti/.socialtokenizator?label=Activity)](https://github.com/ivancarlosti/.socialtokenizator/pulse)
+[![GitHub Issues](https://img.shields.io/github/issues/ivancarlosti/.socialtokenizator?label=Issues&color=orange)](https://github.com/ivancarlosti/.socialtokenizator/issues)  
+[![License](https://img.shields.io/github/license/ivancarlosti/.socialtokenizator?label=License)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ivancarlosti/.socialtokenizator?label=Last%20Commit)](https://github.com/ivancarlosti/.socialtokenizator/commits)
+[![Security](https://img.shields.io/badge/Security-View%20Here-purple)](https://github.com/ivancarlosti/.socialtokenizator/security)
+[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-2.1-4baaaa)](https://github.com/ivancarlosti/.socialtokenizator?tab=coc-ov-file)
 <!-- endbuttons -->
 
 A self-hosted, single-container image-sharing web app:
