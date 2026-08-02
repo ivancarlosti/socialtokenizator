@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    name: Package & Push
+    name: 📦 Package & Push
     runs-on: ubuntu-latest
 
     steps:

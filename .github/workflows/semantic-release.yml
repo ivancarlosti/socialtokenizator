@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   release:
-    name: Determine Version & Create Release
+    name: 🏷️ Determine Version & Create Release
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.semantic.outputs.new_release_version }}
