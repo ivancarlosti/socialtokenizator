@@ -33,10 +33,13 @@ jobs:
           VERSION="${TAG#v}"
           REPO_NAME="$(basename "$GITHUB_REPOSITORY")"
           ZIP_NAME="${REPO_NAME}-${VERSION}.zip"
+          # Docker registries reject path segments starting with "." or "-"
+          DOCKER_REPO="${REPO_NAME#.}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "zip_name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
           echo "repo_name=$REPO_NAME" >> "$GITHUB_OUTPUT"
+          echo "docker_repo=$DOCKER_REPO" >> "$GITHUB_OUTPUT"
 
       - name: 📦 Create ZIP package
         run: |
@@ -85,5 +88,5 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/${{ steps.version.outputs.docker_repo }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ steps.version.outputs.docker_repo }}:${{ steps.version.outputs.version }}
