@@ -19,6 +19,7 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  actions: write       # required to dispatch build.yml workflow
 
 jobs:
   release:
@@ -63,3 +64,12 @@ jobs:
           else
             echo "new_release_published=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: 🔔 Trigger package build workflow
+        if: steps.semantic.outputs.new_release_published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Dispatching build.yml for version v${{ steps.semantic.outputs.new_release_version }}"
+          gh workflow run build.yml \
+            -f version="v${{ steps.semantic.outputs.new_release_version }}"
