@@ -1,42 +1,98 @@
 @extends('layouts.app')
 
+@section('title', __('messages.home_heading').' — '.config('app.name'))
+
 @section('content')
-    <section class="text-center mb-10">
-        <h1 class="text-3xl font-semibold text-white">{{ __('messages.home_heading') }}</h1>
-        <p class="text-neutral-400 mt-1 text-sm">{{ __('messages.home_subheading') }}</p>
+    <section class="text-center mb-8">
+        <h1 class="text-3xl font-semibold text-copy">{{ __('messages.home_heading') }}</h1>
+        <p class="text-muted mt-1 text-sm">{{ __('messages.home_subheading') }}</p>
     </section>
 
-    @if($image)
-        <article class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
-            <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}" class="block">
-                <img src="{{ $image->public_url }}" alt="{{ $image->description }}"
-                     class="w-full max-h-[70vh] object-contain bg-black">
-            </a>
-            <div class="p-4">
-                @if($image->description)
-                    <p class="text-neutral-200">{!! nl2br(e(\Illuminate\Support\Str::limit($image->description, 240))) !!}</p>
-                @endif
-                @if($image->tags->isNotEmpty())
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        @foreach($image->tags as $tag)
-                            <a href="{{ route('search', ['q' => $tag->name]) }}"
-                               class="text-xs bg-neutral-800 border border-neutral-700 rounded px-2 py-0.5 text-neutral-300 hover:text-white">
-                                #{{ $tag->name }}
-                            </a>
-                        @endforeach
-                    </div>
-                @endif
-                <div class="mt-3 text-xs text-neutral-500">
-                    <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}">{{ __('messages.view_detail') }}</a>
-                </div>
+    {{-- Category filter chips --}}
+    @if($categories->isNotEmpty())
+        <div class="mb-8">
+            <p class="text-xs uppercase tracking-wide text-muted mb-2">{{ __('messages.filter_by_category') }}</p>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('home') }}"
+                   class="inline-block px-3 py-1.5 rounded-full text-sm border transition-colors
+                          {{ $category === '' ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
+                    {{ __('messages.all_categories') }}
+                </a>
+                @foreach($categories as $cat)
+                    <a href="{{ route('home', ['category' => $cat->name]) }}"
+                       class="inline-block px-3 py-1.5 rounded-full text-sm border transition-colors
+                              {{ $category === $cat->name ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
+                        {{ $cat->name }}
+                    </a>
+                @endforeach
             </div>
-        </article>
-    @else
-        <div class="text-center text-neutral-400 py-16 border border-dashed border-neutral-700 rounded">
-            {{ __('messages.home_no_images') }}
-            @if($isAdmin)
-                <a href="{{ route('admin.upload.create') }}" class="text-emerald-400">{{ __('messages.home_upload_first') }}</a>
+        </div>
+    @endif
+
+    {{-- Feed --}}
+    @if($images->isEmpty())
+        <div class="text-center text-muted py-16 border border-dashed border-card-border rounded">
+            @if($category !== '')
+                {{ __('messages.no_posts') }}
+            @else
+                {{ __('messages.home_no_images') }}
+                @if($isAdmin)
+                    <a href="{{ route('admin.upload.create') }}" class="text-accent">{{ __('messages.home_upload_first') }}</a>
+                @endif
             @endif
+        </div>
+    @else
+        <div class="space-y-8">
+            @foreach($images as $img)
+                <article class="bg-card border border-card-border rounded-lg overflow-hidden">
+                    <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="block">
+                        <img src="{{ $img->public_url }}" alt="{{ $img->description }}"
+                             class="w-full max-h-[80vh] object-contain bg-black">
+                    </a>
+                    <div class="p-5">
+                        @if($img->description)
+                            <p class="text-copy text-base leading-relaxed">{!! nl2br(e($img->description)) !!}</p>
+                        @endif
+
+                        @if($img->tags->isNotEmpty())
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                @foreach($img->tags as $tag)
+                                    <a href="{{ route('home', ['category' => $tag->name]) }}"
+                                       class="text-xs bg-card border border-card-border rounded px-2 py-0.5 text-muted hover:text-copy">
+                                        #{{ $tag->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if($img->sources->isNotEmpty())
+                            <div class="mt-4">
+                                <h3 class="text-xs uppercase tracking-wide text-muted mb-2">{{ __('messages.image_sources') }}</h3>
+                                <ul class="space-y-1 text-sm">
+                                    @foreach($img->sources as $src)
+                                        <li>
+                                            <a href="{{ $src->url }}" target="_blank" rel="noopener noreferrer ugc"
+                                               class="text-link hover:text-link-hover">
+                                                {{ $src->label ?: $src->url }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mt-4 text-xs text-muted">
+                            <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="text-link">
+                                {{ __('messages.view_detail') }}
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        <div class="mt-10">
+            {{ $images->links() }}
         </div>
     @endif
 @endsection

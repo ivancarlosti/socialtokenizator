@@ -3,20 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Image;
+use App\Models\Setting;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $image = Image::inRandomOrder()->with(['tags', 'sources'])->first();
-        return view('home', compact('image'));
+        $category = trim((string) $request->query('category', ''));
+        $perPage = max(1, min(100, (int) Setting::get('posts_per_page', 12)));
+
+        $query = Image::query()->with(['tags', 'sources']);
+
+        if ($category !== '') {
+            $query->whereHas('tags', function ($q) use ($category) {
+                $q->where('name', Tag::normalize($category));
+            });
+        }
+
+        $images = $query->latest()->paginate($perPage)->withQueryString();
+        $categories = Tag::orderBy('name')->get();
+
+        return view('home', compact('images', 'categories', 'category'));
     }
 
     public function search(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
+        $perPage = max(1, min(100, (int) Setting::get('posts_per_page', 12)));
 
         $query = Image::query()->with('tags');
 
@@ -30,7 +45,7 @@ class HomeController extends Controller
             });
         }
 
-        $images = $query->latest()->paginate(24)->withQueryString();
+        $images = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('search', compact('images', 'q'));
     }

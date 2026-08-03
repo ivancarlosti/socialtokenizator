@@ -34,22 +34,22 @@
 @endsection
 
 @section('content')
-    <article class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
+    <article class="bg-card border border-card-border rounded-lg overflow-hidden">
         <img src="{{ $imgUrl }}" alt="{{ $image->description }}"
              class="w-full max-h-[80vh] object-contain bg-black">
 
         <div class="p-5">
             @if($image->description)
-                <p class="text-neutral-100 text-base leading-relaxed">{!! nl2br(e($image->description)) !!}</p>
+                <p class="text-copy text-base leading-relaxed">{!! nl2br(e($image->description)) !!}</p>
             @else
-                <p class="text-neutral-500 italic">{{ __('messages.image_no_description') }}</p>
+                <p class="text-muted italic">{{ __('messages.image_no_description') }}</p>
             @endif
 
             @if($image->tags->isNotEmpty())
                 <div class="mt-4 flex flex-wrap gap-2">
                     @foreach($image->tags as $tag)
-                        <a href="{{ route('search', ['q' => $tag->name]) }}"
-                           class="text-xs bg-neutral-800 border border-neutral-700 rounded px-2 py-0.5 text-neutral-300 hover:text-white">
+                        <a href="{{ route('home', ['category' => $tag->name]) }}"
+                           class="text-xs bg-card border border-card-border rounded px-2 py-0.5 text-muted hover:text-copy">
                             #{{ $tag->name }}
                         </a>
                     @endforeach
@@ -58,11 +58,12 @@
 
             @if($image->sources->isNotEmpty())
                 <div class="mt-6">
-                    <h2 class="text-sm uppercase tracking-wide text-neutral-400 mb-2">{{ __('messages.image_sources') }}</h2>
+                    <h2 class="text-sm uppercase tracking-wide text-muted mb-2">{{ __('messages.image_sources') }}</h2>
                     <ul class="space-y-1 text-sm">
                         @foreach($image->sources as $src)
                             <li>
-                                <a href="{{ $src->url }}" target="_blank" rel="noopener noreferrer ugc">
+                                <a href="{{ $src->url }}" target="_blank" rel="noopener noreferrer ugc"
+                                   class="text-link">
                                     {{ $src->label ?: $src->url }}
                                 </a>
                             </li>
@@ -96,7 +97,7 @@
             @if($isAdmin)
                 <div class="mt-6 flex items-center gap-4">
                     <a href="{{ route('admin.images.edit', ['uuid' => $image->uuid]) }}"
-                       class="text-xs text-emerald-400 hover:text-emerald-300">{{ __('messages.edit_image') }}</a>
+                       class="text-xs text-accent">{{ __('messages.edit_image') }}</a>
                     <form method="post" action="{{ route('admin.images.destroy', ['uuid' => $image->uuid]) }}"
                           onsubmit="return confirm('{{ __('messages.confirm_delete_image') }}');"
                           class="inline">

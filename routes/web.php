@@ -1,6 +1,7 @@
 <?php
 
 use App\Auth\AuthMethodResolver;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Auth\AccountAuthController;
@@ -36,6 +37,10 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('/images/{uuid}/edit', [UploadController::class, 'edit'])->name('admin.images.edit');
     Route::put('/images/{uuid}', [UploadController::class, 'update'])->name('admin.images.update');
     Route::delete('/images/{uuid}', [UploadController::class, 'destroy'])->name('admin.images.destroy');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/categories/{tag}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/categories/{tag}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
 });

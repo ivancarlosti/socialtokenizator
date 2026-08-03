@@ -9,13 +9,18 @@ return [
     'login'              => 'Entrar',
     'logout'             => 'Sair',
     'language'           => 'Idioma',
+    'theme_toggle_light' => 'Mudar para modo claro',
+    'theme_toggle_dark'  => 'Mudar para modo escuro',
 
-    // Home
-    'home_heading'       => 'Escolha aleatória',
-    'home_subheading'    => 'Atualize para outra imagem ou pesquise acima.',
+    // Home / Feed
+    'home_heading'       => 'Feed',
+    'home_subheading'    => 'Navegue pelas imagens por categoria.',
     'home_no_images'     => 'Ainda não há imagens.',
     'home_upload_first'  => 'Envie a primeira.',
     'view_detail'        => 'Ver detalhe →',
+    'all_categories'     => 'Todas',
+    'filter_by_category' => 'Filtrar por categoria',
+    'no_posts'           => 'Nenhum post encontrado para esta categoria.',
 
     // Search
     'search_results_for' => 'Resultados para ":q"',
@@ -50,6 +55,20 @@ return [
     'label_optional'       => 'Rótulo (opcional)',
     'submit_upload'        => 'Enviar',
 
+    // Admin categories
+    'admin_categories'          => 'Categorias',
+    'categories_heading'        => 'Gerenciar categorias',
+    'category_name'             => 'Nome da categoria',
+    'category_add'              => 'Adicionar categoria',
+    'category_rename'           => 'Renomear',
+    'category_delete'           => 'Excluir',
+    'category_confirm_delete'   => 'Excluir esta categoria? Ela será removida de todas as imagens.',
+    'category_created'          => 'Categoria criada.',
+    'category_updated'          => 'Categoria renomeada.',
+    'category_deleted'          => 'Categoria excluída.',
+    'category_name_taken'       => 'Esta categoria já existe.',
+    'category_images_count'     => '{0} nenhuma imagem|{1} 1 imagem|[2,*] :count imagens',
+
     // Admin settings
     'settings_heading'         => 'Configurações do site',
     'settings_logo'            => 'Logo do site (substitui o texto do cabeçalho)',
@@ -59,6 +78,8 @@ return [
     'settings_favicon_help'    => 'PNG, ICO, SVG, WEBP — máx 512 KB.',
     'settings_favicon_remove'  => 'Remover favicon atual',
     'settings_default_locale'  => 'Idioma padrão',
+    'settings_posts_per_page'  => 'Posts por página',
+    'settings_posts_per_page_help' => 'Número de imagens exibidas em cada página do feed (1–100).',
     'settings_footer_links'    => 'Links no rodapé (até 3)',
     'settings_footer_links_help' => 'Exibidos no lado direito do rodapé. Deixe os dois campos vazios para remover um link.',
     'settings_footer_link_label' => 'Rótulo',

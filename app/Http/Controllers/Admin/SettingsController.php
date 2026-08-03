@@ -25,6 +25,7 @@ class SettingsController extends Controller
             'logoUrl'        => Setting::publicUrl(Setting::get('site_logo_key')),
             'faviconUrl'     => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'  => Setting::get('default_locale', config('app.locale')),
+            'postsPerPage'   => Setting::get('posts_per_page', '12'),
             'locales'        => Locales::supported(),
             'footerLinkRows' => $footerLinkRows,
         ]);
@@ -38,6 +39,7 @@ class SettingsController extends Controller
             'favicon'               => ['nullable', 'file', 'mimes:png,ico,svg,webp', 'max:512'],
             'remove_favicon'        => ['nullable', 'boolean'],
             'default_locale'        => ['required', 'string', 'in:'.implode(',', array_keys(Locales::supported()))],
+            'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
             'footer_links.*.url'    => ['nullable', 'url', 'max:1024'],
@@ -62,6 +64,7 @@ class SettingsController extends Controller
         }
 
         Setting::put('default_locale', $validated['default_locale']);
+        Setting::put('posts_per_page', (string) $validated['posts_per_page']);
 
         $footerLinks = $validated['footer_links'] ?? [];
         for ($i = 1; $i <= 3; $i++) {

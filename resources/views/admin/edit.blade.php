@@ -3,7 +3,7 @@
 @section('title', __('messages.edit_image_heading').' — '.config('app.name'))
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-white">{{ __('messages.edit_image_heading') }}</h1>
+    <h1 class="text-2xl font-semibold text-copy">{{ __('messages.edit_image_heading') }}</h1>
 
     @if($errors->any())
         <div class="mt-4 bg-red-900/30 border border-red-700 text-red-200 rounded px-4 py-2 text-sm">
@@ -13,30 +13,30 @@
         </div>
     @endif
 
-    <div class="mt-4 bg-neutral-900 border border-neutral-800 rounded p-3 inline-block">
+    <div class="mt-4 bg-card border border-card-border rounded p-3 inline-block">
         <img src="{{ $image->public_url }}" alt="" class="max-h-48 w-auto bg-black">
     </div>
 
     <form method="post" action="{{ route('admin.images.update', ['uuid' => $image->uuid]) }}"
-          class="mt-6 space-y-4 bg-neutral-900 border border-neutral-800 rounded p-5">
+          class="mt-6 space-y-4 bg-card border border-card-border rounded p-5">
         @csrf
         @method('PUT')
 
         <div>
-            <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.description') }}</label>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.description') }}</label>
             <textarea name="description" rows="5" maxlength="5000"
-                      class="w-full bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">{{ old('description', $image->description) }}</textarea>
+                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">{{ old('description', $image->description) }}</textarea>
         </div>
 
         <div>
-            <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.tags') }}</label>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.tags') }}</label>
             <input type="text" name="tags" value="{{ old('tags', $tagList) }}"
-                   class="w-full bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm"
+                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
                    placeholder="{{ __('messages.tags_placeholder') }}">
         </div>
 
         <div>
-            <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.source_links') }}</label>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.source_links') }}</label>
             <div id="sources" class="space-y-2"></div>
             <button type="button" id="add-source"
                     class="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 px-2 py-1 rounded">
@@ -45,11 +45,11 @@
         </div>
 
         <div class="pt-2 flex gap-3">
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded">
+            <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-medium px-4 py-2 rounded">
                 {{ __('messages.save_changes') }}
             </button>
             <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}"
-               class="text-neutral-400 hover:text-white px-3 py-2 text-sm">
+               class="text-muted hover:text-copy px-3 py-2 text-sm">
                 {{ __('messages.cancel') }}
             </a>
         </div>

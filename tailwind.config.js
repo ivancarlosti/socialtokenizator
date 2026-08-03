@@ -4,6 +4,7 @@ export default {
         './resources/views/**/*.blade.php',
         './app/**/*.php',
     ],
+    darkMode: 'class',
     theme: {
         extend: {},
     },

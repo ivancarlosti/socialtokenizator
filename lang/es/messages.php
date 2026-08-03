@@ -9,13 +9,18 @@ return [
     'login'              => 'Iniciar sesión',
     'logout'             => 'Cerrar sesión',
     'language'           => 'Idioma',
+    'theme_toggle_light' => 'Cambiar a modo claro',
+    'theme_toggle_dark'  => 'Cambiar a modo oscuro',
 
-    // Home
-    'home_heading'       => 'Elección aleatoria',
-    'home_subheading'    => 'Actualiza para otra imagen, o busca arriba.',
+    // Home / Feed
+    'home_heading'       => 'Feed',
+    'home_subheading'    => 'Explora imágenes por categoría.',
     'home_no_images'     => 'Aún no hay imágenes.',
     'home_upload_first'  => 'Sube la primera.',
     'view_detail'        => 'Ver detalle →',
+    'all_categories'     => 'Todas',
+    'filter_by_category' => 'Filtrar por categoría',
+    'no_posts'           => 'No se encontraron posts para esta categoría.',
 
     // Search
     'search_results_for' => 'Resultados para ":q"',
@@ -50,6 +55,20 @@ return [
     'label_optional'       => 'Etiqueta (opcional)',
     'submit_upload'        => 'Subir',
 
+    // Admin categories
+    'admin_categories'          => 'Categorías',
+    'categories_heading'        => 'Gestionar categorías',
+    'category_name'             => 'Nombre de la categoría',
+    'category_add'              => 'Agregar categoría',
+    'category_rename'           => 'Renombrar',
+    'category_delete'           => 'Eliminar',
+    'category_confirm_delete'   => '¿Eliminar esta categoría? Se quitará de todas las imágenes.',
+    'category_created'          => 'Categoría creada.',
+    'category_updated'          => 'Categoría renombrada.',
+    'category_deleted'          => 'Categoría eliminada.',
+    'category_name_taken'       => 'Esta categoría ya existe.',
+    'category_images_count'     => '{0} ninguna imagen|{1} 1 imagen|[2,*] :count imágenes',
+
     // Admin settings
     'settings_heading'         => 'Configuración del sitio',
     'settings_logo'            => 'Logo del sitio (reemplaza el texto del encabezado)',
@@ -59,6 +78,8 @@ return [
     'settings_favicon_help'    => 'PNG, ICO, SVG, WEBP — máx 512 KB.',
     'settings_favicon_remove'  => 'Eliminar favicon actual',
     'settings_default_locale'  => 'Idioma predeterminado',
+    'settings_posts_per_page'  => 'Posts por página',
+    'settings_posts_per_page_help' => 'Número de imágenes mostradas en cada página del feed (1–100).',
     'settings_footer_links'    => 'Enlaces del pie de página (hasta 3)',
     'settings_footer_links_help' => 'Mostrados en el lado derecho del pie de página. Deja ambos campos vacíos para eliminar un enlace.',
     'settings_footer_link_label' => 'Etiqueta',
