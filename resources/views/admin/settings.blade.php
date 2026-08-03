@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.settings').' — '.config('app.name'))
+@section('title', __('messages.settings').' — '.$siteTitle)
 
 @section('content')
     <h1 class="text-2xl font-semibold text-copy">{{ __('messages.settings_heading') }}</h1>
@@ -71,6 +71,46 @@
                    min="1" max="100" required
                    class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
             <p class="mt-1 text-xs text-muted">{{ __('messages.settings_posts_per_page_help') }}</p>
+        </div>
+
+        {{-- Site handle --}}
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_site_handle') }}</label>
+            <input type="text" name="site_handle" value="{{ old('site_handle', $siteHandle) }}"
+                   placeholder="my-site-handle"
+                   maxlength="64"
+                   class="w-64 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_site_handle_help') }}</p>
+        </div>
+
+        {{-- Site title & subtitle per locale --}}
+        <div>
+            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_site_title_subtitle') }}</label>
+            <div class="space-y-4">
+                @foreach($locales as $code => $info)
+                    <div class="border border-card-border rounded p-3">
+                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }} ({{ $code }})</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_title') }}</label>
+                                <input type="text" name="site_title_{{ $code }}"
+                                       value="{{ old("site_title_{$code}", $titleRows[$code] ?? '') }}"
+                                       placeholder="{{ config('app.name') }}"
+                                       maxlength="120"
+                                       class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_subtitle') }}</label>
+                                <input type="text" name="site_subtitle_{{ $code }}"
+                                       value="{{ old("site_subtitle_{$code}", $subtitleRows[$code] ?? '') }}"
+                                       placeholder="{{ __('messages.settings_site_subtitle_placeholder') }}"
+                                       maxlength="200"
+                                       class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         {{-- Footer links --}}

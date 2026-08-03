@@ -1,11 +1,20 @@
 @extends('layouts.app')
 
-@section('title', __('messages.home_heading').' — '.config('app.name'))
+@php
+    $homeTitle = $siteTitle;
+    if ($siteSubtitle) {
+        $homeTitle .= ' — ' . $siteSubtitle;
+    }
+@endphp
+
+@section('title', $homeTitle)
 
 @section('content')
     <section class="text-center mb-8">
-        <h1 class="text-3xl font-semibold text-copy">{{ __('messages.home_heading') }}</h1>
-        <p class="text-muted mt-1 text-sm">{{ __('messages.home_subheading') }}</p>
+        <h1 class="text-3xl font-semibold text-copy">{{ $siteTitle }}</h1>
+        @if($siteSubtitle)
+            <p class="text-muted mt-1 text-sm">{{ $siteSubtitle }}</p>
+        @endif
     </section>
 
     {{-- Category filter chips --}}

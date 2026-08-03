@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', $siteTitle)</title>
 
     @if($siteFaviconUrl)
         <link rel="icon" href="{{ $siteFaviconUrl }}">
@@ -14,8 +14,8 @@
         @yield('meta')
     @else
         @php
-            $defaultTitle = trim(View::getSection('title') ?: config('app.name'));
-            $defaultDesc  = __('messages.shared_via', ['app' => config('app.name')]);
+            $defaultTitle = trim(View::getSection('title') ?: $siteTitle);
+            $defaultDesc  = $siteSubtitle ?: __('messages.shared_via', ['app' => $siteTitle]);
             $defaultUrl   = url()->current();
             $defaultImg   = $siteLogoUrl;
         @endphp
@@ -24,7 +24,7 @@
         <meta property="og:description" content="{{ $defaultDesc }}">
         <meta property="og:url" content="{{ $defaultUrl }}">
         <meta property="og:type" content="website">
-        <meta property="og:site_name" content="{{ config('app.name') }}">
+        <meta property="og:site_name" content="{{ $siteTitle }}">
         @if($defaultImg)
             <meta property="og:image" content="{{ $defaultImg }}">
             <meta name="twitter:card" content="summary_large_image">
@@ -44,9 +44,9 @@
         <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4 flex-wrap">
             <a href="{{ route('home') }}" class="flex items-center gap-2 text-xl font-semibold tracking-tight text-copy">
                 @if($siteLogoUrl)
-                    <img src="{{ $siteLogoUrl }}" alt="{{ config('app.name') }}" class="h-8 w-auto">
+                    <img src="{{ $siteLogoUrl }}" alt="{{ $siteTitle }}" class="h-8 w-auto">
                 @else
-                    {{ config('app.name') }}
+                    {{ $siteTitle }}
                 @endif
             </a>
             <nav class="flex items-center gap-3 text-sm flex-wrap">
@@ -118,7 +118,7 @@
 
     <footer class="border-t mt-12" style="border-color: var(--color-footer-border);">
         <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-muted flex justify-between gap-4 flex-wrap">
-            <span>{{ config('app.name') }}</span>
+            <span>{{ $siteTitle }}</span>
             @if(!empty($footerLinks))
                 <nav class="flex items-center gap-4">
                     @foreach($footerLinks as $link)

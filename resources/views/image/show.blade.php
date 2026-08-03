@@ -1,32 +1,38 @@
 @extends('layouts.app')
 
 @php
-    $title = $image->description
-        ? \Illuminate\Support\Str::limit($image->description, 60)
-        : config('app.name');
+    $headline = $image->headline
+        ?: ($image->description
+            ? \Illuminate\Support\Str::limit($image->description, 60)
+            : null);
+
+    $pageTitle = $headline
+        ? $siteTitle . ' — ' . $headline
+        : $siteTitle;
+
     $shortDesc = $image->description
         ? \Illuminate\Support\Str::limit($image->description, 200)
-        : __('messages.shared_via', ['app' => config('app.name')]);
+        : __('messages.shared_via', ['app' => $siteTitle]);
     $shareUrl = url()->current();
     $imgUrl = $image->public_url;
 @endphp
 
-@section('title', $title)
+@section('title', $pageTitle)
 
 @section('meta')
     <meta name="description" content="{{ $shortDesc }}">
 
-    <meta property="og:title" content="{{ $title }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $shortDesc }}">
     <meta property="og:image" content="{{ $imgUrl }}">
     @if($image->width)<meta property="og:image:width" content="{{ $image->width }}">@endif
     @if($image->height)<meta property="og:image:height" content="{{ $image->height }}">@endif
     <meta property="og:url" content="{{ $shareUrl }}">
     <meta property="og:type" content="article">
-    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:site_name" content="{{ $siteTitle }}">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $title }}">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
     <meta name="twitter:description" content="{{ $shortDesc }}">
     <meta name="twitter:image" content="{{ $imgUrl }}">
 
@@ -39,6 +45,9 @@
              class="w-full max-h-[80vh] object-contain bg-black">
 
         <div class="p-5">
+            @if($image->headline)
+                <h1 class="text-xl font-semibold text-copy mb-3">{{ $image->headline }}</h1>
+            @endif
             @if($image->description)
                 <p class="text-copy text-base leading-relaxed">{!! nl2br(e($image->description)) !!}</p>
             @else

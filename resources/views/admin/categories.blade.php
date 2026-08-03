@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.categories_heading').' — '.config('app.name'))
+@section('title', __('messages.categories_heading').' — '.$siteTitle)
 
 @section('content')
     <h1 class="text-2xl font-semibold text-copy">{{ __('messages.categories_heading') }}</h1>

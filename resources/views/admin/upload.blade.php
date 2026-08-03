@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.upload_heading').' — '.config('app.name'))
+@section('title', __('messages.upload_heading').' — '.$siteTitle)
 
 @section('content')
     <h1 class="text-2xl font-semibold text-copy">{{ __('messages.upload_heading') }}</h1>
@@ -21,6 +21,14 @@
             <label class="block text-sm text-muted mb-1">{{ __('messages.upload_image_label') }}</label>
             <input type="file" name="image" required accept="image/jpeg,image/png,image/webp,image/gif"
                    class="block w-full text-sm text-muted">
+        </div>
+
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.headline') }}</label>
+            <input type="text" name="headline" value="{{ old('headline') }}"
+                   maxlength="300"
+                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                   placeholder="{{ __('messages.headline_help') }}">
         </div>
 
         <div>

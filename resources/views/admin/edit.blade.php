@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.edit_image_heading').' — '.config('app.name'))
+@section('title', __('messages.edit_image_heading').' — '.$siteTitle)
 
 @section('content')
     <h1 class="text-2xl font-semibold text-copy">{{ __('messages.edit_image_heading') }}</h1>
@@ -21,6 +21,14 @@
           class="mt-6 space-y-4 bg-card border border-card-border rounded p-5">
         @csrf
         @method('PUT')
+
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.headline') }}</label>
+            <input type="text" name="headline" value="{{ old('headline', $image->headline) }}"
+                   maxlength="300"
+                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                   placeholder="{{ __('messages.headline_help') }}">
+        </div>
 
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.description') }}</label>

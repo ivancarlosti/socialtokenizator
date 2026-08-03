@@ -44,12 +44,20 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
+            $locale        = app()->getLocale();
+            $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
+            $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
+            $siteHandle    = $this->safeSetting('site_handle');
+
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
                 'isAdmin'          => AuthMethodResolver::isAdmin(),
                 'siteLogoUrl'      => Setting::publicUrl($logoKey),
                 'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
-                'currentLocale'    => app()->getLocale(),
+                'siteTitle'        => $siteTitle,
+                'siteSubtitle'     => $siteSubtitle,
+                'siteHandle'       => $siteHandle,
+                'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,
             ]);

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('messages.search_placeholder').' — '.config('app.name'))
+@section('title', __('messages.search_placeholder').' — '.$siteTitle)
 
 @section('content')
     <h1 class="text-2xl font-semibold text-copy">

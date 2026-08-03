@@ -21,29 +21,52 @@ class SettingsController extends Controller
             ];
         }
 
+        $locales = Locales::supported();
+
+        $titleRows = [];
+        $subtitleRows = [];
+        foreach ($locales as $code => $info) {
+            $titleRows[$code] = Setting::get("site_title_{$code}", '');
+            $subtitleRows[$code] = Setting::get("site_subtitle_{$code}", '');
+        }
+
         return view('admin.settings', [
             'logoUrl'        => Setting::publicUrl(Setting::get('site_logo_key')),
             'faviconUrl'     => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'  => Setting::get('default_locale', config('app.locale')),
             'postsPerPage'   => Setting::get('posts_per_page', '12'),
-            'locales'        => Locales::supported(),
+            'siteHandle'     => Setting::get('site_handle', ''),
+            'titleRows'      => $titleRows,
+            'subtitleRows'   => $subtitleRows,
+            'locales'        => $locales,
             'footerLinkRows' => $footerLinkRows,
         ]);
     }
 
     public function update(Request $request)
     {
+        $supportedLocales = array_keys(Locales::supported());
+
         $validated = $request->validate([
             'logo'                  => ['nullable', 'file', 'mimes:jpeg,png,webp,gif,svg', 'max:2048'],
             'remove_logo'           => ['nullable', 'boolean'],
             'favicon'               => ['nullable', 'file', 'mimes:png,ico,svg,webp', 'max:512'],
             'remove_favicon'        => ['nullable', 'boolean'],
-            'default_locale'        => ['required', 'string', 'in:'.implode(',', array_keys(Locales::supported()))],
+            'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
+            'site_handle'           => ['nullable', 'string', 'max:64', 'regex:/^[a-z0-9_-]+$/'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
             'footer_links.*.url'    => ['nullable', 'url', 'max:1024'],
         ]);
+
+        // Per-locale title & subtitle
+        foreach ($supportedLocales as $locale) {
+            $request->validate([
+                "site_title_{$locale}"    => ['nullable', 'string', 'max:120'],
+                "site_subtitle_{$locale}" => ['nullable', 'string', 'max:200'],
+            ]);
+        }
 
         if ($request->boolean('remove_logo')) {
             $this->deleteCurrent('site_logo_key');
@@ -65,6 +88,30 @@ class SettingsController extends Controller
 
         Setting::put('default_locale', $validated['default_locale']);
         Setting::put('posts_per_page', (string) $validated['posts_per_page']);
+
+        // Site handle
+        $handle = trim((string) ($validated['site_handle'] ?? ''));
+        if ($handle !== '') {
+            Setting::put('site_handle', $handle);
+        } else {
+            Setting::forget('site_handle');
+        }
+
+        // Per-locale title & subtitle
+        foreach ($supportedLocales as $locale) {
+            $titleVal = trim((string) ($request->input("site_title_{$locale}", '')));
+            $subVal   = trim((string) ($request->input("site_subtitle_{$locale}", '')));
+            if ($titleVal !== '') {
+                Setting::put("site_title_{$locale}", $titleVal);
+            } else {
+                Setting::forget("site_title_{$locale}");
+            }
+            if ($subVal !== '') {
+                Setting::put("site_subtitle_{$locale}", $subVal);
+            } else {
+                Setting::forget("site_subtitle_{$locale}");
+            }
+        }
 
         $footerLinks = $validated['footer_links'] ?? [];
         for ($i = 1; $i <= 3; $i++) {

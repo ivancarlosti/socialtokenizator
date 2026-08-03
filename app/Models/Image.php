@@ -16,6 +16,7 @@ class Image extends Model
         'mime_type',
         'width',
         'height',
+        'headline',
         'description',
     ];
 

@@ -22,6 +22,7 @@ class UploadController extends Controller
     {
         $validated = $request->validate([
             'image' => ['required', 'file', 'mimes:jpeg,png,webp,gif', 'max:10240'],
+            'headline' => ['nullable', 'string', 'max:300'],
             'description' => ['nullable', 'string', 'max:5000'],
             'tags' => ['nullable', 'string', 'max:500'],
             'sources' => ['nullable', 'array'],
@@ -49,6 +50,7 @@ class UploadController extends Controller
                 'mime_type' => $file->getMimeType(),
                 'width' => $width,
                 'height' => $height,
+                'headline' => $validated['headline'] ?? null,
                 'description' => $validated['description'] ?? null,
             ]);
 
@@ -96,6 +98,7 @@ class UploadController extends Controller
         $image = Image::where('uuid', $uuid)->firstOrFail();
 
         $validated = $request->validate([
+            'headline' => ['nullable', 'string', 'max:300'],
             'description' => ['nullable', 'string', 'max:5000'],
             'tags' => ['nullable', 'string', 'max:500'],
             'sources' => ['nullable', 'array'],
@@ -105,6 +108,7 @@ class UploadController extends Controller
 
         DB::transaction(function () use ($image, $validated) {
             $image->update([
+                'headline' => $validated['headline'] ?? null,
                 'description' => $validated['description'] ?? null,
             ]);
 
