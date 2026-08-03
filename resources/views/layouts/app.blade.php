@@ -37,7 +37,6 @@
         <link rel="canonical" href="{{ $defaultUrl }}">
     @endif
 
-    @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) ?: '0' }}">
 </head>
 <body class="min-h-screen">
