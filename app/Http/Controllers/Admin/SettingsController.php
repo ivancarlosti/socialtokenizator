@@ -104,14 +104,14 @@ class SettingsController extends Controller
         }
 
         // Hide title section
-        if ($request->boolean('hide_title_section')) {
+        if ($request->has('hide_title_section') && $request->input('hide_title_section') === '1') {
             Setting::put('hide_title_section', '1');
         } else {
             Setting::forget('hide_title_section');
         }
 
         // Hide filter label
-        if ($request->boolean('hide_filter_label')) {
+        if ($request->has('hide_filter_label') && $request->input('hide_filter_label') === '1') {
             Setting::put('hide_filter_label', '1');
         } else {
             Setting::forget('hide_filter_label');

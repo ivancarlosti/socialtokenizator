@@ -86,6 +86,7 @@
         {{-- Hide title section --}}
         <div>
             <label class="inline-flex items-center gap-2 text-sm text-copy">
+                <input type="hidden" name="hide_title_section" value="0">
                 <input type="checkbox" name="hide_title_section" value="1"
                        @checked($hideTitleSection)>
                 {{ __('messages.settings_hide_title_section') }}
@@ -96,6 +97,7 @@
         {{-- Hide filter label --}}
         <div>
             <label class="inline-flex items-center gap-2 text-sm text-copy">
+                <input type="hidden" name="hide_filter_label" value="0">
                 <input type="checkbox" name="hide_filter_label" value="1"
                        @checked($hideFilterLabel)>
                 {{ __('messages.settings_hide_filter_label') }}

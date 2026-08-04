@@ -32,7 +32,13 @@ class HomeController extends Controller
         $images = $query->latest()->paginate($perPage)->withQueryString();
         $categories = Category::orderBy('handle')->get();
 
-        return view('home', compact('images', 'categories', 'categoryHandle', 'tagFilter'));
+        $hideTitleSection = (bool) Setting::get('hide_title_section');
+        $hideFilterLabel  = (bool) Setting::get('hide_filter_label');
+
+        return view('home', compact(
+            'images', 'categories', 'categoryHandle', 'tagFilter',
+            'hideTitleSection', 'hideFilterLabel'
+        ));
     }
 
     public function search(Request $request)
