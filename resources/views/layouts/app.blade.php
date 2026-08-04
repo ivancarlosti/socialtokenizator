@@ -76,8 +76,8 @@
                         <a href="{{ route('locale.switch', ['locale' => $code]) }}"
                            title="{{ $info['name'] }}"
                            class="inline-flex items-center justify-center rounded overflow-hidden transition-opacity {{ $isActive ? 'opacity-100' : 'opacity-70 hover:opacity-100' }}">
-                            <img src="https://flagcdn.com/w68/{{ $info['flag'] }}.png"
-                                 srcset="https://flagcdn.com/w136/{{ $info['flag'] }}.png 2x"
+                            <img src="https://flagcdn.com/w40/{{ $info['flag'] }}.png"
+                                 srcset="https://flagcdn.com/w80/{{ $info['flag'] }}.png 2x"
                                  alt="{{ $info['name'] }}" width="34" height="23" class="block">
                         </a>
                     @endforeach

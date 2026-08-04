@@ -88,7 +88,7 @@
                                 {{ __('messages.category_save') }}
                             </button>
                             <button type="button"
-                                    onclick="if(confirm('{{ __('messages.category_confirm_delete') }}')){this.closest('div').querySelector('.delete-form').submit()}"
+                                    onclick="if(confirm('{{ __('messages.category_confirm_delete') }}')){this.closest('.bg-card').querySelector('.delete-form').submit()}"
                                     class="text-xs text-red-400 hover:text-red-300">
                                 {{ __('messages.category_delete') }}
                             </button>
