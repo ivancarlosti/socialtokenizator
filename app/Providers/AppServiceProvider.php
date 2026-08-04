@@ -47,7 +47,8 @@ class AppServiceProvider extends ServiceProvider
             $locale        = app()->getLocale();
             $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
             $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
-            $siteHandle    = $this->safeSetting('site_handle');
+            $footerHtml    = $this->safeSetting('footer_html');
+            $postPathPrefix = $this->safeSetting('post_path_prefix') ?: 'p';
 
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
@@ -56,7 +57,8 @@ class AppServiceProvider extends ServiceProvider
                 'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
                 'siteTitle'        => $siteTitle,
                 'siteSubtitle'     => $siteSubtitle,
-                'siteHandle'       => $siteHandle,
+                'footerHtml'       => $footerHtml,
+                'postPathPrefix'   => $postPathPrefix,
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,

@@ -17,11 +17,12 @@
             @foreach($images as $img)
                 <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}"
                    class="block bg-card border border-card-border rounded overflow-hidden hover:border-card-border-hover">
-                    <img src="{{ $img->public_url }}" alt="{{ $img->description }}"
+                    <img src="{{ $img->public_url }}" alt="{{ $img->getDescription($currentLocale) }}"
                          class="w-full aspect-square object-cover bg-black">
-                    @if($img->description)
+                    @php $desc = $img->getDescription($currentLocale); @endphp
+                    @if($desc)
                         <div class="px-2 py-2 text-xs text-copy truncate">
-                            {{ $img->description }}
+                            {{ $desc }}
                         </div>
                     @endif
                 </a>

@@ -22,19 +22,54 @@
         @csrf
         @method('PUT')
 
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.headline') }}</label>
-            <input type="text" name="headline" value="{{ old('headline', $image->headline) }}"
-                   maxlength="300"
-                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
-                   placeholder="{{ __('messages.headline_help') }}">
-        </div>
+        {{-- Per-locale headlines & descriptions --}}
+        @foreach(\App\Support\Locales::supported() as $code => $info)
+            @php
+                $colH = 'headline_'.str_replace('-', '_', $code);
+                $colD = 'description_'.str_replace('-', '_', $code);
+            @endphp
+            <div class="border border-card-border rounded p-3">
+                <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }} ({{ $code }})</p>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.headline') }}</label>
+                        <input type="text" name="{{ $colH }}" value="{{ old($colH, $image->$colH) }}"
+                               maxlength="300"
+                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                               placeholder="{{ __('messages.headline_help') }}">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.description') }}</label>
+                        <textarea name="{{ $colD }}" rows="4" maxlength="5000"
+                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy desc-field"
+                                  data-locale="{{ $code }}">{{ old($colD, $image->$colD) }}</textarea>
+                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
+                                data-target="{{ $colD }}"
+                                data-target-locale="{{ $code }}">
+                            {{ __('messages.translate_with_ai') }}
+                        </button>
+                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                    </div>
+                </div>
+            </div>
+        @endforeach
 
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.description') }}</label>
-            <textarea name="description" rows="5" maxlength="5000"
-                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">{{ old('description', $image->description) }}</textarea>
-        </div>
+        {{-- Categories (multi-select checkboxes) --}}
+        @if($categories->isNotEmpty())
+            <div>
+                <label class="block text-sm text-muted mb-2">{{ __('messages.categories') }}</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    @foreach($categories as $cat)
+                        <label class="flex items-center gap-2 text-sm text-copy">
+                            <input type="checkbox" name="categories[]" value="{{ $cat->id }}"
+                                   {{ in_array($cat->id, old('categories', $selectedCategories)) ? 'checked' : '' }}>
+                            {{ $cat->getName($currentLocale) }}
+                            <span class="text-xs text-muted">({{ $cat->handle }})</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.tags') }}</label>
@@ -100,6 +135,65 @@
             } else {
                 row();
             }
+
+            // AI Translate
+            document.querySelectorAll('.ai-translate-link').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const targetName = this.dataset.target;
+                    const targetLocale = this.dataset.targetLocale;
+                    const targetField = document.querySelector(`[name="${targetName}"]`);
+                    const statusEl = this.nextElementSibling;
+
+                    // Find the best source: any non-empty description from another locale
+                    let sourceText = '';
+                    const allDescs = document.querySelectorAll('.desc-field');
+                    for (const desc of allDescs) {
+                        if (desc.name !== targetName && desc.value.trim()) {
+                            sourceText = desc.value.trim();
+                            break;
+                        }
+                    }
+                    if (!sourceText) {
+                        alert(@json(__('messages.translate_no_source')));
+                        return;
+                    }
+
+                    this.classList.add('hidden');
+                    statusEl.classList.remove('hidden');
+                    statusEl.textContent = @json(__('messages.translating'));
+
+                    try {
+                        const resp = await fetch('{{ route('admin.translate') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                text: sourceText,
+                                target_locale: targetLocale,
+                            }),
+                        });
+
+                        const data = await resp.json();
+                        if (data.translated_text) {
+                            targetField.value = data.translated_text;
+                            statusEl.textContent = @json(__('messages.translate_done'));
+                        } else {
+                            statusEl.textContent = data.error || @json(__('messages.translate_error'));
+                        }
+                    } catch (e) {
+                        statusEl.textContent = @json(__('messages.translate_error'));
+                    }
+
+                    this.classList.remove('hidden');
+                    setTimeout(() => {
+                        statusEl.classList.add('hidden');
+                        statusEl.textContent = '';
+                    }, 3000);
+                });
+            });
         })();
     </script>
 @endsection

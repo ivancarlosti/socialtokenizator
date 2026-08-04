@@ -104,3 +104,25 @@ a:hover {
     opacity: 0.4;
     pointer-events: none;
 }
+
+/* AI translate link */
+.ai-translate-link {
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.ai-translate-link:hover {
+    opacity: 0.8;
+}
+
+/* Footer HTML content */
+.footer-html-content {
+    line-height: 1.5;
+}
+.footer-html-content a {
+    color: var(--color-muted);
+    text-decoration: underline;
+}
+.footer-html-content a:hover {
+    color: var(--color-copy);
+}

@@ -124,6 +124,9 @@ All variables live in `/docker/.env`. The full template with comments is `/docke
 | `ACCOUNT_LOGIN` / `ACCOUNT_PASSWORD` | Single admin credentials (only when `AUTH_METHOD=account`) |
 | `RECAPTCHA_CLIENTID` / `RECAPTCHA_CLIENTSECRET` | Optional Google reCAPTCHA v2 keys |
 | `KEYCLOAK_*` | OIDC config (only when `AUTH_METHOD=keycloak`) |
+| `AI_API_KEY` | API key for AI translation (OpenAI-compatible; e.g. DeepSeek) |
+| `AI_API_URL` | Base URL for AI chat completions API (e.g. `https://api.deepseek.com/v1`) |
+| `AI_MODEL` | Model name for translation requests (e.g. `deepseek-v4-flash`) |
 
 After changing `.env`, restart: `docker compose up -d` (Compose recreates the container if env changed).
 
@@ -226,6 +229,66 @@ OIDC code flow against a Keycloak realm. Only one allow-listed email becomes adm
    ```
 4. Restart. Visiting `/admin` (or clicking *Login*) bounces to Keycloak and back. Only the user whose email matches `KEYCLOAK_EMAIL_ACCOUNT` is granted admin; everyone else gets `403`.
 5. Logout uses RP-initiated logout (`/realms/<realm>/protocol/openid-connect/logout`).
+
+---
+
+## AI Translation
+
+The app supports one-click AI translation for post descriptions in the admin panel. Each description field (English, Spanish, Brazilian Portuguese) has a **"Translate with AI"** link. When clicked, it sends the content from another already-filled description field to an AI provider and fills the target field with the translation.
+
+### Setup
+
+The translation feature uses the **OpenAI-compatible chat completions API**. Any provider that implements this standard works — OpenAI, DeepSeek, Groq, etc.
+
+Add these variables to your `.env`:
+
+```bash
+# AI Translation (OpenAI-compatible API)
+AI_API_KEY=sk-your-api-key-here
+AI_API_URL=https://api.deepseek.com/v1
+AI_MODEL=deepseek-v4-flash
+```
+
+### Example: DeepSeek
+
+1. Sign up at <https://platform.deepseek.com>.
+2. Generate an API key from the dashboard.
+3. Use these values in your `.env`:
+
+```
+AI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AI_API_URL=https://api.deepseek.com/v1
+AI_MODEL=deepseek-v4-flash
+```
+
+4. Restart the app: `docker compose up -d`
+
+The cheapest and fastest model for translation is `deepseek-v4-flash`. You can also use `deepseek-chat` for higher quality.
+
+### How it works
+
+1. In the upload or edit form, fill in one description field (e.g. English).
+2. Next to an empty description field (e.g. Spanish), click **"Translate with AI"**.
+3. The app calls `POST /admin/translate` which proxies the request to the AI API.
+4. The AI returns only the translated text, which is placed into the target textarea.
+
+The system prompt instructs the AI to preserve formatting, line breaks, and HTML tags during translation.
+
+### Supported languages
+
+| Locale code | AI prompt target |
+|---|---|
+| `en` | English |
+| `es` | Spanish (Mexican) |
+| `pt_BR` | Brazilian Portuguese |
+
+---
+
+## Post URL prefix
+
+The default URL pattern for post detail pages is `/p/{uuid}`. You can change the `p` prefix in **Admin → Settings → Post URL prefix**. For example, setting it to `post` changes URLs to `/post/{uuid}`.
+
+The old `/image/{uuid}` URLs automatically redirect (301) to the new pattern.
 
 ---
 

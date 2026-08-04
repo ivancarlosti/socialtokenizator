@@ -1,18 +1,21 @@
 @extends('layouts.app')
 
 @php
-    $headline = $image->headline
-        ?: ($image->description
-            ? \Illuminate\Support\Str::limit($image->description, 60)
+    $headline = $image->getHeadline($currentLocale)
+        ?: ($image->getDescription($currentLocale)
+            ? \Illuminate\Support\Str::limit($image->getDescription($currentLocale), 60)
             : null);
 
     $pageTitle = $headline
         ? $siteTitle . ' — ' . $headline
         : $siteTitle;
 
-    $shortDesc = $image->description
-        ? \Illuminate\Support\Str::limit($image->description, 200)
-        : __('messages.shared_via', ['app' => $siteTitle]);
+    // OG meta uses default locale for consistency
+    $defaultLocale = \App\Models\Setting::get('default_locale', 'en');
+    $ogHeadline = $image->getHeadline($defaultLocale);
+    $ogDesc = $image->getDescription($defaultLocale)
+        ?: __('messages.shared_via', ['app' => $siteTitle]);
+    $shortDesc = \Illuminate\Support\Str::limit((string) $ogDesc, 200);
     $shareUrl = url()->current();
     $imgUrl = $image->public_url;
 @endphp
@@ -22,7 +25,7 @@
 @section('meta')
     <meta name="description" content="{{ $shortDesc }}">
 
-    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta property="og:description" content="{{ $shortDesc }}">
     <meta property="og:image" content="{{ $imgUrl }}">
     @if($image->width)<meta property="og:image:width" content="{{ $image->width }}">@endif
@@ -32,7 +35,7 @@
     <meta property="og:site_name" content="{{ $siteTitle }}">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta name="twitter:description" content="{{ $shortDesc }}">
     <meta name="twitter:image" content="{{ $imgUrl }}">
 
@@ -41,23 +44,27 @@
 
 @section('content')
     <article class="bg-card border border-card-border rounded-lg overflow-hidden">
-        <img src="{{ $imgUrl }}" alt="{{ $image->description }}"
+        <img src="{{ $imgUrl }}" alt="{{ $image->getDescription($currentLocale) }}"
              class="w-full max-h-[80vh] object-contain bg-black">
 
         <div class="p-5">
-            @if($image->headline)
-                <h1 class="text-xl font-semibold text-copy mb-3">{{ $image->headline }}</h1>
+            @php $displayHeadline = $image->getHeadline($currentLocale); @endphp
+            @if($displayHeadline)
+                <h1 class="text-xl font-semibold text-copy mb-3">{{ $displayHeadline }}</h1>
             @endif
-            @if($image->description)
-                <p class="text-copy text-base leading-relaxed">{!! nl2br(e($image->description)) !!}</p>
+
+            @php $displayDesc = $image->getDescription($currentLocale); @endphp
+            @if($displayDesc)
+                <p class="text-copy text-base leading-relaxed">{!! nl2br(e($displayDesc)) !!}</p>
             @else
                 <p class="text-muted italic">{{ __('messages.image_no_description') }}</p>
             @endif
 
+            {{-- Tags at bottom (lowercase, no translation) --}}
             @if($image->tags->isNotEmpty())
                 <div class="mt-4 flex flex-wrap gap-2">
                     @foreach($image->tags as $tag)
-                        <a href="{{ route('home', ['category' => $tag->name]) }}"
+                        <a href="{{ route('home', ['tag' => $tag->name]) }}"
                            class="text-xs bg-card border border-card-border rounded px-2 py-0.5 text-muted hover:text-copy">
                             #{{ $tag->name }}
                         </a>

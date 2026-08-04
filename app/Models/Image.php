@@ -16,8 +16,12 @@ class Image extends Model
         'mime_type',
         'width',
         'height',
-        'headline',
-        'description',
+        'headline_en',
+        'headline_es',
+        'headline_pt_BR',
+        'description_en',
+        'description_es',
+        'description_pt_BR',
     ];
 
     protected static function booted(): void
@@ -34,6 +38,11 @@ class Image extends Model
         return 'uuid';
     }
 
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
@@ -42,6 +51,51 @@ class Image extends Model
     public function sources(): HasMany
     {
         return $this->hasMany(Source::class)->orderBy('position');
+    }
+
+    /**
+     * Get the headline for the given locale with fallback.
+     */
+    public function getHeadline(string $locale): ?string
+    {
+        return $this->getLocalizedField('headline', $locale);
+    }
+
+    /**
+     * Get the description for the given locale with fallback.
+     */
+    public function getDescription(string $locale): ?string
+    {
+        return $this->getLocalizedField('description', $locale);
+    }
+
+    /**
+     * Get a localized field using a fallback chain.
+     */
+    protected function getLocalizedField(string $field, string $locale): ?string
+    {
+        $fallbackChain = [$locale];
+
+        if ($locale === 'pt_BR') {
+            $fallbackChain[] = 'es';
+            $fallbackChain[] = 'en';
+        } elseif ($locale === 'es') {
+            $fallbackChain[] = 'en';
+            $fallbackChain[] = 'pt_BR';
+        } elseif ($locale === 'en') {
+            $fallbackChain[] = 'es';
+            $fallbackChain[] = 'pt_BR';
+        }
+
+        foreach ($fallbackChain as $loc) {
+            $col = $field . '_' . str_replace('-', '_', $loc);
+            $val = $this->getAttribute($col);
+            if (! empty($val)) {
+                return $val;
+            }
+        }
+
+        return null;
     }
 
     public function getPublicUrlAttribute(): string

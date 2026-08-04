@@ -17,21 +17,21 @@
         @endif
     </section>
 
-    {{-- Category filter chips --}}
+    {{-- Category filter chips (top of page) --}}
     @if($categories->isNotEmpty())
         <div class="mb-8">
             <p class="text-xs uppercase tracking-wide text-muted mb-2">{{ __('messages.filter_by_category') }}</p>
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('home') }}"
                    class="inline-block px-3 py-1.5 rounded-full text-sm border transition-colors
-                          {{ $category === '' ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
+                          {{ $categoryHandle === '' ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
                     {{ __('messages.all_categories') }}
                 </a>
                 @foreach($categories as $cat)
-                    <a href="{{ route('home', ['category' => $cat->name]) }}"
+                    <a href="{{ route('home', ['category' => $cat->handle]) }}"
                        class="inline-block px-3 py-1.5 rounded-full text-sm border transition-colors
-                              {{ $category === $cat->name ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
-                        {{ $cat->name }}
+                              {{ $categoryHandle === $cat->handle ? 'bg-accent border-accent text-white' : 'bg-card border-card-border text-muted hover:text-copy hover:border-card-border-hover' }}">
+                        {{ $cat->getName($currentLocale) }}
                     </a>
                 @endforeach
             </div>
@@ -41,7 +41,9 @@
     {{-- Feed --}}
     @if($images->isEmpty())
         <div class="text-center text-muted py-16 border border-dashed border-card-border rounded">
-            @if($category !== '')
+            @if($categoryHandle !== '')
+                {{ __('messages.no_posts') }}
+            @elseif($tagFilter !== '')
                 {{ __('messages.no_posts') }}
             @else
                 {{ __('messages.home_no_images') }}
@@ -55,18 +57,20 @@
             @foreach($images as $img)
                 <article class="bg-card border border-card-border rounded-lg overflow-hidden">
                     <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="block">
-                        <img src="{{ $img->public_url }}" alt="{{ $img->description }}"
+                        <img src="{{ $img->public_url }}" alt="{{ $img->getDescription($currentLocale) }}"
                              class="w-full max-h-[80vh] object-contain bg-black">
                     </a>
                     <div class="p-5">
-                        @if($img->description)
-                            <p class="text-copy text-base leading-relaxed">{!! nl2br(e($img->description)) !!}</p>
+                        @php $desc = $img->getDescription($currentLocale); @endphp
+                        @if($desc)
+                            <p class="text-copy text-base leading-relaxed">{!! nl2br(e($desc)) !!}</p>
                         @endif
 
+                        {{-- Tags at bottom of post (lowercase, no translation) --}}
                         @if($img->tags->isNotEmpty())
                             <div class="mt-3 flex flex-wrap gap-2">
                                 @foreach($img->tags as $tag)
-                                    <a href="{{ route('home', ['category' => $tag->name]) }}"
+                                    <a href="{{ route('home', ['tag' => $tag->name]) }}"
                                        class="text-xs bg-card border border-card-border rounded px-2 py-0.5 text-muted hover:text-copy">
                                         #{{ $tag->name }}
                                     </a>

@@ -35,7 +35,8 @@ class SettingsController extends Controller
             'faviconUrl'     => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'  => Setting::get('default_locale', config('app.locale')),
             'postsPerPage'   => Setting::get('posts_per_page', '12'),
-            'siteHandle'     => Setting::get('site_handle', ''),
+            'postPathPrefix' => Setting::get('post_path_prefix', 'p'),
+            'footerHtml'     => Setting::get('footer_html', ''),
             'titleRows'      => $titleRows,
             'subtitleRows'   => $subtitleRows,
             'locales'        => $locales,
@@ -54,7 +55,8 @@ class SettingsController extends Controller
             'remove_favicon'        => ['nullable', 'boolean'],
             'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
-            'site_handle'           => ['nullable', 'string', 'max:64', 'regex:/^[a-z0-9_-]+$/'],
+            'post_path_prefix'      => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9_-]+$/'],
+            'footer_html'           => ['nullable', 'string', 'max:10000'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
             'footer_links.*.url'    => ['nullable', 'url', 'max:1024'],
@@ -89,12 +91,20 @@ class SettingsController extends Controller
         Setting::put('default_locale', $validated['default_locale']);
         Setting::put('posts_per_page', (string) $validated['posts_per_page']);
 
-        // Site handle
-        $handle = trim((string) ($validated['site_handle'] ?? ''));
-        if ($handle !== '') {
-            Setting::put('site_handle', $handle);
+        // Post path prefix
+        $prefix = trim((string) ($validated['post_path_prefix'] ?? ''));
+        if ($prefix !== '' && $prefix !== 'p') {
+            Setting::put('post_path_prefix', $prefix);
         } else {
-            Setting::forget('site_handle');
+            Setting::forget('post_path_prefix');
+        }
+
+        // Footer HTML
+        $footerHtml = trim((string) ($validated['footer_html'] ?? ''));
+        if ($footerHtml !== '') {
+            Setting::put('footer_html', $footerHtml);
+        } else {
+            Setting::forget('footer_html');
         }
 
         // Per-locale title & subtitle

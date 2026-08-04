@@ -3,64 +3,89 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tag;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Tag::withCount('images')->orderBy('name')->get();
+        $categories = Category::withCount('images')->orderBy('handle')->get();
         return view('admin.categories', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:64'],
+            'handle'   => ['required', 'string', 'max:64', 'regex:/^[a-z0-9_-]+$/'],
+            'name_en'  => ['nullable', 'string', 'max:128'],
+            'name_es'  => ['nullable', 'string', 'max:128'],
+            'name_pt_BR' => ['nullable', 'string', 'max:128'],
         ]);
 
-        $name = Tag::normalize($validated['name']);
+        $handle = Str::lower($validated['handle']);
 
-        if (Tag::where('name', $name)->exists()) {
+        if (Category::where('handle', $handle)->exists()) {
             return redirect()->back()
-                ->withErrors(['name' => __('messages.category_name_taken')])
+                ->withErrors(['handle' => __('messages.category_handle_taken')])
                 ->withInput();
         }
 
-        Tag::create(['name' => $name]);
+        if (empty($validated['name_en']) && empty($validated['name_es']) && empty($validated['name_pt_BR'])) {
+            return redirect()->back()
+                ->withErrors(['name_en' => __('messages.category_at_least_one_name')])
+                ->withInput();
+        }
+
+        Category::create([
+            'handle'   => $handle,
+            'name_en'  => $validated['name_en'] ?? null,
+            'name_es'  => $validated['name_es'] ?? null,
+            'name_pt_BR' => $validated['name_pt_BR'] ?? null,
+        ]);
 
         return redirect()->route('admin.categories.index')
             ->with('status', __('messages.category_created'));
     }
 
-    public function update(Request $request, Tag $tag)
+    public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:64'],
+            'handle'   => ['required', 'string', 'max:64', 'regex:/^[a-z0-9_-]+$/'],
+            'name_en'  => ['nullable', 'string', 'max:128'],
+            'name_es'  => ['nullable', 'string', 'max:128'],
+            'name_pt_BR' => ['nullable', 'string', 'max:128'],
         ]);
 
-        $name = Tag::normalize($validated['name']);
+        $handle = Str::lower($validated['handle']);
 
-        if ($name === $tag->name) {
-            return redirect()->route('admin.categories.index');
-        }
-
-        if (Tag::where('name', $name)->where('id', '!=', $tag->id)->exists()) {
+        if ($handle !== $category->handle && Category::where('handle', $handle)->exists()) {
             return redirect()->back()
-                ->withErrors(['name' => __('messages.category_name_taken')])
+                ->withErrors(['handle' => __('messages.category_handle_taken')])
                 ->withInput();
         }
 
-        $tag->update(['name' => $name]);
+        if (empty($validated['name_en']) && empty($validated['name_es']) && empty($validated['name_pt_BR'])) {
+            return redirect()->back()
+                ->withErrors(['name_en' => __('messages.category_at_least_one_name')])
+                ->withInput();
+        }
+
+        $category->update([
+            'handle'   => $handle,
+            'name_en'  => $validated['name_en'] ?? null,
+            'name_es'  => $validated['name_es'] ?? null,
+            'name_pt_BR' => $validated['name_pt_BR'] ?? null,
+        ]);
 
         return redirect()->route('admin.categories.index')
             ->with('status', __('messages.category_updated'));
     }
 
-    public function destroy(Tag $tag)
+    public function destroy(Category $category)
     {
-        $tag->delete();
+        $category->delete();
 
         return redirect()->route('admin.categories.index')
             ->with('status', __('messages.category_deleted'));

@@ -73,14 +73,14 @@
             <p class="mt-1 text-xs text-muted">{{ __('messages.settings_posts_per_page_help') }}</p>
         </div>
 
-        {{-- Site handle --}}
+        {{-- Post path prefix --}}
         <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_site_handle') }}</label>
-            <input type="text" name="site_handle" value="{{ old('site_handle', $siteHandle) }}"
-                   placeholder="my-site-handle"
-                   maxlength="64"
-                   class="w-64 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_site_handle_help') }}</p>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_post_path_prefix') }}</label>
+            <input type="text" name="post_path_prefix" value="{{ old('post_path_prefix', $postPathPrefix) }}"
+                   placeholder="p"
+                   maxlength="16"
+                   class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_path_prefix_help') }}</p>
         </div>
 
         {{-- Site title & subtitle per locale --}}
@@ -111,6 +111,15 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+
+        {{-- Footer HTML --}}
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_footer_html') }}</label>
+            <textarea name="footer_html" rows="4" maxlength="10000"
+                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                      placeholder="<p>Your custom footer text or HTML</p>">{{ old('footer_html', $footerHtml) }}</textarea>
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_footer_html_help') }}</p>
         </div>
 
         {{-- Footer links --}}

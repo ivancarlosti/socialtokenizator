@@ -75,10 +75,10 @@
                         @php $isActive = $code === $currentLocale; @endphp
                         <a href="{{ route('locale.switch', ['locale' => $code]) }}"
                            title="{{ $info['name'] }}"
-                           class="inline-flex items-center justify-center rounded-sm overflow-hidden border {{ $isActive ? 'border-emerald-400 ring-1 ring-emerald-400' : 'border-neutral-700 opacity-70 hover:opacity-100' }}">
+                           class="inline-flex items-center justify-center rounded overflow-hidden {{ $isActive ? 'opacity-100 ring-1 ring-emerald-400' : 'opacity-70 hover:opacity-100' }}">
                             <img src="https://flagcdn.com/w40/{{ $info['flag'] }}.png"
                                  srcset="https://flagcdn.com/w80/{{ $info['flag'] }}.png 2x"
-                                 alt="{{ $info['name'] }}" width="24" height="18" class="block">
+                                 alt="{{ $info['name'] }}" width="30" height="22" class="block">
                         </a>
                     @endforeach
                 </div>
@@ -119,14 +119,19 @@
     <footer class="border-t mt-12" style="border-color: var(--color-footer-border);">
         <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-muted flex justify-between gap-4 flex-wrap">
             <span>{{ $siteTitle }}</span>
-            @if(!empty($footerLinks))
-                <nav class="flex items-center gap-4">
-                    @foreach($footerLinks as $link)
-                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
-                           class="text-muted hover:text-copy">{{ $link['label'] }}</a>
-                    @endforeach
-                </nav>
-            @endif
+            <div class="flex items-center gap-4 flex-wrap">
+                @if($footerHtml)
+                    <div class="footer-html-content">{!! $footerHtml !!}</div>
+                @endif
+                @if(!empty($footerLinks))
+                    <nav class="flex items-center gap-4">
+                        @foreach($footerLinks as $link)
+                            <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
+                               class="text-muted hover:text-copy">{{ $link['label'] }}</a>
+                        @endforeach
+                    </nav>
+                @endif
+            </div>
         </div>
     </footer>
 

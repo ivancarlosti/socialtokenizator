@@ -8,7 +8,7 @@ class ImageController extends Controller
 {
     public function show(string $uuid)
     {
-        $image = Image::with(['tags', 'sources'])
+        $image = Image::with(['categories', 'tags', 'sources'])
             ->where('uuid', $uuid)
             ->firstOrFail();
 
