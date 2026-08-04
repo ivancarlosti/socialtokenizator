@@ -15,9 +15,12 @@ class Setting extends Model
 
     public const CACHE_KEY = 'app.settings';
 
+    /** Seconds before the settings cache automatically expires. */
+    private const CACHE_TTL = 5;
+
     public static function cached()
     {
-        return Cache::rememberForever(self::CACHE_KEY, function () {
+        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             return static::query()->pluck('value', 'key');
         });
     }
@@ -34,12 +37,18 @@ class Setting extends Model
             ['key' => $key],
             ['value' => $value, 'updated_at' => now(), 'created_at' => now()]
         );
-        Cache::forget(self::CACHE_KEY);
+        static::flushCache();
     }
 
     public static function forget(string $key): void
     {
         static::query()->where('key', $key)->delete();
+        static::flushCache();
+    }
+
+    /** Immediately invalidate the settings cache so the next read hits the database. */
+    public static function flushCache(): void
+    {
         Cache::forget(self::CACHE_KEY);
     }
 

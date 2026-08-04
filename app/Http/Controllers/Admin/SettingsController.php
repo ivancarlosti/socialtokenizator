@@ -156,17 +156,14 @@ class SettingsController extends Controller
             }
         }
 
-        // Clear all relevant caches so changes take effect immediately:
-        // - route cache: needed for post_path_prefix (read at route registration time)
-        // - config cache: safety measure
-        // - view cache: ensures recompiled Blade templates
-        // - app cache: ensures Cache::rememberForever data is refreshed
-        foreach (['cache:clear', 'route:clear', 'config:clear', 'view:clear'] as $command) {
-            try {
-                Artisan::call($command);
-            } catch (\Throwable) {
-                // Ignore failures — the setting was already persisted
-            }
+        // Clear caches so settings take effect immediately.
+        // Application cache (settings themselves):
+        Setting::flushCache();
+        // Route cache: post_path_prefix is read at route-registration time in routes/web.php
+        try {
+            Artisan::call('route:clear');
+        } catch (\Throwable) {
+            // Non-critical — routes will pick up the prefix on next container restart
         }
 
         return redirect()->route('admin.settings.edit')
