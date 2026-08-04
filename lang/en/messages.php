@@ -46,7 +46,7 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Upload image',
-    'upload_image_label'   => 'Image (jpg, png, webp, gif — max 10 MB)',
+    'upload_image_label'   => 'Image (jpg, png, webp, gif, avif — max 10 MB)',
     'headline'             => 'Headline',
     'headline_help'        => 'A short title for this post (shown in browser tab and page heading)',
     'description'          => 'Description',
@@ -97,7 +97,7 @@ return [
     'settings_posts_per_page'       => 'Posts per page',
     'settings_posts_per_page_help'  => 'Number of images shown on each page of the feed (1–100).',
     'settings_post_path_prefix'     => 'Post URL prefix',
-    'settings_post_path_prefix_help'=> 'URL segment for post detail pages (default: p). Changing this requires clearing the route cache.',
+    'settings_post_path_prefix_help'=> 'URL segment for post detail pages (default: p). Changing this requires clearing the route cache. Restart the container (`docker compose restart`) after saving.',
     'settings_footer_html'          => 'Footer HTML',
     'settings_footer_html_help'     => 'Custom HTML or text displayed on the right side of the footer. Accepts HTML tags.',
     'settings_footer_links'         => 'Footer links (up to 3)',
@@ -107,6 +107,10 @@ return [
     'settings_site_title'           => 'Title',
     'settings_site_subtitle'        => 'Subtitle',
     'settings_site_subtitle_placeholder' => 'A short tagline',
+    'settings_hide_title_section'    => 'Hide title section on homepage',
+    'settings_hide_title_section_help' => 'When enabled, the site title and subtitle are hidden at the top of the homepage.',
+    'settings_hide_filter_label'     => 'Hide "Filter by category" label',
+    'settings_hide_filter_label_help'=> 'When enabled, the "Filter by category" text is hidden; category chips remain visible.',
     'settings_save'                 => 'Save settings',
     'settings_saved'                => 'Settings saved.',
     'current'                       => 'Current',

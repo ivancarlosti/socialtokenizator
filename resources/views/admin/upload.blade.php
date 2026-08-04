@@ -118,12 +118,12 @@
                 labelInput.type = 'text';
                 labelInput.name = `sources[${idx}][label]`;
                 labelInput.placeholder = labelPlaceholder;
-                labelInput.className = 'w-1/3 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm';
+                labelInput.className = 'w-1/3 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy';
                 const urlInput = document.createElement('input');
                 urlInput.type = 'url';
                 urlInput.name = `sources[${idx}][url]`;
                 urlInput.placeholder = 'https://…';
-                urlInput.className = 'flex-1 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm';
+                urlInput.className = 'flex-1 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy';
                 const rm = document.createElement('button');
                 rm.type = 'button';
                 rm.className = 'text-xs text-red-400 px-2';

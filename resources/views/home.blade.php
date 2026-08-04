@@ -10,17 +10,21 @@
 @section('title', $homeTitle)
 
 @section('content')
+    @if(!($hideTitleSection ?? false))
     <section class="text-center mb-8">
         <h1 class="text-3xl font-semibold text-copy">{{ $siteTitle }}</h1>
         @if($siteSubtitle)
             <p class="text-muted mt-1 text-sm">{{ $siteSubtitle }}</p>
         @endif
     </section>
+    @endif
 
     {{-- Category filter chips (top of page) --}}
     @if($categories->isNotEmpty())
         <div class="mb-8">
+            @if(!($hideFilterLabel ?? false))
             <p class="text-xs uppercase tracking-wide text-muted mb-2">{{ __('messages.filter_by_category') }}</p>
+            @endif
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('home') }}"
                    class="inline-block px-3 py-1.5 rounded-full text-sm border transition-colors

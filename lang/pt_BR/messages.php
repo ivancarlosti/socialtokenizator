@@ -46,7 +46,7 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Enviar imagem',
-    'upload_image_label'   => 'Imagem (jpg, png, webp, gif — máx 10 MB)',
+    'upload_image_label'   => 'Imagem (jpg, png, webp, gif, avif — máx 10 MB)',
     'headline'             => 'Manchete',
     'headline_help'        => 'Um título curto para este post (aparece na aba do navegador e no topo da página)',
     'description'          => 'Descrição',
@@ -97,7 +97,7 @@ return [
     'settings_posts_per_page'       => 'Posts por página',
     'settings_posts_per_page_help'  => 'Número de imagens exibidas em cada página do feed (1–100).',
     'settings_post_path_prefix'     => 'Prefixo da URL dos posts',
-    'settings_post_path_prefix_help'=> 'Segmento da URL para páginas de detalhe (padrão: p). Alterar requer limpar o cache de rotas.',
+    'settings_post_path_prefix_help'=> 'Segmento da URL para páginas de detalhe (padrão: p). Alterar requer limpar o cache de rotas. Reinicie o container (`docker compose restart`) após salvar.',
     'settings_footer_html'          => 'HTML do rodapé',
     'settings_footer_html_help'     => 'Texto ou HTML personalizado exibido no lado direito do rodapé. Aceita tags HTML.',
     'settings_footer_links'         => 'Links no rodapé (até 3)',
@@ -107,6 +107,10 @@ return [
     'settings_site_title'           => 'Título',
     'settings_site_subtitle'        => 'Subtítulo',
     'settings_site_subtitle_placeholder' => 'Um slogan curto',
+    'settings_hide_title_section'    => 'Ocultar seção de título na página inicial',
+    'settings_hide_title_section_help' => 'Quando ativado, o título e subtítulo do site são ocultados no topo da página inicial.',
+    'settings_hide_filter_label'     => 'Ocultar texto "Filtrar por categoria"',
+    'settings_hide_filter_label_help'=> 'Quando ativado, o texto "Filtrar por categoria" é ocultado; os chips de categoria permanecem visíveis.',
     'settings_save'                 => 'Salvar configurações',
     'settings_saved'                => 'Configurações salvas.',
     'current'                       => 'Atual',

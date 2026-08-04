@@ -46,7 +46,7 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Subir imagen',
-    'upload_image_label'   => 'Imagen (jpg, png, webp, gif — máx 10 MB)',
+    'upload_image_label'   => 'Imagen (jpg, png, webp, gif, avif — máx 10 MB)',
     'headline'             => 'Titular',
     'headline_help'        => 'Un título corto para esta publicación (aparece en la pestaña del navegador y en el encabezado)',
     'description'          => 'Descripción',
@@ -97,7 +97,7 @@ return [
     'settings_posts_per_page'       => 'Posts por página',
     'settings_posts_per_page_help'  => 'Número de imágenes mostradas en cada página del feed (1–100).',
     'settings_post_path_prefix'     => 'Prefijo de URL de posts',
-    'settings_post_path_prefix_help'=> 'Segmento de URL para páginas de detalle (predeterminado: p). Cambiar requiere limpiar la caché de rutas.',
+    'settings_post_path_prefix_help'=> 'Segmento de URL para páginas de detalle (predeterminado: p). Cambiar requiere limpiar la caché de rutas. Reinicie el contenedor (`docker compose restart`) después de guardar.',
     'settings_footer_html'          => 'HTML del pie de página',
     'settings_footer_html_help'     => 'Texto o HTML personalizado mostrado en el lado derecho del pie de página. Acepta etiquetas HTML.',
     'settings_footer_links'         => 'Enlaces del pie de página (hasta 3)',
@@ -107,6 +107,10 @@ return [
     'settings_site_title'           => 'Título',
     'settings_site_subtitle'        => 'Subtítulo',
     'settings_site_subtitle_placeholder' => 'Un eslogan corto',
+    'settings_hide_title_section'    => 'Ocultar sección de título en la página principal',
+    'settings_hide_title_section_help' => 'Cuando está activado, el título y subtítulo del sitio se ocultan en la parte superior de la página principal.',
+    'settings_hide_filter_label'     => 'Ocultar texto "Filtrar por categoría"',
+    'settings_hide_filter_label_help'=> 'Cuando está activado, el texto "Filtrar por categoría" se oculta; los chips de categoría permanecen visibles.',
     'settings_save'                 => 'Guardar configuración',
     'settings_saved'                => 'Configuración guardada.',
     'current'                       => 'Actual',

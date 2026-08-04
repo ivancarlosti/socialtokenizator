@@ -48,7 +48,9 @@ class AppServiceProvider extends ServiceProvider
             $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
             $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
             $footerHtml    = $this->safeSetting('footer_html');
-            $postPathPrefix = $this->safeSetting('post_path_prefix') ?: 'p';
+            $postPathPrefix  = $this->safeSetting('post_path_prefix') ?: 'p';
+            $hideTitleSection = (bool) $this->safeSetting('hide_title_section');
+            $hideFilterLabel  = (bool) $this->safeSetting('hide_filter_label');
 
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
@@ -59,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
                 'siteSubtitle'     => $siteSubtitle,
                 'footerHtml'       => $footerHtml,
                 'postPathPrefix'   => $postPathPrefix,
+                'hideTitleSection' => $hideTitleSection,
+                'hideFilterLabel'  => $hideFilterLabel,
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,

@@ -31,16 +31,18 @@ class SettingsController extends Controller
         }
 
         return view('admin.settings', [
-            'logoUrl'        => Setting::publicUrl(Setting::get('site_logo_key')),
-            'faviconUrl'     => Setting::publicUrl(Setting::get('site_favicon_key')),
-            'defaultLocale'  => Setting::get('default_locale', config('app.locale')),
-            'postsPerPage'   => Setting::get('posts_per_page', '12'),
-            'postPathPrefix' => Setting::get('post_path_prefix', 'p'),
-            'footerHtml'     => Setting::get('footer_html', ''),
-            'titleRows'      => $titleRows,
-            'subtitleRows'   => $subtitleRows,
-            'locales'        => $locales,
-            'footerLinkRows' => $footerLinkRows,
+            'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
+            'faviconUrl'       => Setting::publicUrl(Setting::get('site_favicon_key')),
+            'defaultLocale'    => Setting::get('default_locale', config('app.locale')),
+            'postsPerPage'     => Setting::get('posts_per_page', '12'),
+            'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
+            'footerHtml'       => Setting::get('footer_html', ''),
+            'hideTitleSection' => (bool) Setting::get('hide_title_section'),
+            'hideFilterLabel'  => (bool) Setting::get('hide_filter_label'),
+            'titleRows'        => $titleRows,
+            'subtitleRows'     => $subtitleRows,
+            'locales'          => $locales,
+            'footerLinkRows'   => $footerLinkRows,
         ]);
     }
 
@@ -56,6 +58,8 @@ class SettingsController extends Controller
             'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
             'post_path_prefix'      => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9_-]+$/'],
+            'hide_title_section'    => ['nullable', 'boolean'],
+            'hide_filter_label'     => ['nullable', 'boolean'],
             'footer_html'           => ['nullable', 'string', 'max:10000'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
@@ -97,6 +101,20 @@ class SettingsController extends Controller
             Setting::put('post_path_prefix', $prefix);
         } else {
             Setting::forget('post_path_prefix');
+        }
+
+        // Hide title section
+        if ($request->boolean('hide_title_section')) {
+            Setting::put('hide_title_section', '1');
+        } else {
+            Setting::forget('hide_title_section');
+        }
+
+        // Hide filter label
+        if ($request->boolean('hide_filter_label')) {
+            Setting::put('hide_filter_label', '1');
+        } else {
+            Setting::forget('hide_filter_label');
         }
 
         // Footer HTML

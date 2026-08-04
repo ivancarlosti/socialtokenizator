@@ -83,6 +83,26 @@
             <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_path_prefix_help') }}</p>
         </div>
 
+        {{-- Hide title section --}}
+        <div>
+            <label class="inline-flex items-center gap-2 text-sm text-copy">
+                <input type="checkbox" name="hide_title_section" value="1"
+                       @checked($hideTitleSection)>
+                {{ __('messages.settings_hide_title_section') }}
+            </label>
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_title_section_help') }}</p>
+        </div>
+
+        {{-- Hide filter label --}}
+        <div>
+            <label class="inline-flex items-center gap-2 text-sm text-copy">
+                <input type="checkbox" name="hide_filter_label" value="1"
+                       @checked($hideFilterLabel)>
+                {{ __('messages.settings_hide_filter_label') }}
+            </label>
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_filter_label_help') }}</p>
+        </div>
+
         {{-- Site title & subtitle per locale --}}
         <div>
             <label class="block text-sm text-muted mb-3">{{ __('messages.settings_site_title_subtitle') }}</label>

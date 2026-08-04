@@ -68,16 +68,16 @@
                         <div>
                             <label class="block text-xs text-muted mb-1">{{ __('messages.category_handle') }}</label>
                             <input type="text" name="handle" value="{{ old('handle_'.$cat->id, $cat->handle) }}" required maxlength="64"
-                                   class="w-48 bg-input border border-input-border rounded px-2 py-1 text-xs text-copy">
+                                   class="w-64 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             @foreach(\App\Support\Locales::supported() as $code => $info)
                                 @php $col = 'name_'.str_replace('-', '_', $code); @endphp
                                 <div>
-                                    <label class="block text-xs text-muted mb-0.5">{{ $info['name'] }}</label>
+                                    <label class="block text-xs text-muted mb-1">{{ $info['name'] }}</label>
                                     <input type="text" name="{{ $col }}" value="{{ old($col.'_'.$cat->id, $cat->$col) }}" maxlength="128"
-                                           class="w-full bg-input border border-input-border rounded px-2 py-1 text-xs text-copy"
+                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
                                            placeholder="{{ $info['name'] }}">
                                 </div>
                             @endforeach

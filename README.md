@@ -4,9 +4,12 @@ A self-hosted, single-container image-sharing web app:
 
 - Public, anonymous browsing — every image gets a stable, shareable UUID URL.
 - Private uploads behind a pluggable auth layer (`none` / `account` / `keycloak`).
+- Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 10 MB).
 - Object storage on **Cloudflare R2** (S3-compatible).
-- MySQL for metadata, tags, and source links.
+- MySQL for metadata, tags, categories, and source links.
 - Server-rendered Open Graph + Twitter Card tags so links unfurl perfectly on X and Facebook.
+- Three-language UI (EN_US, es_MX, pt_BR) with AI-powered translation for post descriptions.
+- Dark and light theme with auto-detection and manual toggle.
 - Designed to live behind a reverse proxy (Nginx, Traefik, Caddy…).
 
 The Docker image is published from this repo's GitHub Actions to:
@@ -29,10 +32,15 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
    - [`none`](#auth_methodnone)
    - [`account` + reCAPTCHA](#auth_methodaccount)
    - [`keycloak` (OIDC SSO)](#auth_methodkeycloak)
-6. [Reverse-proxy examples](#reverse-proxy-examples)
-7. [Operating the app](#operating-the-app)
-8. [Troubleshooting](#troubleshooting)
-9. [Repository layout](#repository-layout)
+6. [AI Translation](#ai-translation)
+7. [Post URL prefix](#post-url-prefix)
+8. [Categories](#categories)
+9. [Admin settings](#admin-settings)
+10. [Dark / light mode](#dark--light-mode)
+11. [Reverse-proxy examples](#reverse-proxy-examples)
+12. [Operating the app](#operating-the-app)
+13. [Troubleshooting](#troubleshooting)
+14. [Repository layout](#repository-layout)
 
 ---
 
@@ -278,9 +286,9 @@ The system prompt instructs the AI to preserve formatting, line breaks, and HTML
 
 | Locale code | AI prompt target |
 |---|---|
-| `en` | English |
-| `es` | Spanish (Mexican) |
-| `pt_BR` | Brazilian Portuguese |
+| `en` | EN_US |
+| `es` | es_MX |
+| `pt_BR` | pt_BR |
 
 ---
 
@@ -289,6 +297,56 @@ The system prompt instructs the AI to preserve formatting, line breaks, and HTML
 The default URL pattern for post detail pages is `/p/{uuid}`. You can change the `p` prefix in **Admin → Settings → Post URL prefix**. For example, setting it to `post` changes URLs to `/post/{uuid}`.
 
 The old `/image/{uuid}` URLs automatically redirect (301) to the new pattern.
+
+> **Note:** Changing the prefix requires clearing the route cache. Restart the container after saving: `docker compose restart`.
+
+---
+
+## Categories
+
+Categories are managed in **Admin → Categories**. Each category has:
+
+- **Handle** — a unique, lowercase identifier shared across all languages (e.g. `gaming-market`). Used in URLs for filtering.
+- **Localized names** — one display name per supported language.
+
+Categories appear as filter chips at the top of the homepage. Clicking a category filters the feed to show only images in that category. The "All" chip resets the filter.
+
+### Adding a category
+
+In **Admin → Categories**, fill in the handle and at least one localized name, then click **Add category**. The handle must be unique and contain only lowercase letters, numbers, hyphens, and underscores.
+
+### Editing and deleting
+
+Each existing category shows an inline edit form. You can change the handle or localized names and click **Save**. Deleting a category removes it from all associated images.
+
+The image count next to each category shows how many images belong to it.
+
+---
+
+## Admin settings
+
+All configurable options are in **Admin → Settings**. Changes take effect immediately after saving (except the post URL prefix — see [Post URL prefix](#post-url-prefix)).
+
+| Setting | Description |
+|---|---|
+| **Site logo** | Replaces the header text. Accepts PNG, SVG, WEBP, JPG, GIF — max 2 MB. |
+| **Favicon** | Browser tab icon. PNG, ICO, SVG, WEBP — max 512 KB. |
+| **Default language** | Sets the default locale for visitors. Supports EN_US, es_MX, and pt_BR. |
+| **Posts per page** | Number of images shown per page in the feed (1–100). |
+| **Post URL prefix** | URL segment for post detail pages (default: `p`). Changing to `post` makes URLs `/post/{uuid}`. Requires container restart. |
+| **Hide title section** | When checked, the site title and subtitle are hidden at the top of the homepage. |
+| **Hide "Filter by category" label** | When checked, the "Filter by category" text above the category chips is hidden; the category chips remain visible and functional. |
+| **Site title & subtitle (per language)** | Customizable heading and tagline for each supported language. Falls back to `APP_NAME` if empty. |
+| **Footer HTML** | Custom HTML or text displayed on the right side of the footer. Accepts HTML tags (max 10 000 characters). |
+| **Footer links** | Up to 3 labeled links displayed in the footer. Leave both label and URL empty to remove a link. |
+
+---
+
+## Dark / light mode
+
+The app ships with a dark/light theme toggle in the navigation bar (sun/moon icon). By default it follows the browser's `prefers-color-scheme` setting. The user's choice is persisted in `localStorage` and survives page reloads.
+
+The theme is implemented via CSS custom properties that switch between two color palettes — one for light mode (`:root`) and one for dark mode (`.dark` class). All UI components reference these variables, so both themes work consistently across every page.
 
 ---
 
