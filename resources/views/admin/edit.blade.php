@@ -35,8 +35,16 @@
                         <label class="block text-xs text-muted mb-1">{{ __('messages.headline') }}</label>
                         <input type="text" name="{{ $colH }}" value="{{ old($colH, $image->$colH) }}"
                                maxlength="300"
-                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy headline-field"
+                               data-locale="{{ $code }}"
                                placeholder="{{ __('messages.headline_help') }}">
+                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
+                                data-target="{{ $colH }}"
+                                data-target-locale="{{ $code }}"
+                                data-field-type="headline">
+                            {{ __('messages.translate_with_ai') }}
+                        </button>
+                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
                     </div>
                     <div>
                         <label class="block text-xs text-muted mb-1">{{ __('messages.description') }}</label>
@@ -45,7 +53,8 @@
                                   data-locale="{{ $code }}">{{ old($colD, $image->$colD) }}</textarea>
                         <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
                                 data-target="{{ $colD }}"
-                                data-target-locale="{{ $code }}">
+                                data-target-locale="{{ $code }}"
+                                data-field-type="description">
                             {{ __('messages.translate_with_ai') }}
                         </button>
                         <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
@@ -141,16 +150,29 @@
                 btn.addEventListener('click', async function () {
                     const targetName = this.dataset.target;
                     const targetLocale = this.dataset.targetLocale;
+                    const fieldType = this.dataset.fieldType;
                     const targetField = document.querySelector(`[name="${targetName}"]`);
                     const statusEl = this.nextElementSibling;
 
-                    // Find the best source: any non-empty description from another locale
+                    // Find the best source: prefer same field type from another locale
                     let sourceText = '';
-                    const allDescs = document.querySelectorAll('.desc-field');
-                    for (const desc of allDescs) {
-                        if (desc.name !== targetName && desc.value.trim()) {
-                            sourceText = desc.value.trim();
+                    const sourceSelector = fieldType === 'headline' ? '.headline-field' : '.desc-field';
+                    const allFields = document.querySelectorAll(sourceSelector);
+                    for (const f of allFields) {
+                        if (f.name !== targetName && f.value.trim()) {
+                            sourceText = f.value.trim();
                             break;
+                        }
+                    }
+                    // Fallback: try the other field type
+                    if (!sourceText) {
+                        const fallbackSelector = fieldType === 'headline' ? '.desc-field' : '.headline-field';
+                        const fallbackFields = document.querySelectorAll(fallbackSelector);
+                        for (const f of fallbackFields) {
+                            if (f.value.trim()) {
+                                sourceText = f.value.trim();
+                                break;
+                            }
                         }
                     }
                     if (!sourceText) {

@@ -23,7 +23,7 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'image' => ['required', 'file', 'mimes:jpeg,png,webp,gif', 'max:10240'],
+            'image' => ['required', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
             'headline_en'    => ['nullable', 'string', 'max:300'],
             'headline_es'    => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
