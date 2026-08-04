@@ -47,5 +47,10 @@ php artisan config:cache >/dev/null 2>&1 || true
 php artisan route:cache  >/dev/null 2>&1 || true
 php artisan view:cache   >/dev/null 2>&1 || true
 
-# 6. Hand off to supervisord (or whatever CMD was given)
+# 6. Wipe the application cache so files owned by root (created during
+#    the artisan commands above, which bootstrap Laravel) are deleted.
+#    PHP-FPM runs as www-data and must own the cache files it writes.
+php artisan cache:clear >/dev/null 2>&1 || true
+
+# 7. Hand off to supervisord (or whatever CMD was given)
 exec "$@"

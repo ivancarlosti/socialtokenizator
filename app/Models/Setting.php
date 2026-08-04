@@ -15,12 +15,9 @@ class Setting extends Model
 
     public const CACHE_KEY = 'app.settings';
 
-    /** Seconds before the settings cache automatically expires. */
-    private const CACHE_TTL = 5;
-
     public static function cached()
     {
-        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+        return Cache::rememberForever(self::CACHE_KEY, function () {
             return static::query()->pluck('value', 'key');
         });
     }
