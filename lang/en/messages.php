@@ -96,6 +96,8 @@ return [
     'settings_default_locale'       => 'Default language',
     'settings_posts_per_page'       => 'Posts per page',
     'settings_posts_per_page_help'  => 'Number of images shown on each page of the feed (1–100).',
+    'settings_feed_posts_count'       => 'Feed posts count',
+    'settings_feed_posts_count_help'  => 'Number of posts included in the Atom/RSS feed (1–100, default: 10).',
     'settings_post_path_prefix'     => 'Post URL prefix',
     'settings_post_path_prefix_help'=> 'URL segment for post detail pages (default: p). Changing this requires clearing the route cache. Restart the container (`docker compose restart`) after saving.',
     'settings_footer_html'          => 'Footer HTML',
@@ -119,6 +121,9 @@ return [
     'not_found'      => 'Nothing here.',
     'forbidden'      => 'Forbidden.',
     'home_link'      => '← Home',
+
+    // Feed
+    'feed_atom'      => 'Atom feed',
 
     // Auth
     'admin_login'    => 'Admin login',

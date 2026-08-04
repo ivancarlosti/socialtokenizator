@@ -96,6 +96,8 @@ return [
     'settings_default_locale'       => 'Idioma padrão',
     'settings_posts_per_page'       => 'Posts por página',
     'settings_posts_per_page_help'  => 'Número de imagens exibidas em cada página do feed (1–100).',
+    'settings_feed_posts_count'       => 'Quantidade no feed',
+    'settings_feed_posts_count_help'  => 'Número de posts incluídos no feed Atom/RSS (1–100, padrão: 10).',
     'settings_post_path_prefix'     => 'Prefixo da URL dos posts',
     'settings_post_path_prefix_help'=> 'Segmento da URL para páginas de detalhe (padrão: p). Alterar requer limpar o cache de rotas. Reinicie o container (`docker compose restart`) após salvar.',
     'settings_footer_html'          => 'HTML do rodapé',
@@ -119,6 +121,9 @@ return [
     'not_found'      => 'Nada aqui.',
     'forbidden'      => 'Acesso negado.',
     'home_link'      => '← Início',
+
+    // Feed
+    'feed_atom'      => 'Feed Atom',
 
     // Auth
     'admin_login'    => 'Acesso de administrador',

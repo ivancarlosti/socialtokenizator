@@ -73,6 +73,15 @@
             <p class="mt-1 text-xs text-muted">{{ __('messages.settings_posts_per_page_help') }}</p>
         </div>
 
+        {{-- Feed posts count --}}
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_feed_posts_count') }}</label>
+            <input type="number" name="feed_posts_count" value="{{ old('feed_posts_count', $feedPostsCount) }}"
+                   min="1" max="100" required
+                   class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_feed_posts_count_help') }}</p>
+        </div>
+
         {{-- Post path prefix --}}
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.settings_post_path_prefix') }}</label>

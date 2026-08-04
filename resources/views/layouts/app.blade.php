@@ -75,13 +75,23 @@
                         @php $isActive = $code === $currentLocale; @endphp
                         <a href="{{ route('locale.switch', ['locale' => $code]) }}"
                            title="{{ $info['name'] }}"
-                           class="inline-flex items-center justify-center rounded overflow-hidden transition-opacity {{ $isActive ? 'opacity-100' : 'opacity-70 hover:opacity-100' }}">
+                           class="inline-flex items-center justify-center rounded overflow-hidden transition-opacity {{ $isActive ? 'opacity-100' : 'opacity-50 hover:opacity-100' }}">
                             <img src="https://flagcdn.com/w40/{{ $info['flag'] }}.png"
                                  srcset="https://flagcdn.com/w80/{{ $info['flag'] }}.png 2x"
-                                 alt="{{ $info['name'] }}" width="34" height="23" class="block">
+                                 alt="{{ $info['name'] }}" class="block w-[34px] h-[23px]">
                         </a>
                     @endforeach
                 </div>
+
+                {{-- Feed icon --}}
+                <a href="{{ $feedUrl }}"
+                   class="p-1.5 rounded border border-card-border text-muted hover:text-copy"
+                   style="border-color: var(--color-card-border);"
+                   title="{{ __('messages.feed_atom') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                        <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z"/>
+                    </svg>
+                </a>
 
                 @if($isAdmin)
                     <a href="{{ route('admin.upload.create') }}" class="text-accent">{{ __('messages.upload') }}</a>

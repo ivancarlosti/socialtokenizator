@@ -52,6 +52,20 @@ class AppServiceProvider extends ServiceProvider
             $hideTitleSection = (bool) $this->safeSetting('hide_title_section');
             $hideFilterLabel  = (bool) $this->safeSetting('hide_filter_label');
 
+            // Compute context-aware feed URL for the header icon
+            $feedUrl = route('feed'); // default: main feed
+            $routeName = request()->route()?->getName();
+            if ($routeName === 'home') {
+                $cat = request()->query('category');
+                $tag = request()->query('tag');
+                if ($cat && is_string($cat) && $cat !== '') {
+                    $feedUrl = route('feed', ['category' => $cat]);
+                } elseif ($tag && is_string($tag) && $tag !== '') {
+                    $feedUrl = route('feed', ['tag' => $tag]);
+                }
+            }
+            // For article pages, search, etc. — main feed is the right choice
+
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
                 'isAdmin'          => AuthMethodResolver::isAdmin(),
@@ -66,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,
+                'feedUrl'          => $feedUrl,
             ]);
         });
     }

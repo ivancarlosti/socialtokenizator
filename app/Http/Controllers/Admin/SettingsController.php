@@ -36,6 +36,7 @@ class SettingsController extends Controller
             'faviconUrl'       => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'    => Setting::get('default_locale', config('app.locale')),
             'postsPerPage'     => Setting::get('posts_per_page', '12'),
+            'feedPostsCount'   => Setting::get('feed_posts_count', '10'),
             'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
             'footerHtml'       => Setting::get('footer_html', ''),
             'hideTitleSection' => (bool) Setting::get('hide_title_section'),
@@ -58,6 +59,7 @@ class SettingsController extends Controller
             'remove_favicon'        => ['nullable', 'boolean'],
             'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
+            'feed_posts_count'      => ['required', 'integer', 'min:1', 'max:100'],
             'post_path_prefix'      => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9_-]+$/'],
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
@@ -95,6 +97,7 @@ class SettingsController extends Controller
 
         Setting::put('default_locale', $validated['default_locale']);
         Setting::put('posts_per_page', (string) $validated['posts_per_page']);
+        Setting::put('feed_posts_count', (string) $validated['feed_posts_count']);
 
         // Post path prefix
         $prefix = trim((string) ($validated['post_path_prefix'] ?? ''));

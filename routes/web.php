@@ -1,6 +1,7 @@
 <?php
 
 use App\Auth\AuthMethodResolver;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TranslateController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [HomeController::class, 'search'])->name('search');
+Route::get('/feed', [FeedController::class, 'index'])->name('feed');
 
 // Canonical post URL: /p/{uuid} (prefix configurable in settings)
 $postPrefix = 'p';

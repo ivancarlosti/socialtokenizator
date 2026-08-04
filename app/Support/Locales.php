@@ -14,7 +14,7 @@ class Locales
     public static function supported(): array
     {
         return [
-            'en'    => ['name' => 'EN_US',       'flag' => 'us'],
+            'en'    => ['name' => 'en_US',       'flag' => 'us'],
             'es'    => ['name' => 'es_MX',       'flag' => 'mx'],
             'pt_BR' => ['name' => 'pt_BR',       'flag' => 'br'],
         ];
