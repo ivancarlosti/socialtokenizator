@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
-    protected $fillable = ['handle', 'name_en', 'name_es', 'name_pt_BR'];
+    protected $fillable = ['handle', 'name_en_US', 'name_es_MX', 'name_pt_BR'];
 
     public function images(): BelongsToMany
     {
@@ -21,15 +21,15 @@ class Category extends Model
     {
         $fallbackChain = [$locale];
 
-        // Add fallback: pt_BR → es → en
+        // Add fallback: pt_BR → es_MX → en-US
         if ($locale === 'pt_BR') {
-            $fallbackChain[] = 'es';
-            $fallbackChain[] = 'en';
-        } elseif ($locale === 'es') {
-            $fallbackChain[] = 'en';
+            $fallbackChain[] = 'es_MX';
+            $fallbackChain[] = 'en-US';
+        } elseif ($locale === 'es_MX') {
+            $fallbackChain[] = 'en-US';
             $fallbackChain[] = 'pt_BR';
-        } elseif ($locale === 'en') {
-            $fallbackChain[] = 'es';
+        } elseif ($locale === 'en-US') {
+            $fallbackChain[] = 'es_MX';
             $fallbackChain[] = 'pt_BR';
         }
 
@@ -42,7 +42,7 @@ class Category extends Model
         }
 
         // Last resort: any non-null name
-        foreach (['name_en', 'name_es', 'name_pt_BR'] as $col) {
+        foreach (['name_en_US', 'name_es_MX', 'name_pt_BR'] as $col) {
             $val = $this->getAttribute($col);
             if (! empty($val)) {
                 return $val;

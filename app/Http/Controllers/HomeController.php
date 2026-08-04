@@ -50,11 +50,11 @@ class HomeController extends Controller
 
         if ($q !== '') {
             $query->where(function ($w) use ($q) {
-                $w->where('description_en', 'like', '%'.$q.'%')
-                  ->orWhere('description_es', 'like', '%'.$q.'%')
+                $w->where('description_en_US', 'like', '%'.$q.'%')
+                  ->orWhere('description_es_MX', 'like', '%'.$q.'%')
                   ->orWhere('description_pt_BR', 'like', '%'.$q.'%')
-                  ->orWhere('headline_en', 'like', '%'.$q.'%')
-                  ->orWhere('headline_es', 'like', '%'.$q.'%')
+                  ->orWhere('headline_en_US', 'like', '%'.$q.'%')
+                  ->orWhere('headline_es_MX', 'like', '%'.$q.'%')
                   ->orWhere('headline_pt_BR', 'like', '%'.$q.'%')
                   ->orWhereHas('tags', function ($t) use ($q) {
                       $t->where('name', \App\Models\Tag::normalize($q));

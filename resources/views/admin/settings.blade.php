@@ -53,6 +53,16 @@
             <p class="mt-1 text-xs text-muted">{{ __('messages.settings_favicon_help') }}</p>
         </div>
 
+        {{-- Default theme --}}
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_theme') }}</label>
+            <select name="default_theme"
+                    class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <option value="dark" @selected($defaultTheme === 'dark')>{{ __('messages.theme_dark') }}</option>
+                <option value="light" @selected($defaultTheme === 'light')>{{ __('messages.theme_light') }}</option>
+            </select>
+        </div>
+
         {{-- Default locale --}}
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_locale') }}</label>

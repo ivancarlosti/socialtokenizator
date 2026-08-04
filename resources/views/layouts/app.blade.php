@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', $currentLocale) }}" class="dark">
+<html lang="{{ str_replace('_', '-', $currentLocale) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -166,9 +166,19 @@
                 }
             }
 
+            const defaultTheme = @json($defaultTheme ?? 'dark');
             const stored = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const dark = stored ? stored === 'dark' : prefersDark;
+
+            // Priority: localStorage > server default > system preference
+            let dark;
+            if (stored) {
+                dark = stored === 'dark';
+            } else if (defaultTheme) {
+                dark = defaultTheme === 'dark';
+            } else {
+                dark = prefersDark;
+            }
             setTheme(dark);
 
             toggle.addEventListener('click', function () {

@@ -16,11 +16,11 @@ class Image extends Model
         'mime_type',
         'width',
         'height',
-        'headline_en',
-        'headline_es',
+        'headline_en_US',
+        'headline_es_MX',
         'headline_pt_BR',
-        'description_en',
-        'description_es',
+        'description_en_US',
+        'description_es_MX',
         'description_pt_BR',
     ];
 
@@ -77,13 +77,13 @@ class Image extends Model
         $fallbackChain = [$locale];
 
         if ($locale === 'pt_BR') {
-            $fallbackChain[] = 'es';
-            $fallbackChain[] = 'en';
-        } elseif ($locale === 'es') {
-            $fallbackChain[] = 'en';
+            $fallbackChain[] = 'es_MX';
+            $fallbackChain[] = 'en-US';
+        } elseif ($locale === 'es_MX') {
+            $fallbackChain[] = 'en-US';
             $fallbackChain[] = 'pt_BR';
-        } elseif ($locale === 'en') {
-            $fallbackChain[] = 'es';
+        } elseif ($locale === 'en-US') {
+            $fallbackChain[] = 'es_MX';
             $fallbackChain[] = 'pt_BR';
         }
 

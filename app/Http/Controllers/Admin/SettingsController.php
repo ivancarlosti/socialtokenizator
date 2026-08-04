@@ -35,6 +35,7 @@ class SettingsController extends Controller
             'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
             'faviconUrl'       => Setting::publicUrl(Setting::get('site_favicon_key')),
             'defaultLocale'    => Setting::get('default_locale', config('app.locale')),
+            'defaultTheme'     => Setting::get('default_theme', 'dark'),
             'postsPerPage'     => Setting::get('posts_per_page', '12'),
             'feedPostsCount'   => Setting::get('feed_posts_count', '10'),
             'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
@@ -63,6 +64,7 @@ class SettingsController extends Controller
             'post_path_prefix'      => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9_-]+$/'],
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
+            'default_theme'         => ['required', 'string', 'in:dark,light'],
             'footer_html'           => ['nullable', 'string', 'max:10000'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
@@ -96,6 +98,7 @@ class SettingsController extends Controller
         }
 
         Setting::put('default_locale', $validated['default_locale']);
+        Setting::put('default_theme', $validated['default_theme']);
         Setting::put('posts_per_page', (string) $validated['posts_per_page']);
         Setting::put('feed_posts_count', (string) $validated['feed_posts_count']);
 

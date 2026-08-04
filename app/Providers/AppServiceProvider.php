@@ -49,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
             $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
             $footerHtml    = $this->safeSetting('footer_html');
             $postPathPrefix  = $this->safeSetting('post_path_prefix') ?: 'p';
+            $defaultTheme    = $this->safeSetting('default_theme') ?: 'dark';
             $hideTitleSection = (bool) $this->safeSetting('hide_title_section');
             $hideFilterLabel  = (bool) $this->safeSetting('hide_filter_label');
 
@@ -81,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,
                 'feedUrl'          => $feedUrl,
+                'defaultTheme'     => $defaultTheme,
             ]);
         });
     }
