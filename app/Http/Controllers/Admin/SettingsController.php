@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Support\Locales;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -152,6 +153,19 @@ class SettingsController extends Controller
             } else {
                 Setting::forget("footer_link_{$i}_label");
                 Setting::forget("footer_link_{$i}_url");
+            }
+        }
+
+        // Clear all relevant caches so changes take effect immediately:
+        // - route cache: needed for post_path_prefix (read at route registration time)
+        // - config cache: safety measure
+        // - view cache: ensures recompiled Blade templates
+        // - app cache: ensures Cache::rememberForever data is refreshed
+        foreach (['cache:clear', 'route:clear', 'config:clear', 'view:clear'] as $command) {
+            try {
+                Artisan::call($command);
+            } catch (\Throwable) {
+                // Ignore failures — the setting was already persisted
             }
         }
 
