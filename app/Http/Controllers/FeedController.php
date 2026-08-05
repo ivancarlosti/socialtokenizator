@@ -4,18 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\Image;
 use App\Models\Setting;
+use App\Support\Locales;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class FeedController extends Controller
 {
-    public function index(Request $request): Response
+    /**
+     * Resolve the feed locale from the request or fall back to defaults.
+     */
+    private function resolveFeedLocale(Request $request): string
+    {
+        $lang = trim((string) $request->query('lang', ''));
+
+        if ($lang !== '' && Locales::isSupported($lang)) {
+            return $lang;
+        }
+
+        try {
+            $default = (string) Setting::get('default_locale', config('app.locale', 'pt_BR'));
+        } catch (\Throwable) {
+            $default = (string) config('app.locale', 'pt_BR');
+        }
+
+        return Locales::isSupported($default) ? $default : 'pt_BR';
+    }
+
+    /**
+     * Build the base query for feeds: locale-filtered, category/tag-filtered, limited.
+     */
+    private function buildFeedQuery(Request $request, string $locale)
     {
         $categoryHandle = trim((string) $request->query('category', ''));
         $tagFilter = trim((string) $request->query('tag', ''));
         $limit = max(1, min(100, (int) Setting::get('feed_posts_count', 10)));
 
+        // Build locale column suffixes (e.g. en_US, pt_BR)
+        $localeSuffix = str_replace('-', '_', $locale);
+
         $query = Image::query()->with(['categories', 'tags']);
+
+        // Only include images that have content in the requested locale
+        $headlineCol = 'headline_' . $localeSuffix;
+        $descCol = 'description_' . $localeSuffix;
+        $query->where(function ($q) use ($headlineCol, $descCol) {
+            $q->whereNotNull($headlineCol)->where($headlineCol, '!=', '')
+              ->orWhereNotNull($descCol)->where($descCol, '!=', '');
+        });
 
         if ($categoryHandle !== '') {
             $query->whereHas('categories', function ($q) use ($categoryHandle) {
@@ -29,46 +65,63 @@ class FeedController extends Controller
             });
         }
 
-        $images = $query->latest()->take($limit)->get();
+        return $query->latest()->take($limit)->get();
+    }
 
-        $feedTitle = Setting::get('site_title_' . app()->getLocale()) ?: config('app.name');
+    /**
+     * Build a human-readable feed title.
+     */
+    private function buildFeedTitle(string $locale, string $categoryHandle, string $tagFilter): string
+    {
+        $title = Setting::get('site_title_' . $locale) ?: config('app.name');
+
         if ($categoryHandle !== '') {
-            $feedTitle .= ' — ' . $categoryHandle;
+            $title .= ' — ' . $categoryHandle;
         } elseif ($tagFilter !== '') {
-            $feedTitle .= ' — #' . $tagFilter;
+            $title .= ' — #' . $tagFilter;
         }
 
-        $xml = $this->buildAtomXml($images, $feedTitle, $categoryHandle, $tagFilter);
+        return $title;
+    }
+
+    // ──────────────────────────────────────────────
+    //  Atom feed
+    // ──────────────────────────────────────────────
+
+    public function atom(Request $request): Response
+    {
+        $locale = $this->resolveFeedLocale($request);
+        $categoryHandle = trim((string) $request->query('category', ''));
+        $tagFilter = trim((string) $request->query('tag', ''));
+
+        $images = $this->buildFeedQuery($request, $locale);
+        $feedTitle = $this->buildFeedTitle($locale, $categoryHandle, $tagFilter);
+
+        $xml = $this->buildAtomXml($images, $feedTitle, $locale, $categoryHandle, $tagFilter);
 
         return response($xml, 200)
             ->header('Content-Type', 'application/atom+xml; charset=utf-8');
     }
 
-    private function buildAtomXml($images, string $feedTitle, string $categoryHandle, string $tagFilter): string
+    private function buildAtomXml($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): string
     {
-        $feedId = route('feed');
-        $feedUrl = route('feed');
-        $queryParams = [];
+        $queryParams = ['lang' => $locale];
         if ($categoryHandle !== '') {
             $queryParams['category'] = $categoryHandle;
         } elseif ($tagFilter !== '') {
             $queryParams['tag'] = $tagFilter;
         }
-        if ($queryParams) {
-            $feedId .= '?' . http_build_query($queryParams);
-            $feedUrl .= '?' . http_build_query($queryParams);
-        }
+        $feedUrl = route('feed.atom', $queryParams);
+        $feedId = $feedUrl;
 
         $updated = $images->first()?->created_at?->toAtomString()
             ?? now()->toAtomString();
-
-        $defaultLocale = Setting::get('default_locale', 'en');
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
 
         $feed = $dom->createElementNS('http://www.w3.org/2005/Atom', 'feed');
-        $feed->setAttribute('xml:lang', str_replace('_', '-', $defaultLocale));
+        $feed->setAttribute('xml:lang', str_replace('_', '-', $locale));
         $dom->appendChild($feed);
 
         $this->appendElement($dom, $feed, 'id', $feedId);
@@ -77,7 +130,7 @@ class FeedController extends Controller
         $this->appendLink($dom, $feed, 'self', $feedUrl, 'application/atom+xml');
         $this->appendLink($dom, $feed, 'alternate', url('/'), 'text/html');
 
-        $siteTitle = Setting::get('site_title_' . $defaultLocale) ?: config('app.name');
+        $siteTitle = Setting::get('site_title_' . $locale) ?: config('app.name');
         $author = $dom->createElement('author');
         $this->appendElement($dom, $author, 'name', $siteTitle);
         $feed->appendChild($author);
@@ -88,8 +141,8 @@ class FeedController extends Controller
             $entryId = route('image.show', ['uuid' => $image->uuid]);
             $this->appendElement($dom, $entry, 'id', $entryId);
 
-            $headline = $image->getHeadline($defaultLocale);
-            $description = $image->getDescription($defaultLocale);
+            $headline = $image->getHeadline($locale);
+            $description = $image->getDescription($locale);
             $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');
             $this->appendElement($dom, $entry, 'title', $title);
 
@@ -109,11 +162,10 @@ class FeedController extends Controller
 
             $this->appendLink($dom, $entry, 'alternate', $entryId, 'text/html');
 
-            // Categories as Atom categories
             foreach ($image->categories as $cat) {
                 $catEl = $dom->createElement('category');
                 $catEl->setAttribute('term', $cat->handle);
-                $catEl->setAttribute('label', $cat->getName($defaultLocale) ?? $cat->handle);
+                $catEl->setAttribute('label', $cat->getName($locale) ?? $cat->handle);
                 $entry->appendChild($catEl);
             }
 
@@ -122,6 +174,174 @@ class FeedController extends Controller
 
         return $dom->saveXML();
     }
+
+    // ──────────────────────────────────────────────
+    //  RSS 2.0 feed
+    // ──────────────────────────────────────────────
+
+    public function rss(Request $request): Response
+    {
+        $locale = $this->resolveFeedLocale($request);
+        $categoryHandle = trim((string) $request->query('category', ''));
+        $tagFilter = trim((string) $request->query('tag', ''));
+
+        $images = $this->buildFeedQuery($request, $locale);
+        $feedTitle = $this->buildFeedTitle($locale, $categoryHandle, $tagFilter);
+
+        $xml = $this->buildRssXml($images, $feedTitle, $locale, $categoryHandle, $tagFilter);
+
+        return response($xml, 200)
+            ->header('Content-Type', 'application/rss+xml; charset=utf-8');
+    }
+
+    private function buildRssXml($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): string
+    {
+        $queryParams = ['lang' => $locale];
+        if ($categoryHandle !== '') {
+            $queryParams['category'] = $categoryHandle;
+        } elseif ($tagFilter !== '') {
+            $queryParams['tag'] = $tagFilter;
+        }
+        $feedUrl = route('feed.rss', $queryParams);
+        $siteUrl = url('/');
+        $siteTitle = Setting::get('site_title_' . $locale) ?: config('app.name');
+        $lastBuildDate = $images->first()?->created_at?->toRssString()
+            ?? now()->toRssString();
+        $langTag = str_replace('_', '-', $locale);
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+
+        $rss = $dom->createElement('rss');
+        $rss->setAttribute('version', '2.0');
+        $rss->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+        $dom->appendChild($rss);
+
+        $channel = $dom->createElement('channel');
+        $rss->appendChild($channel);
+
+        $this->appendElement($dom, $channel, 'title', $feedTitle);
+        $this->appendElement($dom, $channel, 'link', $siteUrl);
+        $this->appendElement($dom, $channel, 'description', $feedTitle);
+        $this->appendElement($dom, $channel, 'language', $langTag);
+        $this->appendElement($dom, $channel, 'lastBuildDate', $lastBuildDate);
+
+        // Atom self-link for interoperability
+        $atomLink = $dom->createElementNS('http://www.w3.org/2005/Atom', 'atom:link');
+        $atomLink->setAttribute('href', $feedUrl);
+        $atomLink->setAttribute('rel', 'self');
+        $atomLink->setAttribute('type', 'application/rss+xml');
+        $channel->appendChild($atomLink);
+
+        foreach ($images as $image) {
+            $item = $dom->createElement('item');
+
+            $entryUrl = route('image.show', ['uuid' => $image->uuid]);
+            $headline = $image->getHeadline($locale);
+            $description = $image->getDescription($locale);
+            $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');
+
+            $this->appendElement($dom, $item, 'title', $title);
+            $this->appendElement($dom, $item, 'link', $entryUrl);
+            $this->appendElement($dom, $item, 'guid', $entryUrl);
+
+            $pubDate = $image->created_at->toRssString();
+            $this->appendElement($dom, $item, 'pubDate', $pubDate);
+
+            if ($description) {
+                $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
+                $htmlContent .= '<p>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</p></div>';
+                $descEl = $dom->createElement('description');
+                $descEl->appendChild($dom->createCDATASection($htmlContent));
+                $item->appendChild($descEl);
+            }
+
+            // Categories as RSS category elements
+            foreach ($image->categories as $cat) {
+                $catEl = $dom->createElement('category', htmlspecialchars($cat->getName($locale) ?? $cat->handle, ENT_XML1, 'UTF-8'));
+                $item->appendChild($catEl);
+            }
+
+            $channel->appendChild($item);
+        }
+
+        return $dom->saveXML();
+    }
+
+    // ──────────────────────────────────────────────
+    //  JSON Feed v1.1
+    // ──────────────────────────────────────────────
+
+    public function json(Request $request): JsonResponse
+    {
+        $locale = $this->resolveFeedLocale($request);
+        $categoryHandle = trim((string) $request->query('category', ''));
+        $tagFilter = trim((string) $request->query('tag', ''));
+
+        $images = $this->buildFeedQuery($request, $locale);
+        $feedTitle = $this->buildFeedTitle($locale, $categoryHandle, $tagFilter);
+
+        $data = $this->buildJsonFeed($images, $feedTitle, $locale, $categoryHandle, $tagFilter);
+
+        return response()->json($data, 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            ->header('Content-Type', 'application/feed+json; charset=utf-8');
+    }
+
+    private function buildJsonFeed($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): array
+    {
+        $queryParams = ['lang' => $locale];
+        if ($categoryHandle !== '') {
+            $queryParams['category'] = $categoryHandle;
+        } elseif ($tagFilter !== '') {
+            $queryParams['tag'] = $tagFilter;
+        }
+        $feedUrl = route('feed.json', $queryParams);
+        $siteUrl = url('/');
+        $langTag = str_replace('_', '-', $locale);
+
+        $items = [];
+        foreach ($images as $image) {
+            $entryUrl = route('image.show', ['uuid' => $image->uuid]);
+            $headline = $image->getHeadline($locale);
+            $description = $image->getDescription($locale);
+            $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');
+
+            $item = [
+                'id' => $entryUrl,
+                'url' => $entryUrl,
+                'title' => $title,
+                'date_published' => $image->created_at->toIso8601String(),
+            ];
+
+            if ($description) {
+                $item['content_html'] = '<div><img src="' . $image->public_url . '" alt="" /><p>' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '</p></div>';
+                $item['summary'] = \Illuminate\Support\Str::limit($description, 300);
+            }
+
+            $itemTags = [];
+            foreach ($image->categories as $cat) {
+                $itemTags[] = $cat->getName($locale) ?? $cat->handle;
+            }
+            if ($itemTags) {
+                $item['tags'] = $itemTags;
+            }
+
+            $items[] = $item;
+        }
+
+        return [
+            'version' => 'https://jsonfeed.org/version/1.1',
+            'title' => $feedTitle,
+            'home_page_url' => $siteUrl,
+            'feed_url' => $feedUrl,
+            'language' => $langTag,
+            'items' => $items,
+        ];
+    }
+
+    // ──────────────────────────────────────────────
+    //  DOM helpers
+    // ──────────────────────────────────────────────
 
     private function appendElement(\DOMDocument $dom, \DOMElement $parent, string $name, string $value): void
     {

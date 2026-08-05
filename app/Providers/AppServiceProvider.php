@@ -53,19 +53,22 @@ class AppServiceProvider extends ServiceProvider
             $hideTitleSection = (bool) $this->safeSetting('hide_title_section');
             $hideFilterLabel  = (bool) $this->safeSetting('hide_filter_label');
 
-            // Compute context-aware feed URL for the header icon
-            $feedUrl = route('feed'); // default: main feed
+            // Compute context-aware feed URLs (per format) for the header icon and <link> tags
+            $feedQueryParams = ['lang' => $locale];
             $routeName = request()->route()?->getName();
             if ($routeName === 'home') {
                 $cat = request()->query('category');
                 $tag = request()->query('tag');
                 if ($cat && is_string($cat) && $cat !== '') {
-                    $feedUrl = route('feed', ['category' => $cat]);
+                    $feedQueryParams['category'] = $cat;
                 } elseif ($tag && is_string($tag) && $tag !== '') {
-                    $feedUrl = route('feed', ['tag' => $tag]);
+                    $feedQueryParams['tag'] = $tag;
                 }
             }
-            // For article pages, search, etc. — main feed is the right choice
+
+            $feedAtomUrl = route('feed.atom', $feedQueryParams);
+            $feedRssUrl  = route('feed.rss',  $feedQueryParams);
+            $feedJsonUrl = route('feed.json', $feedQueryParams);
 
             $view->with([
                 'authMethod'       => AuthMethodResolver::current(),
@@ -81,7 +84,10 @@ class AppServiceProvider extends ServiceProvider
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'footerLinks'      => $footerLinks,
-                'feedUrl'          => $feedUrl,
+                'feedUrl'          => $feedAtomUrl,
+                'feedAtomUrl'      => $feedAtomUrl,
+                'feedRssUrl'       => $feedRssUrl,
+                'feedJsonUrl'      => $feedJsonUrl,
                 'defaultTheme'     => $defaultTheme,
             ]);
         });

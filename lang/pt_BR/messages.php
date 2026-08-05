@@ -127,6 +127,8 @@ return [
 
     // Feed
     'feed_atom'      => 'Feed Atom',
+    'feed_rss'       => 'Feed RSS',
+    'feed_json'      => 'Feed JSON',
 
     // Auth
     'admin_login'    => 'Acesso de administrador',

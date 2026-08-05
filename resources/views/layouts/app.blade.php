@@ -37,6 +37,11 @@
         <link rel="canonical" href="{{ $defaultUrl }}">
     @endif
 
+    {{-- Feed auto-discovery links --}}
+    <link rel="alternate" type="application/atom+xml"  href="{{ $feedAtomUrl }}" title="{{ $siteTitle }} — Atom">
+    <link rel="alternate" type="application/rss+xml"   href="{{ $feedRssUrl }}"  title="{{ $siteTitle }} — RSS">
+    <link rel="alternate" type="application/feed+json" href="{{ $feedJsonUrl }}" title="{{ $siteTitle }} — JSON Feed">
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) ?: '0' }}">
 </head>
 <body class="min-h-screen">

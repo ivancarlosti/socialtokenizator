@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [HomeController::class, 'search'])->name('search');
-Route::get('/feed', [FeedController::class, 'index'])->name('feed');
+Route::get('/feed', [FeedController::class, 'atom'])->name('feed.atom');
+Route::get('/rss', [FeedController::class, 'rss'])->name('feed.rss');
+Route::get('/json', [FeedController::class, 'json'])->name('feed.json');
 
 // Canonical post URL: /p/{uuid} (prefix configurable in settings)
 $postPrefix = 'p';
