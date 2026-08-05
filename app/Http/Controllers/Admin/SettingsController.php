@@ -27,10 +27,12 @@ class SettingsController extends Controller
         $titleRows = [];
         $subtitleRows = [];
         $footerHtmlRows = [];
+        $aboutRows = [];
         foreach ($locales as $code => $info) {
             $titleRows[$code] = Setting::get("site_title_{$code}", '');
             $subtitleRows[$code] = Setting::get("site_subtitle_{$code}", '');
             $footerHtmlRows[$code] = Setting::get("footer_html_{$code}", '');
+            $aboutRows[$code] = Setting::get("about_page_{$code}", '');
         }
 
         return view('admin.settings', [
@@ -46,6 +48,7 @@ class SettingsController extends Controller
             'titleRows'        => $titleRows,
             'subtitleRows'     => $subtitleRows,
             'footerHtmlRows'   => $footerHtmlRows,
+            'aboutRows'        => $aboutRows,
             'locales'          => $locales,
             'footerLinkRows'   => $footerLinkRows,
         ]);
@@ -78,6 +81,7 @@ class SettingsController extends Controller
                 "site_title_{$locale}"    => ['nullable', 'string', 'max:120'],
                 "site_subtitle_{$locale}" => ['nullable', 'string', 'max:200'],
                 "footer_html_{$locale}"   => ['nullable', 'string', 'max:10000'],
+                "about_page_{$locale}"    => ['nullable', 'string', 'max:20000'],
             ]);
         }
 
@@ -145,6 +149,12 @@ class SettingsController extends Controller
                 Setting::put("footer_html_{$locale}", $footerVal);
             } else {
                 Setting::forget("footer_html_{$locale}");
+            }
+            $aboutVal = trim((string) ($request->input("about_page_{$locale}", '')));
+            if ($aboutVal !== '') {
+                Setting::put("about_page_{$locale}", $aboutVal);
+            } else {
+                Setting::forget("about_page_{$locale}");
             }
         }
 

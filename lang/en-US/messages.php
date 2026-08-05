@@ -11,6 +11,7 @@ return [
     'language'           => 'Language',
     'theme_toggle_light' => 'Switch to light mode',
     'theme_toggle_dark'  => 'Switch to dark mode',
+    'about'              => 'About',
 
     // Home / Feed
     'home_heading'       => 'Feed',
@@ -135,4 +136,8 @@ return [
     'login_field'    => 'Login',
     'password'       => 'Password',
     'sign_in'        => 'Sign in',
+
+    // About page
+    'about_page_heading' => 'About',
+    'about_page_help'    => 'HTML content for the About page. Accepts HTML tags.',
 ];

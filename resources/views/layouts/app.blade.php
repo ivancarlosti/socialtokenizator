@@ -61,6 +61,9 @@
                     <button type="submit" class="bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1.5 rounded-r">{{ __('messages.search_go') }}</button>
                 </form>
 
+                {{-- About link --}}
+                <a href="{{ route('about') }}" class="text-muted hover:text-copy">{{ __('messages.about') }}</a>
+
                 {{-- Theme toggle --}}
                 <button type="button" id="theme-toggle"
                         class="p-1.5 rounded border border-card-border text-muted hover:text-copy"

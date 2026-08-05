@@ -170,6 +170,29 @@
             </div>
         </div>
 
+        {{-- About page content per locale --}}
+        <div>
+            <label class="block text-sm text-muted mb-3">{{ __('messages.about_page_heading') }}</label>
+            <p class="text-xs text-muted mb-2">{{ __('messages.about_page_help') }}</p>
+            <div class="space-y-4">
+                @foreach($locales as $code => $info)
+                    <div class="border border-card-border rounded p-3">
+                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                        <textarea name="about_page_{{ $code }}" rows="10" maxlength="20000"
+                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono about-field"
+                                  data-locale="{{ $code }}"
+                                  placeholder="<h2>{{ __('messages.about_page_heading') }}</h2><p>...</p>">{{ old("about_page_{$code}", $aboutRows[$code] ?? '') }}</textarea>
+                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
+                                data-target="about_page_{{ $code }}"
+                                data-target-locale="{{ $code }}">
+                            {{ __('messages.translate_with_ai') }}
+                        </button>
+                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
         {{-- Footer links --}}
         <div>
             <label class="block text-sm text-muted mb-2">{{ __('messages.settings_footer_links') }}</label>
@@ -198,4 +221,67 @@
             </button>
         </div>
     </form>
+
+    <script>
+        (function () {
+            // AI Translate for about page content
+            document.querySelectorAll('.ai-translate-link').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const targetName = this.dataset.target;
+                    const targetLocale = this.dataset.targetLocale;
+                    const targetField = document.querySelector(`[name="${targetName}"]`);
+                    const statusEl = this.nextElementSibling;
+
+                    // Find source text from another locale's about field
+                    let sourceText = '';
+                    const allFields = document.querySelectorAll('.about-field');
+                    for (const f of allFields) {
+                        if (f.name !== targetName && f.value.trim()) {
+                            sourceText = f.value.trim();
+                            break;
+                        }
+                    }
+                    if (!sourceText) {
+                        alert(@json(__('messages.translate_no_source')));
+                        return;
+                    }
+
+                    this.classList.add('hidden');
+                    statusEl.classList.remove('hidden');
+                    statusEl.textContent = @json(__('messages.translating'));
+
+                    try {
+                        const resp = await fetch('{{ route('admin.translate') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                text: sourceText,
+                                target_locale: targetLocale,
+                            }),
+                        });
+
+                        const data = await resp.json();
+                        if (data.translated_text) {
+                            targetField.value = data.translated_text;
+                            statusEl.textContent = @json(__('messages.translate_done'));
+                        } else {
+                            statusEl.textContent = data.error || @json(__('messages.translate_error'));
+                        }
+                    } catch (e) {
+                        statusEl.textContent = @json(__('messages.translate_error'));
+                    }
+
+                    this.classList.remove('hidden');
+                    setTimeout(() => {
+                        statusEl.classList.add('hidden');
+                        statusEl.textContent = '';
+                    }, 3000);
+                });
+            });
+        })();
+    </script>
 @endsection

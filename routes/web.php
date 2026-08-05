@@ -1,6 +1,7 @@
 <?php
 
 use App\Auth\AuthMethodResolver;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [HomeController::class, 'search'])->name('search');
+Route::get('/about', [AboutController::class, 'show'])->name('about');
 Route::get('/feed', [FeedController::class, 'atom'])->name('feed.atom');
 Route::get('/rss', [FeedController::class, 'rss'])->name('feed.rss');
 Route::get('/json', [FeedController::class, 'json'])->name('feed.json');

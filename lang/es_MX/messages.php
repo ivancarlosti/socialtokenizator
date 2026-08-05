@@ -11,6 +11,7 @@ return [
     'language'           => 'Idioma',
     'theme_toggle_light' => 'Cambiar a modo claro',
     'theme_toggle_dark'  => 'Cambiar a modo oscuro',
+    'about'              => 'Nosotros',
 
     // Home / Feed
     'home_heading'       => 'Feed',
@@ -135,4 +136,8 @@ return [
     'login_field'    => 'Usuario',
     'password'       => 'Contraseña',
     'sign_in'        => 'Entrar',
+
+    // About page
+    'about_page_heading' => 'Sobre nosotros',
+    'about_page_help'    => 'Contenido HTML para la página Acerca de. Acepta etiquetas HTML.',
 ];

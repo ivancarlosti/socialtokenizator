@@ -11,6 +11,7 @@ return [
     'language'           => 'Idioma',
     'theme_toggle_light' => 'Mudar para modo claro',
     'theme_toggle_dark'  => 'Mudar para modo escuro',
+    'about'              => 'Sobre',
 
     // Home / Feed
     'home_heading'       => 'Feed',
@@ -135,4 +136,8 @@ return [
     'login_field'    => 'Usuário',
     'password'       => 'Senha',
     'sign_in'        => 'Entrar',
+
+    // About page
+    'about_page_heading' => 'Sobre',
+    'about_page_help'    => 'Conteúdo HTML para a página Sobre. Aceita tags HTML.',
 ];
