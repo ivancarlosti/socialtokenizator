@@ -32,7 +32,7 @@
             @foreach(\App\Support\Locales::supported() as $code => $info)
                 @php $col = 'name_'.str_replace('-', '_', $code); @endphp
                 <div>
-                    <label class="block text-xs text-muted mb-1">{{ $info['name'] }} ({{ $code }})</label>
+                    <label class="block text-xs text-muted mb-1">{{ $info['name'] }}</label>
                     <input type="text" name="{{ $col }}" value="{{ old($col) }}" maxlength="128"
                            class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
                            placeholder="{{ __('messages.category_name_placeholder', ['lang' => $info['name']]) }}">

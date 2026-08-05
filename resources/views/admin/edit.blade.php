@@ -29,7 +29,7 @@
                 $colD = 'description_'.str_replace('-', '_', $code);
             @endphp
             <div class="border border-card-border rounded p-3">
-                <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }} ({{ $code }})</p>
+                <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
                 <div class="space-y-2">
                     <div>
                         <label class="block text-xs text-muted mb-1">{{ __('messages.headline') }}</label>

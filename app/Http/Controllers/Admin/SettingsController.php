@@ -26,9 +26,11 @@ class SettingsController extends Controller
 
         $titleRows = [];
         $subtitleRows = [];
+        $footerHtmlRows = [];
         foreach ($locales as $code => $info) {
             $titleRows[$code] = Setting::get("site_title_{$code}", '');
             $subtitleRows[$code] = Setting::get("site_subtitle_{$code}", '');
+            $footerHtmlRows[$code] = Setting::get("footer_html_{$code}", '');
         }
 
         return view('admin.settings', [
@@ -39,11 +41,11 @@ class SettingsController extends Controller
             'postsPerPage'     => Setting::get('posts_per_page', '12'),
             'feedPostsCount'   => Setting::get('feed_posts_count', '10'),
             'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
-            'footerHtml'       => Setting::get('footer_html', ''),
             'hideTitleSection' => (bool) Setting::get('hide_title_section'),
             'hideFilterLabel'  => (bool) Setting::get('hide_filter_label'),
             'titleRows'        => $titleRows,
             'subtitleRows'     => $subtitleRows,
+            'footerHtmlRows'   => $footerHtmlRows,
             'locales'          => $locales,
             'footerLinkRows'   => $footerLinkRows,
         ]);
@@ -65,17 +67,17 @@ class SettingsController extends Controller
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
             'default_theme'         => ['required', 'string', 'in:dark,light'],
-            'footer_html'           => ['nullable', 'string', 'max:10000'],
             'footer_links'          => ['nullable', 'array', 'max:3'],
             'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
             'footer_links.*.url'    => ['nullable', 'url', 'max:1024'],
         ]);
 
-        // Per-locale title & subtitle
+        // Per-locale fields
         foreach ($supportedLocales as $locale) {
             $request->validate([
                 "site_title_{$locale}"    => ['nullable', 'string', 'max:120'],
                 "site_subtitle_{$locale}" => ['nullable', 'string', 'max:200'],
+                "footer_html_{$locale}"   => ['nullable', 'string', 'max:10000'],
             ]);
         }
 
@@ -124,15 +126,7 @@ class SettingsController extends Controller
             Setting::forget('hide_filter_label');
         }
 
-        // Footer HTML
-        $footerHtml = trim((string) ($validated['footer_html'] ?? ''));
-        if ($footerHtml !== '') {
-            Setting::put('footer_html', $footerHtml);
-        } else {
-            Setting::forget('footer_html');
-        }
-
-        // Per-locale title & subtitle
+        // Per-locale title, subtitle & footer HTML
         foreach ($supportedLocales as $locale) {
             $titleVal = trim((string) ($request->input("site_title_{$locale}", '')));
             $subVal   = trim((string) ($request->input("site_subtitle_{$locale}", '')));
@@ -145,6 +139,12 @@ class SettingsController extends Controller
                 Setting::put("site_subtitle_{$locale}", $subVal);
             } else {
                 Setting::forget("site_subtitle_{$locale}");
+            }
+            $footerVal = trim((string) ($request->input("footer_html_{$locale}", '')));
+            if ($footerVal !== '') {
+                Setting::put("footer_html_{$locale}", $footerVal);
+            } else {
+                Setting::forget("footer_html_{$locale}");
             }
         }
 

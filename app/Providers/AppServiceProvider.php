@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             $locale        = app()->getLocale();
             $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
             $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
-            $footerHtml    = $this->safeSetting('footer_html');
+            $footerHtml    = $this->safeSetting("footer_html_{$locale}");
             $postPathPrefix  = $this->safeSetting('post_path_prefix') ?: 'p';
             $defaultTheme    = $this->safeSetting('default_theme') ?: 'dark';
             $hideTitleSection = (bool) $this->safeSetting('hide_title_section');

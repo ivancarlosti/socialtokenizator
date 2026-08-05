@@ -69,7 +69,7 @@
             <select name="default_locale"
                     class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                 @foreach($locales as $code => $info)
-                    <option value="{{ $code }}" @selected($code === $defaultLocale)>{{ $info['name'] }} ({{ $code }})</option>
+                    <option value="{{ $code }}" @selected($code === $defaultLocale)>{{ $info['name'] }}</option>
                 @endforeach
             </select>
         </div>
@@ -130,7 +130,7 @@
             <div class="space-y-4">
                 @foreach($locales as $code => $info)
                     <div class="border border-card-border rounded p-3">
-                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }} ({{ $code }})</p>
+                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_title') }}</label>
@@ -154,13 +154,20 @@
             </div>
         </div>
 
-        {{-- Footer HTML --}}
+        {{-- Footer HTML per locale --}}
         <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_footer_html') }}</label>
-            <textarea name="footer_html" rows="4" maxlength="10000"
-                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
-                      placeholder="<p>Your custom footer text or HTML</p>">{{ old('footer_html', $footerHtml) }}</textarea>
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_footer_html_help') }}</p>
+            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_html') }}</label>
+            <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_html_help') }}</p>
+            <div class="space-y-4">
+                @foreach($locales as $code => $info)
+                    <div class="border border-card-border rounded p-3">
+                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                        <textarea name="footer_html_{{ $code }}" rows="4" maxlength="10000"
+                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                  placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_html_{$code}", $footerHtmlRows[$code] ?? '') }}</textarea>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         {{-- Footer links --}}

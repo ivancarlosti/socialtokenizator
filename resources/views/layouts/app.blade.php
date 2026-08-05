@@ -100,7 +100,7 @@
                     @if(\Illuminate\Support\Facades\Route::has('auth.logout'))
                         <form method="post" action="{{ route('auth.logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-neutral-400 hover:text-white">{{ __('messages.logout') }}</button>
+                            <button type="submit" class="text-muted hover:text-copy">{{ __('messages.logout') }}</button>
                         </form>
                     @endif
                 @elseif($authMethod !== 'none')
@@ -127,21 +127,19 @@
     </main>
 
     <footer class="border-t mt-12" style="border-color: var(--color-footer-border);">
-        <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-muted flex justify-between gap-4 flex-wrap">
+        <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-muted flex items-center gap-4 flex-wrap">
             <span>{{ $siteTitle }}</span>
-            <div class="flex items-center gap-4 flex-wrap">
-                @if($footerHtml)
-                    <div class="footer-html-content">{!! $footerHtml !!}</div>
-                @endif
-                @if(!empty($footerLinks))
-                    <nav class="flex items-center gap-4">
-                        @foreach($footerLinks as $link)
-                            <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
-                               class="text-muted hover:text-copy">{{ $link['label'] }}</a>
-                        @endforeach
-                    </nav>
-                @endif
-            </div>
+            @if(!empty($footerLinks))
+                <nav class="flex-1 flex items-center justify-center gap-4">
+                    @foreach($footerLinks as $link)
+                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
+                           class="text-muted hover:text-copy">{{ $link['label'] }}</a>
+                    @endforeach
+                </nav>
+            @endif
+            @if($footerHtml)
+                <div class="footer-html-content">{!! $footerHtml !!}</div>
+            @endif
         </div>
     </footer>
 
