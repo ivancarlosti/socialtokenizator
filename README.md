@@ -33,15 +33,16 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
    - [`account` + reCAPTCHA](#auth_methodaccount)
    - [`keycloak` (OIDC SSO)](#auth_methodkeycloak)
 6. [AI Translation](#ai-translation)
-7. [Post URL prefix](#post-url-prefix)
-8. [Categories](#categories)
-9. [Admin settings](#admin-settings)
-10. [REST API](#rest-api)
-11. [Dark / light mode](#dark--light-mode)
-12. [Reverse-proxy examples](#reverse-proxy-examples)
-13. [Operating the app](#operating-the-app)
-14. [Troubleshooting](#troubleshooting)
-15. [Repository layout](#repository-layout)
+7. [AI Generation](#ai-generation)
+8. [Post URL prefix](#post-url-prefix)
+9. [Categories](#categories)
+10. [Admin settings](#admin-settings)
+11. [REST API](#rest-api)
+12. [Dark / light mode](#dark--light-mode)
+13. [Reverse-proxy examples](#reverse-proxy-examples)
+14. [Operating the app](#operating-the-app)
+15. [Troubleshooting](#troubleshooting)
+16. [Repository layout](#repository-layout)
 
 ---
 
@@ -293,6 +294,76 @@ The system prompt instructs the AI to preserve formatting, line breaks, and HTML
 
 ---
 
+## AI Generation
+
+The app supports one-click AI post generation in the admin panel. On the **Upload** and **Edit** screens, a textarea lets you paste a press release or news article. Clicking **"Generate with AI"** sends the text to an AI provider, which returns headlines, descriptions (in all three languages), and tags — all populated into the form fields for review before publishing.
+
+It uses the same **OpenAI-compatible chat completions API** as translation (same `AI_API_KEY`, `AI_API_URL`, and `AI_MODEL` env vars). No additional configuration is required.
+
+### How it works
+
+1. Paste a press release or news article into the **"Generate with AI"** textarea on the Upload or Edit screen.
+2. Click **"Generate with AI"**.
+3. The app calls `POST /admin/generate` which sends the text + your custom prompt to the AI API.
+4. The AI returns a structured JSON response with headlines, descriptions (per language), and tags.
+5. All form fields are populated — you can review, edit, and manually submit when ready.
+
+### Customizing the prompt
+
+The AI generation prompt is fully configurable in **Admin → Settings → AI Generate Prompt**. Leave it empty to use the built-in default (shown below). The placeholder `{{INPUT_TEXT}}` is replaced with the user's pasted text at runtime.
+
+The default prompt is:
+
+```
+**Role and Objective**
+You are an expert Social Media Manager and PR Copywriter. Your task is to analyze a provided Press Release or News article and transform it into a short, highly engaging post suitable for a broad audience.
+
+**Tone and Style**
+Your writing should be **enthusiastic and slightly sensationalist**. Use a captivating, hype-driven tone to grab the reader's attention immediately. Make the news sound exciting, groundbreaking, and highly relevant, while still keeping the core message of the original text.
+
+**Content Requirements**
+For the Press Release or News article provided, you must generate:
+1. **Title / Headline:** A catchy, click-worthy headline.
+2. **Post Body:** 1 to 3 short paragraphs summarizing the news and highlighting the most exciting elements.
+3. **Tags:** 3 to 8 relevant tags (lowercase, short phrases) for categorizing the post.
+
+**Language Requirements**
+You must provide the complete output in all three of the following languages:
+- "en-US" — English (US)
+- "pt_BR" — Portuguese (Brazil)
+- "es_MX" — Spanish (Mexico)
+
+**Strict Privacy Constraints**
+- **NO CONTACT DATA:** You must strictly filter out and completely omit any personal data, email addresses, phone numbers, or contact information related to the PR contact, the author, or the PR company that shared the news.
+- Keep the focus solely on the product, event, or announcement itself.
+
+**CRITICAL OUTPUT FORMAT**
+You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no explanations. The JSON structure must be exactly:
+
+{
+    "headlines": {
+        "en-US": "English headline here",
+        "pt_BR": "Portuguese headline here",
+        "es_MX": "Spanish headline here"
+    },
+    "descriptions": {
+        "en-US": "English description paragraphs here",
+        "pt_BR": "Portuguese description paragraphs here",
+        "es_MX": "Spanish description paragraphs here"
+    },
+    "tags": "tag1, tag2, tag3, tag4"
+}
+
+---
+**Input Data:**
+Here is the Press Release/News to process:
+{{INPUT_TEXT}}
+```
+
+> **Tip:** To customize, copy the prompt above, paste it into **Admin → Settings → AI Generate Prompt**, modify as needed, and save. Keep `{{INPUT_TEXT}}` as the placeholder — it will be replaced with the user's pasted text.
+
+---
+
 ## Post URL prefix
 
 The default URL pattern for post detail pages is `/p/{uuid}`. You can change the `p` prefix in **Admin → Settings → Post URL prefix**. For example, setting it to `post` changes URLs to `/post/{uuid}`.
@@ -340,6 +411,7 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 | **Site title & subtitle (per language)** | Customizable heading and tagline for each supported language. Falls back to `APP_NAME` if empty. |
 | **Footer HTML** | Custom HTML or text displayed on the right side of the footer. Accepts HTML tags (max 10 000 characters). |
 | **Footer links** | Up to 3 labeled links displayed in the footer. Leave both label and URL empty to remove a link. |
+| **AI Generate Prompt** | Customizable system prompt for AI post generation. Uses `{{INPUT_TEXT}}` as placeholder. Leave empty to use the built-in default. See [AI Generation](#ai-generation) for the default prompt text. |
 
 ---
 
