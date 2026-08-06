@@ -24,11 +24,11 @@ class UploadController extends Controller
     {
         $validated = $request->validate([
             'image' => ['required', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
-            'headline_en'    => ['nullable', 'string', 'max:300'],
-            'headline_es'    => ['nullable', 'string', 'max:300'],
+            'headline_en_US' => ['nullable', 'string', 'max:300'],
+            'headline_es_MX' => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
-            'description_en'    => ['nullable', 'string', 'max:5000'],
-            'description_es'    => ['nullable', 'string', 'max:5000'],
+            'description_en_US' => ['nullable', 'string', 'max:5000'],
+            'description_es_MX' => ['nullable', 'string', 'max:5000'],
             'description_pt_BR' => ['nullable', 'string', 'max:5000'],
             'categories' => ['nullable', 'array'],
             'categories.*' => ['integer', 'exists:categories,id'],
@@ -58,11 +58,11 @@ class UploadController extends Controller
                 'mime_type' => $file->getMimeType(),
                 'width' => $width,
                 'height' => $height,
-                'headline_en'    => $validated['headline_en'] ?? null,
-                'headline_es'    => $validated['headline_es'] ?? null,
+                'headline_en_US' => $validated['headline_en_US'] ?? null,
+                'headline_es_MX' => $validated['headline_es_MX'] ?? null,
                 'headline_pt_BR' => $validated['headline_pt_BR'] ?? null,
-                'description_en'    => $validated['description_en'] ?? null,
-                'description_es'    => $validated['description_es'] ?? null,
+                'description_en_US' => $validated['description_en_US'] ?? null,
+                'description_es_MX' => $validated['description_es_MX'] ?? null,
                 'description_pt_BR' => $validated['description_pt_BR'] ?? null,
             ]);
 
@@ -121,11 +121,11 @@ class UploadController extends Controller
         $image = Image::where('uuid', $uuid)->firstOrFail();
 
         $validated = $request->validate([
-            'headline_en'    => ['nullable', 'string', 'max:300'],
-            'headline_es'    => ['nullable', 'string', 'max:300'],
+            'headline_en_US' => ['nullable', 'string', 'max:300'],
+            'headline_es_MX' => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
-            'description_en'    => ['nullable', 'string', 'max:5000'],
-            'description_es'    => ['nullable', 'string', 'max:5000'],
+            'description_en_US' => ['nullable', 'string', 'max:5000'],
+            'description_es_MX' => ['nullable', 'string', 'max:5000'],
             'description_pt_BR' => ['nullable', 'string', 'max:5000'],
             'categories' => ['nullable', 'array'],
             'categories.*' => ['integer', 'exists:categories,id'],
@@ -137,11 +137,11 @@ class UploadController extends Controller
 
         DB::transaction(function () use ($image, $validated) {
             $image->update([
-                'headline_en'    => $validated['headline_en'] ?? null,
-                'headline_es'    => $validated['headline_es'] ?? null,
+                'headline_en_US' => $validated['headline_en_US'] ?? null,
+                'headline_es_MX' => $validated['headline_es_MX'] ?? null,
                 'headline_pt_BR' => $validated['headline_pt_BR'] ?? null,
-                'description_en'    => $validated['description_en'] ?? null,
-                'description_es'    => $validated['description_es'] ?? null,
+                'description_en_US' => $validated['description_en_US'] ?? null,
+                'description_es_MX' => $validated['description_es_MX'] ?? null,
                 'description_pt_BR' => $validated['description_pt_BR'] ?? null,
             ]);
 
