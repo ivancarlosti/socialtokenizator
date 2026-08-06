@@ -66,6 +66,14 @@ return [
     'translate_error'    => 'Falha na tradução.',
     'translate_no_source' => 'Nenhum texto de origem encontrado. Preencha outro campo de descrição primeiro.',
 
+    // AI Generation
+    'generate_with_ai'          => 'Gerar com IA',
+    'generating'                => 'Gerando…',
+    'generate_done'             => '✓ Gerado',
+    'generate_error'            => 'Falha na geração.',
+    'generate_no_text'          => 'Cole algum texto primeiro para gerar o post.',
+    'generate_paste_placeholder' => 'Cole um comunicado de imprensa ou artigo aqui e deixe a IA gerar o post…',
+
     // Admin categories
     'admin_categories'            => 'Categorias',
     'categories_heading'          => 'Gerenciar categorias',
@@ -146,4 +154,8 @@ return [
     // About page
     'about_page_heading' => 'Sobre',
     'about_page_help'    => 'Conteúdo HTML para a página Sobre. Aceita tags HTML.',
+
+    // AI Generate Prompt Settings
+    'settings_ai_generate_prompt'      => 'Prompt de Geração por IA',
+    'settings_ai_generate_prompt_help' => 'Prompt do sistema usado ao gerar posts com IA. Use {{INPUT_TEXT}} como placeholder onde o texto colado pelo usuário será inserido. Deixe vazio para usar o prompt padrão.',
 ];

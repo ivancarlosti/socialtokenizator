@@ -5,6 +5,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\GenerateController;
 use App\Http\Controllers\Admin\TranslateController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Auth\AccountAuthController;
@@ -70,4 +71,5 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::post('/translate', [TranslateController::class, 'translate'])->name('admin.translate');
+    Route::post('/generate', [GenerateController::class, 'generate'])->name('admin.generate');
 });

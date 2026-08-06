@@ -209,6 +209,15 @@
             </div>
         </div>
 
+        {{-- AI Generate Prompt --}}
+        <div>
+            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_ai_generate_prompt') }}</label>
+            <p class="text-xs text-muted mb-2">{{ __('messages.settings_ai_generate_prompt_help') }}</p>
+            <textarea name="ai_generate_prompt" rows="20" maxlength="20000"
+                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                      placeholder="Leave empty to use the default prompt.">{{ old('ai_generate_prompt', $aiGeneratePrompt) }}</textarea>
+        </div>
+
         {{-- API Token --}}
         <div class="border-t border-card-border pt-6">
             <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>

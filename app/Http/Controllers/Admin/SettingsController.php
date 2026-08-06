@@ -45,9 +45,10 @@ class SettingsController extends Controller
             'subtitleRows'     => $subtitleRows,
             'footerTextRows'   => $footerTextRows,
             'footerHtmlRows'   => $footerHtmlRows,
-            'aboutRows'        => $aboutRows,
-            'locales'          => $locales,
-            'apiToken'         => $apiToken,
+            'aboutRows'           => $aboutRows,
+            'locales'             => $locales,
+            'apiToken'            => $apiToken,
+            'aiGeneratePrompt'    => Setting::get('ai_generate_prompt', ''),
         ]);
     }
 
@@ -67,6 +68,7 @@ class SettingsController extends Controller
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
             'default_theme'         => ['required', 'string', 'in:dark,light'],
+            'ai_generate_prompt'    => ['nullable', 'string', 'max:20000'],
         ]);
 
         // Per-locale fields
@@ -163,6 +165,14 @@ class SettingsController extends Controller
         $apiTokenAction = trim((string) ($request->input('api_token_action', '')));
         if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
             Setting::put('api_token', Str::random(64));
+        }
+
+        // AI Generate Prompt
+        $aiPrompt = trim((string) ($request->input('ai_generate_prompt', '')));
+        if ($aiPrompt !== '') {
+            Setting::put('ai_generate_prompt', $aiPrompt);
+        } else {
+            Setting::forget('ai_generate_prompt');
         }
 
         // Clear caches so settings take effect immediately.

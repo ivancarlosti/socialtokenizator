@@ -22,6 +22,21 @@
         @csrf
         @method('PUT')
 
+        {{-- AI Generate input --}}
+        <div class="border border-card-border rounded p-4 bg-card-hover/20">
+            <label class="block text-sm text-muted mb-2">{{ __('messages.generate_with_ai') }}</label>
+            <textarea id="ai-generate-input" rows="6" maxlength="10000"
+                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                      placeholder="{{ __('messages.generate_paste_placeholder') }}"></textarea>
+            <div class="flex items-center gap-2 mt-2">
+                <button type="button" id="ai-generate-btn"
+                        class="bg-accent hover:bg-accent-hover text-white text-sm font-medium px-4 py-2 rounded">
+                    {{ __('messages.generate_with_ai') }}
+                </button>
+                <span id="ai-generate-status" class="text-xs text-muted hidden"></span>
+            </div>
+        </div>
+
         {{-- Per-locale headlines & descriptions --}}
         @foreach(\App\Support\Locales::supported() as $code => $info)
             @php
@@ -216,6 +231,76 @@
                     }, 3000);
                 });
             });
+
+            // AI Generate
+            const generateBtn = document.getElementById('ai-generate-btn');
+            const generateInput = document.getElementById('ai-generate-input');
+            const generateStatus = document.getElementById('ai-generate-status');
+
+            if (generateBtn && generateInput) {
+                generateBtn.addEventListener('click', async function () {
+                    const text = generateInput.value.trim();
+                    if (!text) {
+                        alert(@json(__('messages.generate_no_text')));
+                        return;
+                    }
+
+                    generateBtn.disabled = true;
+                    generateStatus.classList.remove('hidden');
+                    generateStatus.textContent = @json(__('messages.generating'));
+
+                    try {
+                        const resp = await fetch('{{ route('admin.generate') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ text: text }),
+                        });
+
+                        const data = await resp.json();
+
+                        if (data.headlines && data.descriptions) {
+                            // Populate headline fields
+                            for (const [locale, headline] of Object.entries(data.headlines)) {
+                                const colH = 'headline_' + locale.replace('-', '_');
+                                const field = document.querySelector(`[name="${colH}"]`);
+                                if (field && headline) field.value = headline;
+                            }
+                            // Populate description fields
+                            for (const [locale, desc] of Object.entries(data.descriptions)) {
+                                const colD = 'description_' + locale.replace('-', '_');
+                                const field = document.querySelector(`[name="${colD}"]`);
+                                if (field && desc) field.value = desc;
+                            }
+                            // Populate tags
+                            if (data.tags) {
+                                const tagsField = document.querySelector('[name="tags"]');
+                                if (tagsField) tagsField.value = data.tags;
+                            }
+
+                            generateStatus.textContent = @json(__('messages.generate_done'));
+                        } else if (data.raw_text) {
+                            generateStatus.textContent = @json(__('messages.generate_done')) + ' (raw)';
+                            const firstDesc = document.querySelector('[name="description_en_US"]');
+                            if (firstDesc) firstDesc.value = data.raw_text;
+                            if (data.error) console.warn('Generate parse warning:', data.error);
+                        } else {
+                            generateStatus.textContent = data.error || @json(__('messages.generate_error'));
+                        }
+                    } catch (e) {
+                        generateStatus.textContent = @json(__('messages.generate_error'));
+                    }
+
+                    generateBtn.disabled = false;
+                    setTimeout(() => {
+                        generateStatus.classList.add('hidden');
+                        generateStatus.textContent = '';
+                    }, 5000);
+                });
+            }
         })();
     </script>
 @endsection

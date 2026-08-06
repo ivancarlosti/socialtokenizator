@@ -66,6 +66,14 @@ return [
     'translate_error'    => 'Translation failed.',
     'translate_no_source' => 'No source text found. Fill in another description field first.',
 
+    // AI Generation
+    'generate_with_ai'          => 'Generate with AI',
+    'generating'                => 'Generating…',
+    'generate_done'             => '✓ Generated',
+    'generate_error'            => 'Generation failed.',
+    'generate_no_text'          => 'Paste some text to generate from first.',
+    'generate_paste_placeholder' => 'Paste a press release or news article here and let AI generate the post…',
+
     // Admin categories
     'admin_categories'            => 'Categories',
     'categories_heading'          => 'Manage categories',
@@ -146,4 +154,8 @@ return [
     // About page
     'about_page_heading' => 'About',
     'about_page_help'    => 'HTML content for the About page. Accepts HTML tags.',
+
+    // AI Generate Prompt Settings
+    'settings_ai_generate_prompt'      => 'AI Generate Prompt',
+    'settings_ai_generate_prompt_help' => 'System prompt used when generating posts with AI. Use {{INPUT_TEXT}} as the placeholder where the user\'s pasted text will be inserted. Leave empty to use the default prompt.',
 ];
