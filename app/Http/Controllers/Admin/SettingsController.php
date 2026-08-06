@@ -35,6 +35,8 @@ class SettingsController extends Controller
             $aboutRows[$code] = Setting::get("about_page_{$code}", '');
         }
 
+        $apiToken = Setting::get('api_token');
+
         return view('admin.settings', [
             'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
             'faviconUrl'       => Setting::publicUrl(Setting::get('site_favicon_key')),
@@ -51,6 +53,7 @@ class SettingsController extends Controller
             'aboutRows'        => $aboutRows,
             'locales'          => $locales,
             'footerLinkRows'   => $footerLinkRows,
+            'apiToken'         => $apiToken,
         ]);
     }
 
@@ -170,6 +173,12 @@ class SettingsController extends Controller
                 Setting::forget("footer_link_{$i}_label");
                 Setting::forget("footer_link_{$i}_url");
             }
+        }
+
+        // API token management
+        $apiTokenAction = trim((string) ($request->input('api_token_action', '')));
+        if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
+            Setting::put('api_token', Str::random(64));
         }
 
         // Clear caches so settings take effect immediately.

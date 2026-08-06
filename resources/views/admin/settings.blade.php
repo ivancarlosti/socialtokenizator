@@ -215,6 +215,36 @@
             </div>
         </div>
 
+        {{-- API Token --}}
+        <div class="border-t border-card-border pt-6">
+            <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>
+            <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_help') }}</p>
+
+            @if($apiToken)
+                <div class="flex items-center gap-3 mb-3">
+                    <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
+                          id="api-token-display">{{ substr($apiToken, 0, 12) }}&hellip;</code>
+                    <button type="button" id="copy-api-token"
+                            class="text-xs text-accent hover:underline whitespace-nowrap"
+                            data-token="{{ $apiToken }}">
+                        {{ __('messages.settings_api_token_copy') }}
+                    </button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="submit" name="api_token_action" value="regenerate"
+                            class="bg-red-700 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded"
+                            onclick="return confirm(@json(__('messages.settings_api_token_regenerate_confirm')))">
+                        {{ __('messages.settings_api_token_regenerate') }}
+                    </button>
+                </div>
+            @else
+                <button type="submit" name="api_token_action" value="generate"
+                        class="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded">
+                    {{ __('messages.settings_api_token_generate') }}
+                </button>
+            @endif
+        </div>
+
         <div class="pt-2">
             <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-medium px-4 py-2 rounded">
                 {{ __('messages.settings_save') }}
@@ -282,6 +312,24 @@
                     }, 3000);
                 });
             });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const copyBtn = document.getElementById('copy-api-token');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function () {
+                    const token = this.dataset.token;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(token).then(() => {
+                            const original = this.textContent;
+                            this.textContent = '{{ __('messages.settings_api_token_copied') }}';
+                            setTimeout(() => { this.textContent = original; }, 2000);
+                        });
+                    }
+                });
+            }
         })();
     </script>
 @endsection

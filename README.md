@@ -36,11 +36,12 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
 7. [Post URL prefix](#post-url-prefix)
 8. [Categories](#categories)
 9. [Admin settings](#admin-settings)
-10. [Dark / light mode](#dark--light-mode)
-11. [Reverse-proxy examples](#reverse-proxy-examples)
-12. [Operating the app](#operating-the-app)
-13. [Troubleshooting](#troubleshooting)
-14. [Repository layout](#repository-layout)
+10. [REST API](#rest-api)
+11. [Dark / light mode](#dark--light-mode)
+12. [Reverse-proxy examples](#reverse-proxy-examples)
+13. [Operating the app](#operating-the-app)
+14. [Troubleshooting](#troubleshooting)
+15. [Repository layout](#repository-layout)
 
 ---
 
@@ -339,6 +340,25 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 | **Site title & subtitle (per language)** | Customizable heading and tagline for each supported language. Falls back to `APP_NAME` if empty. |
 | **Footer HTML** | Custom HTML or text displayed on the right side of the footer. Accepts HTML tags (max 10 000 characters). |
 | **Footer links** | Up to 3 labeled links displayed in the footer. Leave both label and URL empty to remove a link. |
+
+---
+
+## REST API
+
+SocialTokenizator provides a REST API for programmatic post creation, listing, and deletion with image uploads. It uses Bearer token authentication — the token is generated in **Admin → Settings**.
+
+Full documentation: [**API.md**](API.md) — includes endpoint specs, request/response examples, and n8n workflow configurations.
+
+Quick overview:
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/posts` | `POST` | Create a post (multipart: image + optional metadata) |
+| `/api/posts` | `GET` | List posts with filters, search, and pagination |
+| `/api/posts/{uuid}` | `GET` | Get a single post by UUID |
+| `/api/posts/{uuid}` | `DELETE` | Delete a post and its image |
+
+Authentication: `Authorization: Bearer <token>` header.
 
 ---
 

@@ -120,6 +120,13 @@ return [
     'settings_save'                 => 'Salvar configurações',
     'settings_saved'                => 'Configurações salvas.',
     'current'                       => 'Atual',
+    'settings_api_token'             => 'Token da API',
+    'settings_api_token_help'       => 'Usado para autenticar requisições da API REST. Envie como: Authorization: Bearer <token>. Mantenha em segredo!',
+    'settings_api_token_copy'       => 'Copiar',
+    'settings_api_token_copied'     => 'Copiado!',
+    'settings_api_token_generate'   => 'Gerar Token',
+    'settings_api_token_regenerate' => 'Regenerar',
+    'settings_api_token_regenerate_confirm' => 'Regenerar o token invalidará o atual. Todos os clientes da API precisarão ser atualizados. Continuar?',
 
     // Errors
     'not_found'      => 'Nada aqui.',
