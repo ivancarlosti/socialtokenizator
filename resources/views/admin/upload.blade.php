@@ -43,6 +43,8 @@
             @php
                 $colH = 'headline_'.str_replace('-', '_', $code);
                 $colD = 'description_'.str_replace('-', '_', $code);
+                $allLocales = \App\Support\Locales::supported();
+                $otherLocales = array_filter($allLocales, fn($l, $k) => $k !== $code, ARRAY_FILTER_USE_BOTH);
             @endphp
             <div class="border border-card-border rounded p-3">
                 <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
@@ -54,26 +56,36 @@
                                class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy headline-field"
                                data-locale="{{ $code }}"
                                placeholder="{{ __('messages.headline_help') }}">
-                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
-                                data-target="{{ $colH }}"
-                                data-target-locale="{{ $code }}"
-                                data-field-type="headline">
-                            {{ __('messages.translate_with_ai') }}
-                        </button>
-                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                        <div class="flex flex-wrap items-center gap-1 mt-1">
+                            @foreach($otherLocales as $srcCode => $srcInfo)
+                                <button type="button" class="ai-translate-link text-xs text-accent inline-block"
+                                        data-target="{{ $colH }}"
+                                        data-target-locale="{{ $code }}"
+                                        data-source-locale="{{ $srcCode }}"
+                                        data-field-type="headline">
+                                    {{ __('messages.translate_with_ai_from', ['locale' => $srcInfo['name']]) }}
+                                </button>
+                            @endforeach
+                            <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-xs text-muted mb-1">{{ __('messages.description') }}</label>
                         <textarea name="{{ $colD }}" rows="3" maxlength="5000"
                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy desc-field"
                                   data-locale="{{ $code }}">{{ old($colD) }}</textarea>
-                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
-                                data-target="{{ $colD }}"
-                                data-target-locale="{{ $code }}"
-                                data-field-type="description">
-                            {{ __('messages.translate_with_ai') }}
-                        </button>
-                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                        <div class="flex flex-wrap items-center gap-1 mt-1">
+                            @foreach($otherLocales as $srcCode => $srcInfo)
+                                <button type="button" class="ai-translate-link text-xs text-accent inline-block"
+                                        data-target="{{ $colD }}"
+                                        data-target-locale="{{ $code }}"
+                                        data-source-locale="{{ $srcCode }}"
+                                        data-field-type="description">
+                                    {{ __('messages.translate_with_ai_from', ['locale' => $srcInfo['name']]) }}
+                                </button>
+                            @endforeach
+                            <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,39 +167,28 @@
                 btn.addEventListener('click', async function () {
                     const targetName = this.dataset.target;
                     const targetLocale = this.dataset.targetLocale;
+                    const sourceLocale = this.dataset.sourceLocale;
                     const fieldType = this.dataset.fieldType;
                     const targetField = document.querySelector(`[name="${targetName}"]`);
-                    const statusEl = this.nextElementSibling;
+                    const statusEl = this.parentElement.querySelector('.ai-translate-status');
 
-                    // Find the best source: prefer same field type from another locale
-                    let sourceText = '';
-                    const sourceSelector = fieldType === 'headline' ? '.headline-field' : '.desc-field';
-                    const allFields = document.querySelectorAll(sourceSelector);
-                    for (const f of allFields) {
-                        if (f.name !== targetName && f.value.trim()) {
-                            sourceText = f.value.trim();
-                            break;
-                        }
-                    }
-                    // Fallback: try the other field type
+                    // Find source field by matching locale and field type
+                    const srcSelector = fieldType === 'headline' ? '.headline-field' : '.desc-field';
+                    const sourceField = document.querySelector(`${srcSelector}[data-locale="${sourceLocale}"]`);
+                    const sourceText = sourceField?.value.trim() || '';
+
                     if (!sourceText) {
-                        const fallbackSelector = fieldType === 'headline' ? '.desc-field' : '.headline-field';
-                        const fallbackFields = document.querySelectorAll(fallbackSelector);
-                        for (const f of fallbackFields) {
-                            if (f.value.trim()) {
-                                sourceText = f.value.trim();
-                                break;
-                            }
-                        }
-                    }
-                    if (!sourceText) {
-                        alert(@json(__('messages.translate_no_source')));
+                        const localeNames = @json(\App\Support\Locales::supported());
+                        const srcName = localeNames[sourceLocale]?.name || sourceLocale;
+                        alert(@json(__('messages.translate_no_source_for')).replace(':locale', srcName));
                         return;
                     }
 
                     this.classList.add('hidden');
-                    statusEl.classList.remove('hidden');
-                    statusEl.textContent = @json(__('messages.translating'));
+                    if (statusEl) {
+                        statusEl.classList.remove('hidden');
+                        statusEl.textContent = @json(__('messages.translating'));
+                    }
 
                     try {
                         const resp = await fetch('{{ route('admin.translate') }}', {
@@ -206,19 +207,26 @@
                         const data = await resp.json();
                         if (data.translated_text) {
                             targetField.value = data.translated_text;
-                            statusEl.textContent = @json(__('messages.translate_done'));
+                            if (statusEl) statusEl.textContent = @json(__('messages.translate_done'));
                         } else {
-                            statusEl.textContent = data.error || @json(__('messages.translate_error'));
+                            if (statusEl) statusEl.textContent = data.error || @json(__('messages.translate_error'));
                         }
                     } catch (e) {
-                        statusEl.textContent = @json(__('messages.translate_error'));
+                        const msg = e.name === 'TypeError' || (e.message && e.message.includes('fetch'))
+                            ? @json(__('messages.translate_error_network'))
+                            : e.name === 'AbortError'
+                                ? @json(__('messages.translate_error_timeout'))
+                                : @json(__('messages.translate_error'));
+                        if (statusEl) statusEl.textContent = msg;
                     }
 
                     this.classList.remove('hidden');
                     setTimeout(() => {
-                        statusEl.classList.add('hidden');
-                        statusEl.textContent = '';
-                    }, 3000);
+                        if (statusEl) {
+                            statusEl.classList.add('hidden');
+                            statusEl.textContent = '';
+                        }
+                    }, 5000);
                 });
             });
 

@@ -60,11 +60,15 @@ return [
     'submit_upload'        => 'Enviar',
 
     // AI Translation
-    'translate_with_ai'  => 'Traduzir com IA',
-    'translating'        => 'Traduzindo…',
-    'translate_done'     => '✓ Traduzido',
-    'translate_error'    => 'Falha na tradução.',
-    'translate_no_source' => 'Nenhum texto de origem encontrado. Preencha outro campo de descrição primeiro.',
+    'translate_with_ai'      => 'Traduzir com IA',
+    'translate_with_ai_from' => 'Traduzir de :locale',
+    'translating'            => 'Traduzindo…',
+    'translate_done'         => '✓ Traduzido',
+    'translate_error'        => 'Falha na tradução.',
+    'translate_error_network' => 'Erro de rede. Verifique sua conexão e tente novamente.',
+    'translate_error_timeout' => 'Tradução expirou. Tente novamente.',
+    'translate_no_source'    => 'Nenhum texto de origem encontrado. Preencha outro campo de descrição primeiro.',
+    'translate_no_source_for'=> 'Nenhum texto de origem em :locale. Preencha esse campo primeiro.',
 
     // AI Generation
     'generate_with_ai'          => 'Gerar com IA',

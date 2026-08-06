@@ -60,11 +60,15 @@ return [
     'submit_upload'        => 'Upload',
 
     // AI Translation
-    'translate_with_ai'  => 'Translate with AI',
-    'translating'        => 'Translating…',
-    'translate_done'     => '✓ Translated',
-    'translate_error'    => 'Translation failed.',
-    'translate_no_source' => 'No source text found. Fill in another description field first.',
+    'translate_with_ai'      => 'Translate with AI',
+    'translate_with_ai_from' => 'Translate from :locale',
+    'translating'            => 'Translating…',
+    'translate_done'         => '✓ Translated',
+    'translate_error'        => 'Translation failed.',
+    'translate_error_network' => 'Network error. Check your connection and try again.',
+    'translate_error_timeout' => 'Translation timed out. Try again.',
+    'translate_no_source'    => 'No source text found. Fill in another description field first.',
+    'translate_no_source_for'=> 'No source text in :locale. Fill in that field first.',
 
     // AI Generation
     'generate_with_ai'          => 'Generate with AI',

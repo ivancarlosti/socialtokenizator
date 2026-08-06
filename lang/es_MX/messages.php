@@ -60,11 +60,15 @@ return [
     'submit_upload'        => 'Subir',
 
     // AI Translation
-    'translate_with_ai'  => 'Traducir con IA',
-    'translating'        => 'Traduciendo…',
-    'translate_done'     => '✓ Traducido',
-    'translate_error'    => 'Traducción fallida.',
-    'translate_no_source' => 'No se encontró texto de origen. Llena otro campo de descripción primero.',
+    'translate_with_ai'      => 'Traducir con IA',
+    'translate_with_ai_from' => 'Traducir de :locale',
+    'translating'            => 'Traduciendo…',
+    'translate_done'         => '✓ Traducido',
+    'translate_error'        => 'Traducción fallida.',
+    'translate_error_network' => 'Error de red. Verifica tu conexión e inténtalo de nuevo.',
+    'translate_error_timeout' => 'Traducción expiró. Inténtalo de nuevo.',
+    'translate_no_source'    => 'No se encontró texto de origen. Llena otro campo de descripción primero.',
+    'translate_no_source_for'=> 'No hay texto de origen en :locale. Llena ese campo primero.',
 
     // AI Generation
     'generate_with_ai'          => 'Generar con IA',
