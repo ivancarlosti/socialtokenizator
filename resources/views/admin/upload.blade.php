@@ -92,7 +92,7 @@
             <label class="block text-sm text-muted mb-1">{{ __('messages.source_links') }}</label>
             <div id="sources" class="space-y-2"></div>
             <button type="button" id="add-source"
-                    class="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 px-2 py-1 rounded">
+                    class="mt-2 text-xs bg-input border border-input-border rounded px-2 py-1 text-copy hover:border-card-border-hover">
                 {{ __('messages.add_source') }}
             </button>
         </div>

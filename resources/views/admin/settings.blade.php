@@ -154,6 +154,22 @@
             </div>
         </div>
 
+        {{-- Footer left text per locale --}}
+        <div>
+            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_text') }}</label>
+            <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_text_help') }}</p>
+            <div class="space-y-4">
+                @foreach($locales as $code => $info)
+                    <div class="border border-card-border rounded p-3">
+                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                        <textarea name="footer_text_{{ $code }}" rows="4" maxlength="10000"
+                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                  placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_text_{$code}", $footerTextRows[$code] ?? '') }}</textarea>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
         {{-- Footer HTML per locale --}}
         <div>
             <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_html') }}</label>
@@ -188,28 +204,6 @@
                             {{ __('messages.translate_with_ai') }}
                         </button>
                         <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Footer links --}}
-        <div>
-            <label class="block text-sm text-muted mb-2">{{ __('messages.settings_footer_links') }}</label>
-            <p class="text-xs text-muted mb-3">{{ __('messages.settings_footer_links_help') }}</p>
-            <div class="space-y-2">
-                @foreach($footerLinkRows as $i => $link)
-                    <div class="flex gap-2">
-                        <input type="text" name="footer_links[{{ $i }}][label]"
-                               value="{{ old('footer_links.'.$i.'.label', $link['label']) }}"
-                               placeholder="{{ __('messages.settings_footer_link_label') }}"
-                               maxlength="60"
-                               class="w-1/3 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-                        <input type="url" name="footer_links[{{ $i }}][url]"
-                               value="{{ old('footer_links.'.$i.'.url', $link['url']) }}"
-                               placeholder="https://…"
-                               maxlength="1024"
-                               class="flex-1 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                     </div>
                 @endforeach
             </div>

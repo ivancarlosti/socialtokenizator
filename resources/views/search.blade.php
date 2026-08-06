@@ -13,19 +13,38 @@
             {{ __('messages.search_empty') }}
         </div>
     @else
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">
+        <div class="space-y-8 mt-6">
             @foreach($images as $img)
-                <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}"
-                   class="block bg-card border border-card-border rounded overflow-hidden hover:border-card-border-hover">
-                    <img src="{{ $img->public_url }}" alt="{{ $img->getDescription($currentLocale) }}"
-                         class="w-full aspect-square object-cover bg-black">
-                    @php $desc = $img->getDescription($currentLocale); @endphp
-                    @if($desc)
-                        <div class="px-2 py-2 text-xs text-copy truncate">
-                            {{ $desc }}
+                <article class="bg-card border border-card-border rounded-lg overflow-hidden">
+                    <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="block">
+                        <img src="{{ $img->public_url }}" alt="{{ $img->getDescription($currentLocale) }}"
+                             class="w-full max-h-[80vh] object-contain bg-black">
+                    </a>
+                    <div class="p-5">
+                        @php $headline = $img->getHeadline($currentLocale); @endphp
+                        @if($headline)
+                            <h2 class="text-lg font-semibold text-copy">{{ $headline }}</h2>
+                        @endif
+
+                        {{-- Tags at bottom of post (lowercase, no translation) --}}
+                        @if($img->tags->isNotEmpty())
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                @foreach($img->tags as $tag)
+                                    <a href="{{ route('home', ['tag' => $tag->name]) }}"
+                                       class="text-xs bg-card border border-card-border rounded px-2 py-0.5 text-muted hover:text-copy">
+                                        #{{ $tag->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <div class="mt-4 text-xs text-muted">
+                            <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="text-link">
+                                {{ __('messages.view_detail') }}
+                            </a>
                         </div>
-                    @endif
-                </a>
+                    </div>
+                </article>
             @endforeach
         </div>
 

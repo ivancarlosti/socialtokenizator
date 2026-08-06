@@ -91,7 +91,7 @@
             <label class="block text-sm text-muted mb-1">{{ __('messages.source_links') }}</label>
             <div id="sources" class="space-y-2"></div>
             <button type="button" id="add-source"
-                    class="mt-2 text-xs bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 px-2 py-1 rounded">
+                    class="mt-2 text-xs bg-input border border-input-border rounded px-2 py-1 text-copy hover:border-card-border-hover">
                 {{ __('messages.add_source') }}
             </button>
         </div>
@@ -122,13 +122,13 @@
                 labelInput.type = 'text';
                 labelInput.name = `sources[${idx}][label]`;
                 labelInput.placeholder = labelPlaceholder;
-                labelInput.className = 'w-1/3 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm';
+                labelInput.className = 'w-1/3 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy';
                 if (prefill && prefill.label) labelInput.value = prefill.label;
                 const urlInput = document.createElement('input');
                 urlInput.type = 'url';
                 urlInput.name = `sources[${idx}][url]`;
                 urlInput.placeholder = 'https://…';
-                urlInput.className = 'flex-1 bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm';
+                urlInput.className = 'flex-1 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy';
                 if (prefill && prefill.url) urlInput.value = prefill.url;
                 const rm = document.createElement('button');
                 rm.type = 'button';

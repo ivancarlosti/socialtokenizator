@@ -65,9 +65,9 @@
                              class="w-full max-h-[80vh] object-contain bg-black">
                     </a>
                     <div class="p-5">
-                        @php $desc = $img->getDescription($currentLocale); @endphp
-                        @if($desc)
-                            <p class="text-copy text-base leading-relaxed">{!! nl2br(e($desc)) !!}</p>
+                        @php $headline = $img->getHeadline($currentLocale); @endphp
+                        @if($headline)
+                            <h2 class="text-lg font-semibold text-copy">{{ $headline }}</h2>
                         @endif
 
                         {{-- Tags at bottom of post (lowercase, no translation) --}}
@@ -79,22 +79,6 @@
                                         #{{ $tag->name }}
                                     </a>
                                 @endforeach
-                            </div>
-                        @endif
-
-                        @if($img->sources->isNotEmpty())
-                            <div class="mt-4">
-                                <h3 class="text-xs uppercase tracking-wide text-muted mb-2">{{ __('messages.image_sources') }}</h3>
-                                <ul class="space-y-1 text-sm">
-                                    @foreach($img->sources as $src)
-                                        <li>
-                                            <a href="{{ $src->url }}" target="_blank" rel="noopener noreferrer ugc"
-                                               class="text-link hover:text-link-hover">
-                                                {{ $src->label ?: $src->url }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
                             </div>
                         @endif
 

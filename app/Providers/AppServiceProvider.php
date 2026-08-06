@@ -35,18 +35,10 @@ class AppServiceProvider extends ServiceProvider
             $logoKey    = $this->safeSetting('site_logo_key');
             $faviconKey = $this->safeSetting('site_favicon_key');
 
-            $footerLinks = [];
-            for ($i = 1; $i <= 3; $i++) {
-                $label = $this->safeSetting("footer_link_{$i}_label");
-                $url   = $this->safeSetting("footer_link_{$i}_url");
-                if ($label && $url) {
-                    $footerLinks[] = ['label' => $label, 'url' => $url];
-                }
-            }
-
             $locale        = app()->getLocale();
             $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
             $siteSubtitle  = $this->safeSetting("site_subtitle_{$locale}");
+            $footerText    = $this->safeSetting("footer_text_{$locale}");
             $footerHtml    = $this->safeSetting("footer_html_{$locale}");
             $postPathPrefix  = $this->safeSetting('post_path_prefix') ?: 'p';
             $defaultTheme    = $this->safeSetting('default_theme') ?: 'dark';
@@ -77,13 +69,13 @@ class AppServiceProvider extends ServiceProvider
                 'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
                 'siteTitle'        => $siteTitle,
                 'siteSubtitle'     => $siteSubtitle,
+                'footerText'       => $footerText,
                 'footerHtml'       => $footerHtml,
                 'postPathPrefix'   => $postPathPrefix,
                 'hideTitleSection' => $hideTitleSection,
                 'hideFilterLabel'  => $hideFilterLabel,
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
-                'footerLinks'      => $footerLinks,
                 'feedUrl'          => $feedAtomUrl,
                 'feedAtomUrl'      => $feedAtomUrl,
                 'feedRssUrl'       => $feedRssUrl,

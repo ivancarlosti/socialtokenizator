@@ -14,23 +14,17 @@ class SettingsController extends Controller
 {
     public function edit()
     {
-        $footerLinkRows = [];
-        for ($i = 1; $i <= 3; $i++) {
-            $footerLinkRows[] = [
-                'label' => Setting::get("footer_link_{$i}_label", ''),
-                'url'   => Setting::get("footer_link_{$i}_url", ''),
-            ];
-        }
-
         $locales = Locales::supported();
 
         $titleRows = [];
         $subtitleRows = [];
+        $footerTextRows = [];
         $footerHtmlRows = [];
         $aboutRows = [];
         foreach ($locales as $code => $info) {
             $titleRows[$code] = Setting::get("site_title_{$code}", '');
             $subtitleRows[$code] = Setting::get("site_subtitle_{$code}", '');
+            $footerTextRows[$code] = Setting::get("footer_text_{$code}", '');
             $footerHtmlRows[$code] = Setting::get("footer_html_{$code}", '');
             $aboutRows[$code] = Setting::get("about_page_{$code}", '');
         }
@@ -49,10 +43,10 @@ class SettingsController extends Controller
             'hideFilterLabel'  => (bool) Setting::get('hide_filter_label'),
             'titleRows'        => $titleRows,
             'subtitleRows'     => $subtitleRows,
+            'footerTextRows'   => $footerTextRows,
             'footerHtmlRows'   => $footerHtmlRows,
             'aboutRows'        => $aboutRows,
             'locales'          => $locales,
-            'footerLinkRows'   => $footerLinkRows,
             'apiToken'         => $apiToken,
         ]);
     }
@@ -73,9 +67,6 @@ class SettingsController extends Controller
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
             'default_theme'         => ['required', 'string', 'in:dark,light'],
-            'footer_links'          => ['nullable', 'array', 'max:3'],
-            'footer_links.*.label'  => ['nullable', 'string', 'max:60'],
-            'footer_links.*.url'    => ['nullable', 'url', 'max:1024'],
         ]);
 
         // Per-locale fields
@@ -83,6 +74,7 @@ class SettingsController extends Controller
             $request->validate([
                 "site_title_{$locale}"    => ['nullable', 'string', 'max:120'],
                 "site_subtitle_{$locale}" => ['nullable', 'string', 'max:200'],
+                "footer_text_{$locale}"   => ['nullable', 'string', 'max:10000'],
                 "footer_html_{$locale}"   => ['nullable', 'string', 'max:10000'],
                 "about_page_{$locale}"    => ['nullable', 'string', 'max:20000'],
             ]);
@@ -147,6 +139,12 @@ class SettingsController extends Controller
             } else {
                 Setting::forget("site_subtitle_{$locale}");
             }
+            $footerTextVal = trim((string) ($request->input("footer_text_{$locale}", '')));
+            if ($footerTextVal !== '') {
+                Setting::put("footer_text_{$locale}", $footerTextVal);
+            } else {
+                Setting::forget("footer_text_{$locale}");
+            }
             $footerVal = trim((string) ($request->input("footer_html_{$locale}", '')));
             if ($footerVal !== '') {
                 Setting::put("footer_html_{$locale}", $footerVal);
@@ -158,20 +156,6 @@ class SettingsController extends Controller
                 Setting::put("about_page_{$locale}", $aboutVal);
             } else {
                 Setting::forget("about_page_{$locale}");
-            }
-        }
-
-        $footerLinks = $validated['footer_links'] ?? [];
-        for ($i = 1; $i <= 3; $i++) {
-            $row   = $footerLinks[$i - 1] ?? [];
-            $label = trim((string) ($row['label'] ?? ''));
-            $url   = trim((string) ($row['url'] ?? ''));
-            if ($label !== '' && $url !== '') {
-                Setting::put("footer_link_{$i}_label", $label);
-                Setting::put("footer_link_{$i}_url", $url);
-            } else {
-                Setting::forget("footer_link_{$i}_label");
-                Setting::forget("footer_link_{$i}_url");
             }
         }
 

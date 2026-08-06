@@ -136,14 +136,10 @@
 
     <footer class="border-t mt-12" style="border-color: var(--color-footer-border);">
         <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-muted flex items-center gap-4 flex-wrap">
-            <span>{{ $siteTitle }}</span>
-            @if(!empty($footerLinks))
-                <nav class="flex-1 flex items-center justify-center gap-4">
-                    @foreach($footerLinks as $link)
-                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer"
-                           class="text-muted hover:text-copy">{{ $link['label'] }}</a>
-                    @endforeach
-                </nav>
+            @if($footerText)
+                <div class="footer-text-content flex-1">{!! $footerText !!}</div>
+            @else
+                <span class="flex-1">{{ $siteTitle }}</span>
             @endif
             @if($footerHtml)
                 <div class="footer-html-content">{!! $footerHtml !!}</div>
