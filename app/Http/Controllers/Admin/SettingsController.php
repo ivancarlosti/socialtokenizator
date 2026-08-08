@@ -41,14 +41,19 @@ class SettingsController extends Controller
             'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
             'hideTitleSection' => (bool) Setting::get('hide_title_section'),
             'hideFilterLabel'  => (bool) Setting::get('hide_filter_label'),
-            'titleRows'        => $titleRows,
-            'subtitleRows'     => $subtitleRows,
-            'footerTextRows'   => $footerTextRows,
-            'footerHtmlRows'   => $footerHtmlRows,
-            'aboutRows'           => $aboutRows,
-            'locales'             => $locales,
-            'apiToken'            => $apiToken,
-            'aiGeneratePrompt'    => Setting::get('ai_generate_prompt', ''),
+            'titleRows'          => $titleRows,
+            'subtitleRows'       => $subtitleRows,
+            'footerTextRows'     => $footerTextRows,
+            'footerHtmlRows'     => $footerHtmlRows,
+            'aboutRows'          => $aboutRows,
+            'locales'            => $locales,
+            'apiToken'           => $apiToken,
+            'aiGeneratePrompt'   => Setting::get('ai_generate_prompt', ''),
+            'robotsEnabled'      => (bool) Setting::get('robots_enabled', true),
+            'robotsContent'      => Setting::get('robots_content', "User-agent: *\nDisallow: /admin\nDisallow: /auth"),
+            'llmsEnabled'        => (bool) Setting::get('llms_enabled'),
+            'llmsFullEnabled'    => (bool) Setting::get('llms_full_enabled'),
+            'sitemapEnabled'     => (bool) Setting::get('sitemap_enabled'),
         ]);
     }
 
@@ -69,6 +74,11 @@ class SettingsController extends Controller
             'hide_filter_label'     => ['nullable', 'boolean'],
             'default_theme'         => ['required', 'string', 'in:dark,light'],
             'ai_generate_prompt'    => ['nullable', 'string', 'max:20000'],
+            'robots_enabled'        => ['nullable', 'boolean'],
+            'robots_content'        => ['nullable', 'string', 'max:5000'],
+            'llms_enabled'          => ['nullable', 'boolean'],
+            'llms_full_enabled'     => ['nullable', 'boolean'],
+            'sitemap_enabled'       => ['nullable', 'boolean'],
         ]);
 
         // Per-locale fields
@@ -174,6 +184,45 @@ class SettingsController extends Controller
         } else {
             Setting::forget('ai_generate_prompt');
         }
+
+        // Web Standards — robots.txt
+        if ($request->has('robots_enabled') && $request->input('robots_enabled') === '1') {
+            Setting::put('robots_enabled', '1');
+        } else {
+            Setting::forget('robots_enabled');
+        }
+        $robotsContent = trim((string) ($request->input('robots_content', '')));
+        if ($robotsContent !== '') {
+            Setting::put('robots_content', $robotsContent);
+        } else {
+            Setting::forget('robots_content');
+        }
+
+        // Web Standards — llms.txt
+        if ($request->has('llms_enabled') && $request->input('llms_enabled') === '1') {
+            Setting::put('llms_enabled', '1');
+        } else {
+            Setting::forget('llms_enabled');
+        }
+
+        // Web Standards — llms-full.txt
+        if ($request->has('llms_full_enabled') && $request->input('llms_full_enabled') === '1') {
+            Setting::put('llms_full_enabled', '1');
+        } else {
+            Setting::forget('llms_full_enabled');
+        }
+
+        // Web Standards — sitemap.xml
+        if ($request->has('sitemap_enabled') && $request->input('sitemap_enabled') === '1') {
+            Setting::put('sitemap_enabled', '1');
+        } else {
+            Setting::forget('sitemap_enabled');
+        }
+
+        // Invalidate web-standards caches so they regenerate on next request
+        \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
+        \Illuminate\Support\Facades\Cache::forget('web_standards.llms_full_txt');
+        \Illuminate\Support\Facades\Cache::forget('web_standards.sitemap_xml');
 
         // Clear caches so settings take effect immediately.
         // Application cache (settings themselves):

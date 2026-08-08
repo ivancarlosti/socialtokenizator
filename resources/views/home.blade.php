@@ -67,7 +67,9 @@
                     <div class="p-5">
                         @php $headline = $img->getHeadline($currentLocale); @endphp
                         @if($headline)
-                            <h2 class="text-lg font-semibold text-copy">{{ $headline }}</h2>
+                            <h2 class="text-lg font-semibold text-copy">
+                                <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="hover:underline">{{ $headline }}</a>
+                            </h2>
                         @endif
 
                         {{-- Tags at bottom of post (lowercase, no translation) --}}

@@ -13,8 +13,15 @@ use App\Http\Controllers\Auth\KeycloakAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\WebStandardsController;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
+
+// Web Standards — dynamic files served at root level
+Route::get('/robots.txt', [WebStandardsController::class, 'robots']);
+Route::get('/llms.txt', [WebStandardsController::class, 'llms']);
+Route::get('/llms-full.txt', [WebStandardsController::class, 'llmsFull']);
+Route::get('/sitemap.xml', [WebStandardsController::class, 'sitemap']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [HomeController::class, 'search'])->name('search');

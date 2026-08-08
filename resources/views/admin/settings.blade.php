@@ -3,7 +3,7 @@
 @section('title', __('messages.settings').' — '.$siteTitle)
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-copy">{{ __('messages.settings_heading') }}</h1>
+    <h1 class="text-2xl font-semibold text-copy mb-6">{{ __('messages.settings_heading') }}</h1>
 
     @if($errors->any())
         <div class="mt-4 bg-red-900/30 border border-red-700 text-red-200 rounded px-4 py-2 text-sm">
@@ -13,251 +13,419 @@
         </div>
     @endif
 
-    <form method="post" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data"
-          class="mt-6 space-y-6 bg-card border border-card-border rounded p-5">
+    <form method="post" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="mt-6" id="settings-form">
         @csrf
 
-        {{-- Logo --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_logo') }}</label>
-            @if($logoUrl)
-                <div class="mb-2 flex items-center gap-3">
-                    <img src="{{ $logoUrl }}" alt="" class="h-10 w-auto bg-neutral-950 border border-neutral-800 rounded">
-                    <span class="text-xs text-muted">{{ __('messages.current') }}</span>
-                </div>
-                <label class="inline-flex items-center gap-2 text-xs text-muted mb-2">
-                    <input type="checkbox" name="remove_logo" value="1">
-                    {{ __('messages.settings_logo_remove') }}
+        {{-- Tab navigation --}}
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-card-border pb-3" role="tablist">
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="appearance" role="tab" aria-selected="true">
+                {{ __('messages.settings_tab_appearance') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="footer" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_footer') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="about" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_about') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="ai" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_ai') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="restapi" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_restapi') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="webstandards" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_web_standards') }}
+            </button>
+        </div>
+
+        {{-- ============================================ --}}
+        {{-- TAB: Appearance --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel bg-card border border-card-border rounded p-5 space-y-6" data-tab="appearance" role="tabpanel">
+            {{-- Logo --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_logo') }}</label>
+                @if($logoUrl)
+                    <div class="mb-2 flex items-center gap-3">
+                        <img src="{{ $logoUrl }}" alt="" class="h-10 w-auto bg-neutral-950 border border-neutral-800 rounded">
+                        <span class="text-xs text-muted">{{ __('messages.current') }}</span>
+                    </div>
+                    <label class="inline-flex items-center gap-2 text-xs text-muted mb-2">
+                        <input type="checkbox" name="remove_logo" value="1">
+                        {{ __('messages.settings_logo_remove') }}
+                    </label>
+                @endif
+                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                       class="block w-full text-sm text-muted">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_logo_help') }}</p>
+            </div>
+
+            {{-- Favicon --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_favicon') }}</label>
+                @if($faviconUrl)
+                    <div class="mb-2 flex items-center gap-3">
+                        <img src="{{ $faviconUrl }}" alt="" class="h-8 w-8 bg-neutral-950 border border-neutral-800 rounded">
+                        <span class="text-xs text-muted">{{ __('messages.current') }}</span>
+                    </div>
+                    <label class="inline-flex items-center gap-2 text-xs text-muted mb-2">
+                        <input type="checkbox" name="remove_favicon" value="1">
+                        {{ __('messages.settings_favicon_remove') }}
+                    </label>
+                @endif
+                <input type="file" name="favicon" accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,image/webp"
+                       class="block w-full text-sm text-muted">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_favicon_help') }}</p>
+            </div>
+
+            {{-- Default theme --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_theme') }}</label>
+                <select name="default_theme"
+                        class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                    <option value="dark" @selected($defaultTheme === 'dark')>{{ __('messages.theme_dark') }}</option>
+                    <option value="light" @selected($defaultTheme === 'light')>{{ __('messages.theme_light') }}</option>
+                </select>
+            </div>
+
+            {{-- Default locale --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_locale') }}</label>
+                <select name="default_locale"
+                        class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                    @foreach($locales as $code => $info)
+                        <option value="{{ $code }}" @selected($code === $defaultLocale)>{{ $info['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Posts per page --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_posts_per_page') }}</label>
+                <input type="number" name="posts_per_page" value="{{ old('posts_per_page', $postsPerPage) }}"
+                       min="1" max="100" required
+                       class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_posts_per_page_help') }}</p>
+            </div>
+
+            {{-- Feed posts count --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_feed_posts_count') }}</label>
+                <input type="number" name="feed_posts_count" value="{{ old('feed_posts_count', $feedPostsCount) }}"
+                       min="1" max="100" required
+                       class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_feed_posts_count_help') }}</p>
+            </div>
+
+            {{-- Post path prefix --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_post_path_prefix') }}</label>
+                <input type="text" name="post_path_prefix" value="{{ old('post_path_prefix', $postPathPrefix) }}"
+                       placeholder="p"
+                       maxlength="16"
+                       class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_path_prefix_help') }}</p>
+            </div>
+
+            {{-- Hide title section --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="hide_title_section" value="0">
+                    <input type="checkbox" name="hide_title_section" value="1"
+                           @checked($hideTitleSection)>
+                    {{ __('messages.settings_hide_title_section') }}
                 </label>
-            @endif
-            <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
-                   class="block w-full text-sm text-muted">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_logo_help') }}</p>
-        </div>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_title_section_help') }}</p>
+            </div>
 
-        {{-- Favicon --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_favicon') }}</label>
-            @if($faviconUrl)
-                <div class="mb-2 flex items-center gap-3">
-                    <img src="{{ $faviconUrl }}" alt="" class="h-8 w-8 bg-neutral-950 border border-neutral-800 rounded">
-                    <span class="text-xs text-muted">{{ __('messages.current') }}</span>
-                </div>
-                <label class="inline-flex items-center gap-2 text-xs text-muted mb-2">
-                    <input type="checkbox" name="remove_favicon" value="1">
-                    {{ __('messages.settings_favicon_remove') }}
+            {{-- Hide filter label --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="hide_filter_label" value="0">
+                    <input type="checkbox" name="hide_filter_label" value="1"
+                           @checked($hideFilterLabel)>
+                    {{ __('messages.settings_hide_filter_label') }}
                 </label>
-            @endif
-            <input type="file" name="favicon" accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/svg+xml,image/webp"
-                   class="block w-full text-sm text-muted">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_favicon_help') }}</p>
-        </div>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_filter_label_help') }}</p>
+            </div>
 
-        {{-- Default theme --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_theme') }}</label>
-            <select name="default_theme"
-                    class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-                <option value="dark" @selected($defaultTheme === 'dark')>{{ __('messages.theme_dark') }}</option>
-                <option value="light" @selected($defaultTheme === 'light')>{{ __('messages.theme_light') }}</option>
-            </select>
-        </div>
-
-        {{-- Default locale --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_locale') }}</label>
-            <select name="default_locale"
-                    class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-                @foreach($locales as $code => $info)
-                    <option value="{{ $code }}" @selected($code === $defaultLocale)>{{ $info['name'] }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        {{-- Posts per page --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_posts_per_page') }}</label>
-            <input type="number" name="posts_per_page" value="{{ old('posts_per_page', $postsPerPage) }}"
-                   min="1" max="100" required
-                   class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_posts_per_page_help') }}</p>
-        </div>
-
-        {{-- Feed posts count --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_feed_posts_count') }}</label>
-            <input type="number" name="feed_posts_count" value="{{ old('feed_posts_count', $feedPostsCount) }}"
-                   min="1" max="100" required
-                   class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_feed_posts_count_help') }}</p>
-        </div>
-
-        {{-- Post path prefix --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_post_path_prefix') }}</label>
-            <input type="text" name="post_path_prefix" value="{{ old('post_path_prefix', $postPathPrefix) }}"
-                   placeholder="p"
-                   maxlength="16"
-                   class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_path_prefix_help') }}</p>
-        </div>
-
-        {{-- Hide title section --}}
-        <div>
-            <label class="inline-flex items-center gap-2 text-sm text-copy">
-                <input type="hidden" name="hide_title_section" value="0">
-                <input type="checkbox" name="hide_title_section" value="1"
-                       @checked($hideTitleSection)>
-                {{ __('messages.settings_hide_title_section') }}
-            </label>
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_title_section_help') }}</p>
-        </div>
-
-        {{-- Hide filter label --}}
-        <div>
-            <label class="inline-flex items-center gap-2 text-sm text-copy">
-                <input type="hidden" name="hide_filter_label" value="0">
-                <input type="checkbox" name="hide_filter_label" value="1"
-                       @checked($hideFilterLabel)>
-                {{ __('messages.settings_hide_filter_label') }}
-            </label>
-            <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_filter_label_help') }}</p>
-        </div>
-
-        {{-- Site title & subtitle per locale --}}
-        <div>
-            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_site_title_subtitle') }}</label>
-            <div class="space-y-4">
-                @foreach($locales as $code => $info)
-                    <div class="border border-card-border rounded p-3">
-                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_title') }}</label>
-                                <input type="text" name="site_title_{{ $code }}"
-                                       value="{{ old("site_title_{$code}", $titleRows[$code] ?? '') }}"
-                                       placeholder="{{ config('app.name') }}"
-                                       maxlength="120"
-                                       class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_subtitle') }}</label>
-                                <input type="text" name="site_subtitle_{{ $code }}"
-                                       value="{{ old("site_subtitle_{$code}", $subtitleRows[$code] ?? '') }}"
-                                       placeholder="{{ __('messages.settings_site_subtitle_placeholder') }}"
-                                       maxlength="200"
-                                       class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+            {{-- Site title & subtitle per locale --}}
+            <div>
+                <label class="block text-sm text-muted mb-3">{{ __('messages.settings_site_title_subtitle') }}</label>
+                <div class="space-y-4">
+                    @foreach($locales as $code => $info)
+                        <div class="border border-card-border rounded p-3">
+                            <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_title') }}</label>
+                                    <input type="text" name="site_title_{{ $code }}"
+                                           value="{{ old("site_title_{$code}", $titleRows[$code] ?? '') }}"
+                                           placeholder="{{ config('app.name') }}"
+                                           maxlength="120"
+                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_site_subtitle') }}</label>
+                                    <input type="text" name="site_subtitle_{{ $code }}"
+                                           value="{{ old("site_subtitle_{$code}", $subtitleRows[$code] ?? '') }}"
+                                           placeholder="{{ __('messages.settings_site_subtitle_placeholder') }}"
+                                           maxlength="200"
+                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
 
-        {{-- Footer left text per locale --}}
-        <div>
-            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_text') }}</label>
-            <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_text_help') }}</p>
-            <div class="space-y-4">
-                @foreach($locales as $code => $info)
-                    <div class="border border-card-border rounded p-3">
-                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
-                        <textarea name="footer_text_{{ $code }}" rows="4" maxlength="10000"
-                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
-                                  placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_text_{$code}", $footerTextRows[$code] ?? '') }}</textarea>
-                    </div>
-                @endforeach
+        {{-- ============================================ --}}
+        {{-- TAB: Footer --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="footer" role="tabpanel">
+            {{-- Footer left text per locale --}}
+            <div>
+                <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_text') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_text_help') }}</p>
+                <div class="space-y-4">
+                    @foreach($locales as $code => $info)
+                        <div class="border border-card-border rounded p-3">
+                            <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                            <textarea name="footer_text_{{ $code }}" rows="4" maxlength="10000"
+                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                      placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_text_{$code}", $footerTextRows[$code] ?? '') }}</textarea>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Footer HTML per locale --}}
+            <div>
+                <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_html') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_html_help') }}</p>
+                <div class="space-y-4">
+                    @foreach($locales as $code => $info)
+                        <div class="border border-card-border rounded p-3">
+                            <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                            <textarea name="footer_html_{{ $code }}" rows="4" maxlength="10000"
+                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                      placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_html_{$code}", $footerHtmlRows[$code] ?? '') }}</textarea>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
 
-        {{-- Footer HTML per locale --}}
-        <div>
-            <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_html') }}</label>
-            <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_html_help') }}</p>
-            <div class="space-y-4">
-                @foreach($locales as $code => $info)
-                    <div class="border border-card-border rounded p-3">
-                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
-                        <textarea name="footer_html_{{ $code }}" rows="4" maxlength="10000"
-                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
-                                  placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_html_{$code}", $footerHtmlRows[$code] ?? '') }}</textarea>
-                    </div>
-                @endforeach
+        {{-- ============================================ --}}
+        {{-- TAB: About --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="about" role="tabpanel">
+            <div>
+                <label class="block text-sm text-muted mb-3">{{ __('messages.about_page_heading') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.about_page_help') }}</p>
+                <div class="space-y-4">
+                    @foreach($locales as $code => $info)
+                        <div class="border border-card-border rounded p-3">
+                            <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
+                            <textarea name="about_page_{{ $code }}" rows="10" maxlength="20000"
+                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono about-field"
+                                      data-locale="{{ $code }}"
+                                      placeholder="<h2>{{ __('messages.about_page_heading') }}</h2><p>...</p>">{{ old("about_page_{$code}", $aboutRows[$code] ?? '') }}</textarea>
+                            <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
+                                    data-target="about_page_{{ $code }}"
+                                    data-target-locale="{{ $code }}">
+                                {{ __('messages.translate_with_ai') }}
+                            </button>
+                            <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
 
-        {{-- About page content per locale --}}
-        <div>
-            <label class="block text-sm text-muted mb-3">{{ __('messages.about_page_heading') }}</label>
-            <p class="text-xs text-muted mb-2">{{ __('messages.about_page_help') }}</p>
-            <div class="space-y-4">
-                @foreach($locales as $code => $info)
-                    <div class="border border-card-border rounded p-3">
-                        <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
-                        <textarea name="about_page_{{ $code }}" rows="10" maxlength="20000"
-                                  class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono about-field"
-                                  data-locale="{{ $code }}"
-                                  placeholder="<h2>{{ __('messages.about_page_heading') }}</h2><p>...</p>">{{ old("about_page_{$code}", $aboutRows[$code] ?? '') }}</textarea>
-                        <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
-                                data-target="about_page_{{ $code }}"
-                                data-target-locale="{{ $code }}">
-                            {{ __('messages.translate_with_ai') }}
+        {{-- ============================================ --}}
+        {{-- TAB: Artificial Intelligence --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="ai" role="tabpanel">
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_ai_generate_prompt') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_ai_generate_prompt_help') }}</p>
+                <textarea name="ai_generate_prompt" rows="20" maxlength="20000"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                          placeholder="Leave empty to use the default prompt.">{{ old('ai_generate_prompt', $aiGeneratePrompt) }}</textarea>
+            </div>
+        </div>
+
+        {{-- ============================================ --}}
+        {{-- TAB: RestAPI --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="restapi" role="tabpanel">
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>
+                <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_help') }}</p>
+
+                @if($apiToken)
+                    <div class="flex items-center gap-3 mb-3">
+                        <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
+                              id="api-token-display">{{ substr($apiToken, 0, 12) }}&hellip;</code>
+                        <button type="button" id="copy-api-token"
+                                class="text-xs text-accent hover:underline whitespace-nowrap"
+                                data-token="{{ $apiToken }}">
+                            {{ __('messages.settings_api_token_copy') }}
                         </button>
-                        <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
                     </div>
-                @endforeach
+                    <div class="flex items-center gap-3">
+                        <button type="submit" name="api_token_action" value="regenerate"
+                                class="bg-red-700 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded"
+                                onclick="return confirm(@json(__('messages.settings_api_token_regenerate_confirm')))">
+                            {{ __('messages.settings_api_token_regenerate') }}
+                        </button>
+                    </div>
+                @else
+                    <button type="submit" name="api_token_action" value="generate"
+                            class="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded">
+                        {{ __('messages.settings_api_token_generate') }}
+                    </button>
+                @endif
             </div>
         </div>
 
-        {{-- AI Generate Prompt --}}
-        <div>
-            <label class="block text-sm text-muted mb-1">{{ __('messages.settings_ai_generate_prompt') }}</label>
-            <p class="text-xs text-muted mb-2">{{ __('messages.settings_ai_generate_prompt_help') }}</p>
-            <textarea name="ai_generate_prompt" rows="20" maxlength="20000"
-                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
-                      placeholder="Leave empty to use the default prompt.">{{ old('ai_generate_prompt', $aiGeneratePrompt) }}</textarea>
+        {{-- ============================================ --}}
+        {{-- TAB: Web Standards --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="webstandards" role="tabpanel">
+            {{-- robots.txt --}}
+            <div class="border-b border-card-border pb-6">
+                <label class="inline-flex items-center gap-2 text-sm text-copy mb-2">
+                    <input type="hidden" name="robots_enabled" value="0">
+                    <input type="checkbox" name="robots_enabled" value="1"
+                           @checked($robotsEnabled)>
+                    {{ __('messages.settings_robots_enabled') }}
+                </label>
+                <p class="mt-1 text-xs text-muted mb-3">{{ __('messages.settings_robots_enabled_help') }}</p>
+
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_robots_content') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_robots_content_help') }}</p>
+                <textarea name="robots_content" rows="6" maxlength="5000"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono">{{ old('robots_content', $robotsContent) }}</textarea>
+            </div>
+
+            {{-- llms.txt --}}
+            <div class="border-b border-card-border pb-6">
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="llms_enabled" value="0">
+                    <input type="checkbox" name="llms_enabled" value="1"
+                           @checked($llmsEnabled)>
+                    {{ __('messages.settings_llms_enabled') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_llms_enabled_help') }}</p>
+            </div>
+
+            {{-- llms-full.txt --}}
+            <div class="border-b border-card-border pb-6">
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="llms_full_enabled" value="0">
+                    <input type="checkbox" name="llms_full_enabled" value="1"
+                           @checked($llmsFullEnabled)>
+                    {{ __('messages.settings_llms_full_enabled') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_llms_full_enabled_help') }}</p>
+            </div>
+
+            {{-- sitemap.xml --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="sitemap_enabled" value="0">
+                    <input type="checkbox" name="sitemap_enabled" value="1"
+                           @checked($sitemapEnabled)>
+                    {{ __('messages.settings_sitemap_enabled') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_sitemap_enabled_help') }}</p>
+            </div>
         </div>
 
-        {{-- API Token --}}
-        <div class="border-t border-card-border pt-6">
-            <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>
-            <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_help') }}</p>
-
-            @if($apiToken)
-                <div class="flex items-center gap-3 mb-3">
-                    <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
-                          id="api-token-display">{{ substr($apiToken, 0, 12) }}&hellip;</code>
-                    <button type="button" id="copy-api-token"
-                            class="text-xs text-accent hover:underline whitespace-nowrap"
-                            data-token="{{ $apiToken }}">
-                        {{ __('messages.settings_api_token_copy') }}
-                    </button>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button type="submit" name="api_token_action" value="regenerate"
-                            class="bg-red-700 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded"
-                            onclick="return confirm(@json(__('messages.settings_api_token_regenerate_confirm')))">
-                        {{ __('messages.settings_api_token_regenerate') }}
-                    </button>
-                </div>
-            @else
-                <button type="submit" name="api_token_action" value="generate"
-                        class="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded">
-                    {{ __('messages.settings_api_token_generate') }}
-                </button>
-            @endif
-        </div>
-
-        <div class="pt-2">
+        {{-- Submit button --}}
+        <div class="mt-6">
             <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-medium px-4 py-2 rounded">
                 {{ __('messages.settings_save') }}
             </button>
         </div>
     </form>
 
+    {{-- Tab switching JS --}}
     <script>
         (function () {
-            // AI Translate for about page content
+            const STORAGE_KEY = 'admin_settings_active_tab';
+            const tabs = document.querySelectorAll('.tab-btn');
+            const panels = document.querySelectorAll('.tab-panel');
+
+            function activateTab(tabName) {
+                tabs.forEach(btn => {
+                    const isActive = btn.dataset.tab === tabName;
+                    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    if (isActive) {
+                        btn.classList.add('bg-accent', 'border-accent', 'text-white');
+                        btn.classList.remove('bg-transparent', 'border-card-border', 'text-muted');
+                    } else {
+                        btn.classList.remove('bg-accent', 'border-accent', 'text-white');
+                        btn.classList.add('bg-transparent', 'border-card-border', 'text-muted');
+                    }
+                });
+
+                panels.forEach(panel => {
+                    if (panel.dataset.tab === tabName) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
+
+                sessionStorage.setItem(STORAGE_KEY, tabName);
+            }
+
+            // Click handlers
+            tabs.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    activateTab(this.dataset.tab);
+                });
+            });
+
+            // Determine initial tab
+            let activeTab = sessionStorage.getItem(STORAGE_KEY);
+
+            @if($errors->any())
+                // On validation error, find the first tab containing an error
+                let errorTab = null;
+                panels.forEach(panel => {
+                    if (!errorTab && panel.querySelector('.border-red-700, [class*="error"], input:invalid')) {
+                        errorTab = panel.dataset.tab;
+                    }
+                });
+                if (errorTab) {
+                    activeTab = errorTab;
+                }
+            @endif
+
+            // Fall back to first tab if stored tab doesn't exist
+            const validTabs = Array.from(tabs).map(t => t.dataset.tab);
+            if (!activeTab || !validTabs.includes(activeTab)) {
+                activeTab = validTabs[0];
+            }
+
+            activateTab(activeTab);
+        })();
+    </script>
+
+    {{-- AI Translate for about page content --}}
+    <script>
+        (function () {
             document.querySelectorAll('.ai-translate-link').forEach(btn => {
                 btn.addEventListener('click', async function () {
                     const targetName = this.dataset.target;
@@ -265,7 +433,6 @@
                     const targetField = document.querySelector(`[name="${targetName}"]`);
                     const statusEl = this.nextElementSibling;
 
-                    // Find source text from another locale's about field
                     let sourceText = '';
                     const allFields = document.querySelectorAll('.about-field');
                     for (const f of allFields) {
@@ -318,6 +485,7 @@
         })();
     </script>
 
+    {{-- Copy API token --}}
     <script>
         (function () {
             const copyBtn = document.getElementById('copy-api-token');

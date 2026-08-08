@@ -31,6 +31,25 @@ class Image extends Model
                 $image->uuid = (string) Str::uuid();
             }
         });
+
+        // Invalidate web-standards caches whenever a post changes
+        static::created(function (Image $image) {
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_full_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.sitemap_xml');
+        });
+
+        static::updated(function (Image $image) {
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_full_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.sitemap_xml');
+        });
+
+        static::deleted(function (Image $image) {
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.llms_full_txt');
+            \Illuminate\Support\Facades\Cache::forget('web_standards.sitemap_xml');
+        });
     }
 
     public function getRouteKeyName(): string

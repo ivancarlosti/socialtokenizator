@@ -162,4 +162,24 @@ return [
     // AI Generate Prompt Settings
     'settings_ai_generate_prompt'      => 'AI Generate Prompt',
     'settings_ai_generate_prompt_help' => 'System prompt used when generating posts with AI. Use {{INPUT_TEXT}} as the placeholder where the user\'s pasted text will be inserted. Leave empty to use the default prompt.',
+
+    // Settings tabs
+    'settings_tab_appearance'            => 'Appearance',
+    'settings_tab_footer'                => 'Footer',
+    'settings_tab_about'                 => 'About',
+    'settings_tab_ai'                    => 'Artificial Intelligence',
+    'settings_tab_restapi'               => 'RestAPI',
+    'settings_tab_web_standards'         => 'Web Standards',
+
+    // Web Standards fields
+    'settings_robots_enabled'            => 'Enable robots.txt',
+    'settings_robots_enabled_help'       => 'Serve a dynamically managed robots.txt at /robots.txt.',
+    'settings_robots_content'            => 'robots.txt content',
+    'settings_robots_content_help'       => 'Edit the contents of your robots.txt file.',
+    'settings_llms_enabled'              => 'Enable llms.txt',
+    'settings_llms_enabled_help'         => 'Provide a machine-readable list of all posts at /llms.txt. Auto-regenerated when posts change.',
+    'settings_llms_full_enabled'         => 'Enable llms-full.txt',
+    'settings_llms_full_enabled_help'    => 'Provide full post content at /llms-full.txt. Auto-regenerated when posts change.',
+    'settings_sitemap_enabled'           => 'Enable sitemap.xml',
+    'settings_sitemap_enabled_help'      => 'Provide an XML sitemap at /sitemap.xml. Auto-regenerated when posts change.',
 ];

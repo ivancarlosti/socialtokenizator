@@ -162,4 +162,24 @@ return [
     // AI Generate Prompt Settings
     'settings_ai_generate_prompt'      => 'Prompt de Geração por IA',
     'settings_ai_generate_prompt_help' => 'Prompt do sistema usado ao gerar posts com IA. Use {{INPUT_TEXT}} como placeholder onde o texto colado pelo usuário será inserido. Deixe vazio para usar o prompt padrão.',
+
+    // Settings tabs
+    'settings_tab_appearance'            => 'Aparência',
+    'settings_tab_footer'                => 'Rodapé',
+    'settings_tab_about'                 => 'Sobre',
+    'settings_tab_ai'                    => 'Inteligência Artificial',
+    'settings_tab_restapi'               => 'RestAPI',
+    'settings_tab_web_standards'         => 'Padrões Web',
+
+    // Web Standards fields
+    'settings_robots_enabled'            => 'Habilitar robots.txt',
+    'settings_robots_enabled_help'       => 'Serve um robots.txt gerenciado dinamicamente em /robots.txt.',
+    'settings_robots_content'            => 'Conteúdo do robots.txt',
+    'settings_robots_content_help'       => 'Edite o conteúdo do seu arquivo robots.txt.',
+    'settings_llms_enabled'              => 'Habilitar llms.txt',
+    'settings_llms_enabled_help'         => 'Fornece uma lista legível por máquina de todos os posts em /llms.txt. Regenerado automaticamente quando os posts mudam.',
+    'settings_llms_full_enabled'         => 'Habilitar llms-full.txt',
+    'settings_llms_full_enabled_help'    => 'Fornece o conteúdo completo dos posts em /llms-full.txt. Regenerado automaticamente quando os posts mudam.',
+    'settings_sitemap_enabled'           => 'Habilitar sitemap.xml',
+    'settings_sitemap_enabled_help'      => 'Fornece um sitemap XML em /sitemap.xml. Regenerado automaticamente quando os posts mudam.',
 ];
