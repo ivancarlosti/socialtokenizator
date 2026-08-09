@@ -25,9 +25,19 @@ class UploadController extends Controller
 
     public function store(Request $request)
     {
+        // Strip empty source rows so the default JS row doesn't fail validation
+        if ($request->has('sources') && is_array($request->input('sources'))) {
+            $sources = array_filter($request->input('sources'), function (array $row): bool {
+                $url = trim((string) ($row['url'] ?? ''));
+                $label = trim((string) ($row['label'] ?? ''));
+                return $url !== '' || $label !== '';
+            });
+            $request->merge(['sources' => array_values($sources) ?: null]);
+        }
+
         $validated = $request->validate([
             'image'     => ['required_without:image_url', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
-            'image_url' => ['required_without:image', 'string', 'url:http,https', 'max:2048'],
+            'image_url' => ['nullable', 'required_without:image', 'string', 'url:http,https', 'max:2048'],
             'headline_en_US' => ['nullable', 'string', 'max:300'],
             'headline_es_MX' => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
@@ -137,6 +147,16 @@ class UploadController extends Controller
     public function update(Request $request, string $uuid)
     {
         $image = Image::where('uuid', $uuid)->firstOrFail();
+
+        // Strip empty source rows so the default JS row doesn't fail validation
+        if ($request->has('sources') && is_array($request->input('sources'))) {
+            $sources = array_filter($request->input('sources'), function (array $row): bool {
+                $url = trim((string) ($row['url'] ?? ''));
+                $label = trim((string) ($row['label'] ?? ''));
+                return $url !== '' || $label !== '';
+            });
+            $request->merge(['sources' => array_values($sources) ?: null]);
+        }
 
         $validated = $request->validate([
             'headline_en_US' => ['nullable', 'string', 'max:300'],

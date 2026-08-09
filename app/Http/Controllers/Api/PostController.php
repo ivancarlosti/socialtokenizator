@@ -27,7 +27,7 @@ class PostController extends Controller
         try {
             $validated = $request->validate([
                 'image'     => ['required_without:image_url', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
-                'image_url' => ['required_without:image', 'string', 'url:http,https', 'max:2048'],
+                'image_url' => ['nullable', 'required_without:image', 'string', 'url:http,https', 'max:2048'],
                 'headline_en_US' => ['nullable', 'string', 'max:300'],
                 'headline_es_MX' => ['nullable', 'string', 'max:300'],
                 'headline_pt_BR' => ['nullable', 'string', 'max:300'],
