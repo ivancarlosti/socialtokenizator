@@ -19,8 +19,13 @@
 
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.upload_image_label') }}</label>
-            <input type="file" name="image" required accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+            <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                    class="block w-full text-sm text-muted">
+            <p class="text-xs text-muted mt-2 mb-1">— {{ __('messages.or') }} —</p>
+            <input type="url" name="image_url" value="{{ old('image_url') }}"
+                   class="block w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                   placeholder="https://example.com/photo.jpg">
+            <p class="text-xs text-muted mt-1">{{ __('messages.upload_image_url_help') }}</p>
         </div>
 
         {{-- AI Generate input --}}

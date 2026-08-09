@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Image;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Support\ImageUrlDownloader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
 
 class UploadController extends Controller
 {
+    use ImageUrlDownloader;
+
     public function create()
     {
         $categories = Category::orderBy('handle')->get();
@@ -23,7 +26,8 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'image' => ['required', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+            'image'     => ['required_without:image_url', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+            'image_url' => ['required_without:image', 'string', 'url:http,https', 'max:2048'],
             'headline_en_US' => ['nullable', 'string', 'max:300'],
             'headline_es_MX' => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
@@ -38,26 +42,40 @@ class UploadController extends Controller
             'sources.*.label' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $file = $request->file('image');
-        $uuid = (string) Str::uuid();
-        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
-        $r2Key = 'images/'.$uuid.'.'.$ext;
+        // Process image: prefer file upload, fall back to URL download
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $uuid = (string) Str::uuid();
+            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+            $r2Key = 'images/'.$uuid.'.'.$ext;
 
-        Storage::disk('r2')->putFileAs('', $file, $r2Key, [
-            'visibility' => 'public',
-            'ContentType' => $file->getMimeType(),
-        ]);
+            Storage::disk('r2')->putFileAs('', $file, $r2Key, [
+                'visibility' => 'public',
+                'ContentType' => $file->getMimeType(),
+            ]);
 
-        [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+            [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
 
-        $image = DB::transaction(function () use ($uuid, $r2Key, $file, $width, $height, $validated) {
-            $image = Image::create([
-                'uuid' => $uuid,
-                'r2_key' => $r2Key,
+            $imageMeta = [
+                'uuid'              => $uuid,
+                'r2_key'            => $r2Key,
                 'original_filename' => $file->getClientOriginalName(),
-                'mime_type' => $file->getMimeType(),
-                'width' => $width,
-                'height' => $height,
+                'mime_type'         => $file->getMimeType(),
+                'width'             => $width,
+                'height'            => $height,
+            ];
+        } else {
+            $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
+        }
+
+        $image = DB::transaction(function () use ($imageMeta, $validated) {
+            $image = Image::create([
+                'uuid'              => $imageMeta['uuid'],
+                'r2_key'            => $imageMeta['r2_key'],
+                'original_filename' => $imageMeta['original_filename'],
+                'mime_type'         => $imageMeta['mime_type'],
+                'width'             => $imageMeta['width'],
+                'height'            => $imageMeta['height'],
                 'headline_en_US' => $validated['headline_en_US'] ?? null,
                 'headline_es_MX' => $validated['headline_es_MX'] ?? null,
                 'headline_pt_BR' => $validated['headline_pt_BR'] ?? null,

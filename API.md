@@ -9,16 +9,19 @@ The SocialTokenizator REST API allows you to programmatically create, list, and 
 1. [Authentication](#authentication)
 2. [Base URL](#base-url)
 3. [Endpoints](#endpoints)
-   - [Create a Post](#1-create-a-post)
-   - [List Posts](#2-list-posts)
-   - [Get a Single Post](#3-get-a-single-post)
-   - [Delete a Post](#4-delete-a-post)
+   - [Get All Categories](#1-get-all-categories)
+   - [Create a Post](#2-create-a-post)
+   - [List Posts](#3-list-posts)
+   - [Get a Single Post](#4-get-a-single-post)
+   - [Delete a Post](#5-delete-a-post)
 4. [Error Responses](#error-responses)
 5. [n8n Integration Examples](#n8n-integration-examples)
-   - [Create a post with an image](#n8n-example-1-create-a-post-with-an-image)
-   - [List posts filtered by category](#n8n-example-2-list-posts-by-category)
-   - [Paginate through all posts](#n8n-example-3-paginate-through-all-posts)
-   - [Delete a post by UUID](#n8n-example-4-delete-a-post)
+   - [Get all categories](#n8n-example-1-get-all-categories)
+   - [Create a post with an image file](#n8n-example-2-create-a-post-with-an-image-file)
+   - [Create a post from an image URL](#n8n-example-3-create-a-post-from-an-image-url)
+   - [List posts filtered by category](#n8n-example-4-list-posts-by-category)
+   - [Paginate through all posts](#n8n-example-5-paginate-through-all-posts)
+   - [Delete a post by UUID](#n8n-example-6-delete-a-post)
 
 ---
 
@@ -54,20 +57,61 @@ All endpoints are relative to this base.
 
 ## Endpoints
 
-### 1. Create a Post
+### 1. Get All Categories
+
+```
+GET /api/categories
+```
+
+Returns the list of all categories. Useful for discovering available categories before creating or filtering posts.
+
+#### Example Request (curl)
+
+```bash
+curl -X GET "https://example.com/api/categories" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "handle": "landscape",
+      "name_en_US": "Landscape",
+      "name_es_MX": "Paisaje",
+      "name_pt_BR": "Paisagem"
+    },
+    {
+      "id": 2,
+      "handle": "tech",
+      "name_en_US": "Technology",
+      "name_es_MX": "Tecnología",
+      "name_pt_BR": "Tecnologia"
+    }
+  ]
+}
+```
+
+---
+
+### 2. Create a Post
 
 ```
 POST /api/posts
 Content-Type: multipart/form-data
 ```
 
-Creates a new post with an image. The image is **required** — all other fields are optional.
+Creates a new post with an image. You must provide **either** `image` (file upload) **or** `image_url` (public URL to download) — but not necessarily both. All other fields are optional.
 
 #### Request Body
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `image` | File | **Yes** | Image file (JPG, PNG, WebP, GIF, AVIF — max 10 MB) |
+| `image` | File | **One of these is required** | Image file (JPG, PNG, WebP, GIF, AVIF — max 10 MB) |
+| `image_url` | String | **One of these is required** | Publicly-accessible image URL to download and host locally |
 | `headline_en_US` | String | No | Headline in English (max 300 chars) |
 | `headline_es_MX` | String | No | Headline in Spanish (max 300 chars) |
 | `headline_pt_BR` | String | No | Headline in Brazilian Portuguese (max 300 chars) |
@@ -78,7 +122,9 @@ Creates a new post with an image. The image is **required** — all other fields
 | `tags` | String | No | Comma-separated tags (e.g. `ai,opensource,linux`) |
 | `sources` | String (JSON) | No | JSON array of `{url, label?}` objects |
 
-#### Example Request (curl)
+> **About `image_url`:** The server downloads the image from the provided URL, validates it (MIME type, size ≤ 10 MB), and stores it in the same R2 bucket as file uploads. This avoids hotlinking — the image is self-hosted. If both `image` and `image_url` are sent, the file upload (`image`) takes precedence.
+
+#### Example Request — File Upload (curl)
 
 ```bash
 curl -X POST https://example.com/api/posts \
@@ -89,6 +135,18 @@ curl -X POST https://example.com/api/posts \
   -F 'categories=landscape,nature' \
   -F 'tags=sunset,mountains,hiking' \
   -F 'sources=[{"url":"https://unsplash.com/photos/abc","label":"Unsplash"}]'
+```
+
+#### Example Request — Image URL (curl)
+
+```bash
+curl -X POST https://example.com/api/posts \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "image_url=https://example.com/photo.jpg" \
+  -F "headline_en_US=My Awesome Photo" \
+  -F "description_en_US=A beautiful sunset over the mountains." \
+  -F 'categories=landscape,nature' \
+  -F 'tags=sunset,mountains,hiking'
 ```
 
 #### Example Response (201 Created)
@@ -126,7 +184,7 @@ curl -X POST https://example.com/api/posts \
 
 ---
 
-### 2. List Posts
+### 3. List Posts
 
 ```
 GET /api/posts
@@ -224,7 +282,7 @@ When using `limit`, the response has a simpler structure:
 
 ---
 
-### 3. Get a Single Post
+### 4. Get a Single Post
 
 ```
 GET /api/posts/{uuid}
@@ -251,7 +309,7 @@ Same structure as a single item in the `data` array from the list endpoint.
 
 ---
 
-### 4. Delete a Post
+### 5. Delete a Post
 
 ```
 DELETE /api/posts/{uuid}
@@ -310,9 +368,53 @@ All errors follow a consistent JSON format:
 
 ## n8n Integration Examples
 
-### n8n Example 1: Create a Post with an Image
+### n8n Example 1: Get All Categories
 
-This workflow uploads an image (downloaded from a URL or from a previous node) to your SocialTokenizator instance.
+Fetches the full list of categories. Use this to populate dropdowns or discover available category handles before creating posts.
+
+#### HTTP Request Node Configuration
+
+| Setting | Value |
+|---|---|
+| **Method** | GET |
+| **URL** | `https://your-domain.com/api/categories` |
+| **Authentication** | Header Auth |
+| **Header Name** | `Authorization` |
+| **Header Value** | `Bearer YOUR_API_TOKEN` |
+
+#### n8n JSON Import
+
+```json
+{
+  "name": "Get All Categories",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://your-domain.com/api/categories",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "Bearer YOUR_API_TOKEN"}
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 300]
+    }
+  ]
+}
+```
+
+---
+
+### n8n Example 2: Create a Post with an Image File
+
+This workflow uploads an image file (binary data from a previous node) to your SocialTokenizator instance.
 
 #### HTTP Request Node Configuration
 
@@ -340,7 +442,7 @@ This workflow uploads an image (downloaded from a URL or from a previous node) t
 
 ```json
 {
-  "name": "Create SocialTokenizator Post",
+  "name": "Create SocialTokenizator Post (File Upload)",
   "nodes": [
     {
       "parameters": {
@@ -374,11 +476,77 @@ This workflow uploads an image (downloaded from a URL or from a previous node) t
 }
 ```
 
-> **Tip:** To upload an image from a URL, use a preceding **HTTP Request** node set to "Respond with File" to download the image as binary data, then pass it to the `image` field above.
+---
+
+### n8n Example 3: Create a Post from an Image URL
+
+This workflow sends an image URL directly — the server downloads and hosts it. No need for a separate download step.
+
+#### HTTP Request Node Configuration
+
+| Setting | Value |
+|---|---|
+| **Method** | POST |
+| **URL** | `https://your-domain.com/api/posts` |
+| **Authentication** | Header Auth |
+| **Header Name** | `Authorization` |
+| **Header Value** | `Bearer YOUR_API_TOKEN` |
+| **Body Content Type** | Form-Data |
+| **Parameters** | |
+
+**Form fields:**
+
+| Name | Type | Value |
+|---|---|---|
+| `image_url` | Text | `{{ $json.image_url }}` (e.g. `https://example.com/photo.jpg`) |
+| `headline_en_US` | Text | `My n8n Post` |
+| `description_en_US` | Text | `Posted automatically via n8n workflow.` |
+| `categories` | Text | `automation` |
+| `tags` | Text | `n8n,automated` |
+
+#### n8n JSON Import
+
+```json
+{
+  "name": "Create Post from Image URL",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-domain.com/api/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "Bearer YOUR_API_TOKEN"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "image_url", "value": "={{ $json.image_url }}"},
+            {"name": "headline_en_US", "value": "My n8n Post"},
+            {"name": "description_en_US", "value": "Posted automatically via n8n workflow."},
+            {"name": "categories", "value": "automation"},
+            {"name": "tags", "value": "n8n,automated"}
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 300]
+    }
+  ]
+}
+```
+
+> **Tip:** The server downloads the image, validates it, and stores it in R2 — no hotlinking. If both `image` (file) and `image_url` are sent, the file upload takes priority.
 
 ---
 
-### n8n Example 2: List Posts by Category
+### n8n Example 4: List Posts by Category
 
 Fetches the latest 20 posts in the `tech` category.
 
@@ -422,7 +590,7 @@ Fetches the latest 20 posts in the `tech` category.
 
 ---
 
-### n8n Example 3: Paginate Through All Posts
+### n8n Example 5: Paginate Through All Posts
 
 This example shows how to use the `loop` approach in n8n to fetch all posts across multiple pages. The strategy:
 
@@ -462,7 +630,7 @@ Alternatively, use `?limit=1000` to pull up to 1000 posts in a single request wi
 
 ---
 
-### n8n Example 4: Delete a Post
+### n8n Example 6: Delete a Post
 
 Deletes a post by its UUID. Useful for cleanup workflows.
 

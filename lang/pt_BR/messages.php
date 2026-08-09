@@ -48,6 +48,12 @@ return [
     // Admin upload
     'upload_heading'       => 'Enviar imagem',
     'upload_image_label'   => 'Imagem (jpg, png, webp, gif, avif — máx 10 MB)',
+    'or'                   => 'ou',
+    'upload_image_url_help' => 'Ou cole uma URL de imagem — ela será baixada e armazenada neste servidor.',
+    'image_url_download_failed' => 'Falha ao baixar a imagem da URL fornecida.',
+    'image_url_http_error' => 'A URL retornou HTTP :code.',
+    'image_url_not_image'  => 'A URL não aponta para uma imagem válida (detectado: :type).',
+    'image_url_too_large'  => 'A imagem na URL excede o limite de 10 MB.',
     'headline'             => 'Manchete',
     'headline_help'        => 'Um título curto para este post (aparece na aba do navegador e no topo da página)',
     'description'          => 'Descrição',

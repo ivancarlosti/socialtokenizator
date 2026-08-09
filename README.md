@@ -417,7 +417,7 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 
 ## REST API
 
-SocialTokenizator provides a REST API for programmatic post creation, listing, and deletion with image uploads. It uses Bearer token authentication — the token is generated in **Admin → Settings**.
+SocialTokenizator provides a REST API for programmatic post creation, listing, and deletion. It uses Bearer token authentication — the token is generated in **Admin → Settings**.
 
 Full documentation: [**API.md**](API.md) — includes endpoint specs, request/response examples, and n8n workflow configurations.
 
@@ -425,12 +425,17 @@ Quick overview:
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/api/posts` | `POST` | Create a post (multipart: image + optional metadata) |
+| `/api/categories` | `GET` | List all categories |
+| `/api/posts` | `POST` | Create a post (file upload or image URL — server downloads and hosts it) |
 | `/api/posts` | `GET` | List posts with filters, search, and pagination |
 | `/api/posts/{uuid}` | `GET` | Get a single post by UUID |
 | `/api/posts/{uuid}` | `DELETE` | Delete a post and its image |
 
 Authentication: `Authorization: Bearer <token>` header.
+
+### Image by URL
+
+Both the REST API and the admin **Upload** page support posting an image by URL. Instead of uploading a file, you can paste a public image URL — the server downloads it, validates it, and stores it in R2 (same as a file upload). This avoids hotlinking and keeps all images self-hosted.
 
 ---
 

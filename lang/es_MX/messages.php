@@ -48,6 +48,12 @@ return [
     // Admin upload
     'upload_heading'       => 'Subir imagen',
     'upload_image_label'   => 'Imagen (jpg, png, webp, gif, avif — máx 10 MB)',
+    'or'                   => 'o',
+    'upload_image_url_help' => 'O pega una URL de imagen — se descargará y almacenará en este servidor.',
+    'image_url_download_failed' => 'Error al descargar la imagen desde la URL proporcionada.',
+    'image_url_http_error' => 'La URL devolvió HTTP :code.',
+    'image_url_not_image'  => 'La URL no apunta a una imagen válida (detectado: :type).',
+    'image_url_too_large'  => 'La imagen en la URL excede el límite de 10 MB.',
     'headline'             => 'Titular',
     'headline_help'        => 'Un título corto para esta publicación (aparece en la pestaña del navegador y en el encabezado)',
     'description'          => 'Descripción',
