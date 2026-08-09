@@ -104,13 +104,13 @@ Add three `<link rel="alternate">` tags in `<head>` (after canonical):
 Feed button (line 87) already uses `$feedUrl` which will carry the localized Atom URL — no change needed.
 
 ### 5. Language files
-Add to `lang/en-US/messages.php`, `lang/pt_BR/messages.php`, `lang/es_MX/messages.php`:
+Add to `lang/en_US/messages.php`, `lang/pt_BR/messages.php`, `lang/es_MX/messages.php`:
 
 ```php
-'feed_rss'  => 'RSS feed',     // en-US
+'feed_rss'  => 'RSS feed',     // en_US
 'feed_rss'  => 'Feed RSS',     // pt_BR
 'feed_rss'  => 'Feed RSS',     // es_MX
-'feed_json' => 'JSON feed',    // en-US
+'feed_json' => 'JSON feed',    // en_US
 'feed_json' => 'Feed JSON',    // pt_BR
 'feed_json' => 'Feed JSON',    // es_MX
 ```
@@ -120,7 +120,7 @@ Add to `lang/en-US/messages.php`, `lang/pt_BR/messages.php`, `lang/es_MX/message
 | Endpoint | Format | Example |
 |----------|--------|---------|
 | `/feed?lang=pt_BR` | Atom XML | `xml:lang="pt-BR"`, only posts with pt_BR content |
-| `/rss?lang=en_US` | RSS 2.0 XML | `<language>en-us</language>`, only posts with en_US content |
+| `/rss?lang=en_US` | RSS 2.0 XML | `<language>en-US</language>`, only posts with en_US content |
 | `/json?lang=es_MX` | JSON Feed | `"language": "es-MX"`, only posts with es_MX content |
 
 - **No `lang` param**: uses `default_locale` setting (or `pt_BR` from config)

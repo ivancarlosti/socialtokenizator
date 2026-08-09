@@ -15,7 +15,7 @@ class Locales
     {
         return [
             'pt_BR' => ['name' => 'Português (Brasil)', 'flag' => 'br'],
-            'en-US' => ['name' => 'English (US)',     'flag' => 'us'],
+            'en_US' => ['name' => 'English (US)',     'flag' => 'us'],
             'es_MX' => ['name' => 'Español (México)', 'flag' => 'mx'],
         ];
     }

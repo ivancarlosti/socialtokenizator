@@ -235,7 +235,7 @@ These MUST be registered **before** any catch-all routes. They should be placed 
   - For each post, iterate over all locales and include content if the post has a headline or description in that locale
   - Title (headline or description excerpt, localized)
   - URL: `route('image.show', ['uuid' => $image->uuid])`
-  - Locale label before each entry (e.g. `[en-US]`, `[pt-BR]`)
+  - Locale label before each entry (e.g. `[en_US]`, `[pt_BR]`)
   - Format: Markdown-style list with `- [title](url) [locale]: description`
 - Cache with key `web_standards.llms_txt` for 1 hour
 - Return `Content-Type: text/plain; charset=utf-8`
@@ -298,7 +298,7 @@ This ensures the next request after any post change regenerates the content with
 
 ## Step 7 — Language strings
 
-Add to all three locale files (`lang/en-US/messages.php`, `lang/pt_BR/messages.php`, `lang/es_MX/messages.php`):
+Add to all three locale files (`lang/en_US/messages.php`, `lang/pt_BR/messages.php`, `lang/es_MX/messages.php`):
 
 ```php
 // Tab labels
@@ -394,7 +394,7 @@ stateDiagram-v2
 | [`app/Http/Controllers/Admin/SettingsController.php`](app/Http/Controllers/Admin/SettingsController.php) | Add web standards fields to edit() and update() |
 | [`app/Models/Image.php`](app/Models/Image.php) | Add cache invalidation in model events |
 | [`routes/web.php`](routes/web.php) | Add 4 web standards routes |
-| [`lang/en-US/messages.php`](lang/en-US/messages.php) | Add tab labels and web standards strings |
+| [`lang/en_US/messages.php`](lang/en_US/messages.php) | Add tab labels and web standards strings |
 | [`lang/pt_BR/messages.php`](lang/pt_BR/messages.php) | Add tab labels and web standards strings |
 | [`lang/es_MX/messages.php`](lang/es_MX/messages.php) | Add tab labels and web standards strings |
 

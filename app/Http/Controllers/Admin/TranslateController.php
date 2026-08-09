@@ -13,7 +13,7 @@ class TranslateController extends Controller
     {
         $validated = $request->validate([
             'text'          => ['required', 'string', 'max:5000'],
-            'target_locale' => ['required', 'string', 'in:en-US,es_MX,pt_BR'],
+            'target_locale' => ['required', 'string', 'in:en_US,es_MX,pt_BR'],
         ]);
 
         $apiKey = config('services.ai.api_key');
@@ -27,7 +27,7 @@ class TranslateController extends Controller
         }
 
         $localeNames = [
-            'en-US' => 'English',
+            'en_US' => 'English',
             'es_MX' => 'Spanish (Mexican)',
             'pt_BR' => 'Brazilian Portuguese',
         ];

@@ -124,7 +124,7 @@ For the Press Release or News article provided, you must generate:
 
 **Language Requirements**
 You must provide the complete output in all three of the following languages:
-- "en-US" — English (US)
+- "en_US" — English (US)
 - "pt_BR" — Portuguese (Brazil)
 - "es_MX" — Spanish (Mexico)
 
@@ -137,12 +137,12 @@ You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no 
 
 {
     "headlines": {
-        "en-US": "English headline here",
+        "en_US": "English headline here",
         "pt_BR": "Portuguese headline here",
         "es_MX": "Spanish headline here"
     },
     "descriptions": {
-        "en-US": "English description paragraphs here",
+        "en_US": "English description paragraphs here",
         "pt_BR": "Portuguese description paragraphs here",
         "es_MX": "Spanish description paragraphs here"
     },

@@ -4,7 +4,7 @@
 
 Two interdependent changes:
 
-1. **Locale key normalization** — rename locale keys from `en`/`es` to `en-US`/`es_MX`, reorder everything to `pt_BR` → `en-US` → `es_MX`
+1. **Locale key normalization** — rename locale keys from `en`/`es` to `en_US`/`es_MX`, reorder everything to `pt_BR` → `en_US` → `es_MX`
 2. **Default theme setting** — add a server-side `default_theme` setting (dark/light) that controls the initial theme, replacing the hardcoded `class="dark"`
 
 ---
@@ -17,7 +17,7 @@ flowchart TD
     B -->|app.setLocale| C[AppServiceProvider]
     C -->|View Composer| D[All Views]
     
-    E[Locales::supported] -->|pt_BR, en-US, es_MX| F[Language Switcher]
+    E[Locales::supported] -->|pt_BR, en_US, es_MX| F[Language Switcher]
     E --> G[Category Forms]
     E --> H[Upload/Edit Forms]
     E --> I[Settings Form]
@@ -27,7 +27,7 @@ flowchart TD
     L -->|JS init| M[Theme Toggle Logic]
     
     N[lang/pt_BR/] --> O[Translation Keys]
-    P[lang/en-US/] --> O
+    P[lang/en_US/] --> O
     Q[lang/es_MX/] --> O
 ```
 
@@ -39,7 +39,7 @@ flowchart TD
 
 | Old Path | New Path |
 |---|---|
-| `lang/en/messages.php` | `lang/en-US/messages.php` |
+| `lang/en/messages.php` | `lang/en_US/messages.php` |
 | `lang/es/messages.php` | `lang/es_MX/messages.php` |
 | `lang/pt_BR/messages.php` | *(unchanged)* |
 
@@ -51,7 +51,7 @@ Each messages.php keeps all existing keys, plus new theme-related keys (see Phas
 
 Add these keys to `settings` section:
 
-| Key | en-US | pt_BR | es_MX |
+| Key | en_US | pt_BR | es_MX |
 |---|---|---|---|
 | `settings_default_theme` | Default theme | Tema padrão | Tema predeterminado |
 | `theme_dark` | Dark | Escuro | Oscuro |
@@ -70,7 +70,7 @@ Add these keys to `settings` section:
 
 // NEW order & keys
 'pt_BR' => ['name' => 'pt_BR', 'flag' => 'br'],
-'en-US' => ['name' => 'en-US', 'flag' => 'us'],
+'en_US' => ['name' => 'en_US', 'flag' => 'us'],
 'es_MX' => ['name' => 'es_MX', 'flag' => 'mx'],
 ```
 
@@ -118,7 +118,7 @@ protected $fillable = ['handle', 'name_en', 'name_es', 'name_pt_BR'];
 protected $fillable = ['handle', 'name_en_US', 'name_es_MX', 'name_pt_BR'];
 ```
 
-`getName()` fallback chain — change all `'es'` → `'es_MX'`, `'en'` → `'en-US'`, and adjust the fallback array of column names:
+`getName()` fallback chain — change all `'es'` → `'es_MX'`, `'en'` → `'en_US'`, and adjust the fallback array of column names:
 ```php
 // OLD fallback column array
 ['name_en', 'name_es', 'name_pt_BR']
@@ -138,7 +138,7 @@ protected $fillable = ['handle', 'name_en_US', 'name_es_MX', 'name_pt_BR'];
 'description_en_US', 'description_es_MX', 'description_pt_BR',
 ```
 
-`getLocalizedField()` — change `'es'` → `'es_MX'`, `'en'` → `'en-US'` in the fallback chain conditions.
+`getLocalizedField()` — change `'es'` → `'es_MX'`, `'en'` → `'en_US'` in the fallback chain conditions.
 
 ---
 
@@ -187,7 +187,7 @@ Validation:
 'in:en,es,pt_BR'
 
 // NEW
-'in:en-US,es_MX,pt_BR'
+'in:en_US,es_MX,pt_BR'
 ```
 
 Locale names map:
@@ -197,7 +197,7 @@ Locale names map:
 'es'    => 'Spanish (Mexican)',
 
 // NEW
-'en-US' => 'English',
+'en_US' => 'English',
 'es_MX' => 'Spanish (Mexican)',
 ```
 
@@ -239,7 +239,7 @@ Add a new section between "Default language" and "Posts per page" (after line 65
 ```
 
 #### Other views
-- `categories.blade.php` — dynamically generates column names from `Locales::supported()` keys, so `str_replace('-', '_', $code)` will automatically produce `name_en_US` and `name_es_MX` ✅
+- `categories.blade.php` — dynamically generates column names from `Locales::supported()` keys, so `str_replace('_', '_', $code)` will automatically produce `name_en_US` and `name_es_MX` ✅
 - `upload.blade.php` — same dynamic pattern ✅
 - `edit.blade.php` — same dynamic pattern ✅
 - `search.blade.php` — no hardcoded locale references ✅
@@ -259,7 +259,7 @@ Add to the view composer:
 
 | File | Action |
 |---|---|
-| `lang/en/messages.php` | Move to `lang/en-US/messages.php` + add theme keys |
+| `lang/en/messages.php` | Move to `lang/en_US/messages.php` + add theme keys |
 | `lang/es/messages.php` | Move to `lang/es_MX/messages.php` + add theme keys |
 | `lang/pt_BR/messages.php` | Add theme keys |
 | `app/Support/Locales.php` | Reorder + rename keys |

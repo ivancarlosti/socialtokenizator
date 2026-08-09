@@ -8,7 +8,7 @@ A self-hosted, single-container image-sharing web app:
 - Object storage on **Cloudflare R2** (S3-compatible).
 - MySQL for metadata, tags, categories, and source links.
 - Server-rendered Open Graph + Twitter Card tags so links unfurl perfectly on X and Facebook.
-- Three-language UI (EN_US, es_MX, pt_BR) with AI-powered translation for post descriptions.
+- Three-language UI (en_US, es_MX, pt_BR) with AI-powered translation for post descriptions.
 - Dark and light theme with auto-detection and manual toggle.
 - Designed to live behind a reverse proxy (Nginx, Traefik, Caddy…).
 
@@ -288,7 +288,7 @@ The system prompt instructs the AI to preserve formatting, line breaks, and HTML
 
 | Locale code | AI prompt target |
 |---|---|
-| `en` | EN_US |
+| `en` | en_US |
 | `es` | es_MX |
 | `pt_BR` | pt_BR |
 
@@ -329,7 +329,7 @@ For the Press Release or News article provided, you must generate:
 
 **Language Requirements**
 You must provide the complete output in all three of the following languages:
-- "en-US" — English (US)
+- "en_US" — English (US)
 - "pt_BR" — Portuguese (Brazil)
 - "es_MX" — Spanish (Mexico)
 
@@ -342,12 +342,12 @@ You MUST respond with ONLY a valid JSON object. No markdown, no code fences, no 
 
 {
     "headlines": {
-        "en-US": "English headline here",
+        "en_US": "English headline here",
         "pt_BR": "Portuguese headline here",
         "es_MX": "Spanish headline here"
     },
     "descriptions": {
-        "en-US": "English description paragraphs here",
+        "en_US": "English description paragraphs here",
         "pt_BR": "Portuguese description paragraphs here",
         "es_MX": "Spanish description paragraphs here"
     },
@@ -403,7 +403,7 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 |---|---|
 | **Site logo** | Replaces the header text. Accepts PNG, SVG, WEBP, JPG, GIF — max 2 MB. |
 | **Favicon** | Browser tab icon. PNG, ICO, SVG, WEBP — max 512 KB. |
-| **Default language** | Sets the default locale for visitors. Supports EN_US, es_MX, and pt_BR. |
+| **Default language** | Sets the default locale for visitors. Supports en_US, es_MX, and pt_BR. |
 | **Posts per page** | Number of images shown per page in the feed (1–100). |
 | **Post URL prefix** | URL segment for post detail pages (default: `p`). Changing to `post` makes URLs `/post/{uuid}`. Requires container restart. |
 | **Hide title section** | When checked, the site title and subtitle are hidden at the top of the homepage. |

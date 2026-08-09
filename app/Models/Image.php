@@ -97,11 +97,11 @@ class Image extends Model
 
         if ($locale === 'pt_BR') {
             $fallbackChain[] = 'es_MX';
-            $fallbackChain[] = 'en-US';
+            $fallbackChain[] = 'en_US';
         } elseif ($locale === 'es_MX') {
-            $fallbackChain[] = 'en-US';
+            $fallbackChain[] = 'en_US';
             $fallbackChain[] = 'pt_BR';
-        } elseif ($locale === 'en-US') {
+        } elseif ($locale === 'en_US') {
             $fallbackChain[] = 'es_MX';
             $fallbackChain[] = 'pt_BR';
         }
