@@ -9,5 +9,6 @@ Route::middleware('api.token')->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('api.posts.store');
     Route::get('/posts', [PostController::class, 'index'])->name('api.posts.index');
     Route::get('/posts/{uuid}', [PostController::class, 'show'])->name('api.posts.show');
+    Route::put('/posts/{uuid}', [PostController::class, 'update'])->name('api.posts.update');
     Route::delete('/posts/{uuid}', [PostController::class, 'destroy'])->name('api.posts.destroy');
 });

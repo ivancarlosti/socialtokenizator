@@ -188,4 +188,14 @@ return [
     'settings_llms_full_enabled_help'    => 'Provide full post content at /llms-full.txt. Auto-regenerated when posts change.',
     'settings_sitemap_enabled'           => 'Enable sitemap.xml',
     'settings_sitemap_enabled_help'      => 'Provide an XML sitemap at /sitemap.xml. Auto-regenerated when posts change.',
+
+    // Image paste & change
+    'paste_image_clipboard'     => 'Or paste an image from clipboard (Ctrl+V)',
+    'paste_image_placeholder'   => 'Click here and press Ctrl+V to paste an image',
+    'change_image_label'        => 'Change image (optional)',
+    'current_image'             => 'Current image',
+    'new_image_preview'         => 'New image preview',
+    'clear_image'               => 'Clear selected image',
+    'paste_image_not_image'     => 'No image found in clipboard. Copy an image first.',
+    'paste_image_unsupported'   => 'Clipboard paste is not supported in this browser.',
 ];

@@ -159,6 +159,8 @@ class UploadController extends Controller
         }
 
         $validated = $request->validate([
+            'image'     => ['nullable', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+            'image_url' => ['nullable', 'string', 'url:http,https', 'max:2048'],
             'headline_en_US' => ['nullable', 'string', 'max:300'],
             'headline_es_MX' => ['nullable', 'string', 'max:300'],
             'headline_pt_BR' => ['nullable', 'string', 'max:300'],
@@ -173,7 +175,52 @@ class UploadController extends Controller
             'sources.*.label' => ['nullable', 'string', 'max:255'],
         ]);
 
-        DB::transaction(function () use ($image, $validated) {
+        DB::transaction(function () use ($image, $validated, $request) {
+            // ── Image replacement ──
+            if ($request->hasFile('image')) {
+                $oldR2Key = $image->r2_key;
+
+                $file = $request->file('image');
+                $uuid = (string) Str::uuid();
+                $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+                $r2Key = 'images/' . $uuid . '.' . $ext;
+
+                Storage::disk('r2')->putFileAs('', $file, $r2Key, [
+                    'visibility'  => 'public',
+                    'ContentType' => $file->getMimeType(),
+                ]);
+
+                [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+
+                $image->update([
+                    'uuid'              => $uuid,
+                    'r2_key'            => $r2Key,
+                    'original_filename' => $file->getClientOriginalName(),
+                    'mime_type'         => $file->getMimeType(),
+                    'width'             => $width,
+                    'height'            => $height,
+                ]);
+
+                // Delete old image from R2 after successful replacement
+                Storage::disk('r2')->delete($oldR2Key);
+            } elseif (! empty($validated['image_url'])) {
+                $oldR2Key = $image->r2_key;
+
+                $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
+
+                $image->update([
+                    'uuid'              => $imageMeta['uuid'],
+                    'r2_key'            => $imageMeta['r2_key'],
+                    'original_filename' => $imageMeta['original_filename'],
+                    'mime_type'         => $imageMeta['mime_type'],
+                    'width'             => $imageMeta['width'],
+                    'height'            => $imageMeta['height'],
+                ]);
+
+                Storage::disk('r2')->delete($oldR2Key);
+            }
+
+            // ── Metadata update ──
             $image->update([
                 'headline_en_US' => $validated['headline_en_US'] ?? null,
                 'headline_es_MX' => $validated['headline_es_MX'] ?? null,

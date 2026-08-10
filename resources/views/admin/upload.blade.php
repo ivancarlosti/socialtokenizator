@@ -19,13 +19,21 @@
 
         <div>
             <label class="block text-sm text-muted mb-1">{{ __('messages.upload_image_label') }}</label>
-            <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+            <input type="file" name="image" id="image-file-input" accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
                    class="block w-full text-sm text-muted">
             <p class="text-xs text-muted mt-2 mb-1">— {{ __('messages.or') }} —</p>
-            <input type="url" name="image_url" value="{{ old('image_url') }}"
+            <input type="url" name="image_url" id="image-url-input" value="{{ old('image_url') }}"
                    class="block w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
                    placeholder="https://example.com/photo.jpg">
             <p class="text-xs text-muted mt-1">{{ __('messages.upload_image_url_help') }}</p>
+            <p class="text-xs text-muted mt-2 mb-1">— {{ __('messages.or') }} —</p>
+            <div id="paste-zone" class="paste-zone" tabindex="0">
+                <span id="paste-zone-text" class="text-sm text-muted">{{ __('messages.paste_image_placeholder') }}</span>
+                <div id="paste-preview" class="paste-preview hidden mt-2">
+                    <img id="paste-preview-img" src="" alt="{{ __('messages.new_image_preview') }}">
+                    <button type="button" id="paste-clear-btn" class="clear-preview" title="{{ __('messages.clear_image') }}">×</button>
+                </div>
+            </div>
         </div>
 
         {{-- AI Generate input --}}
@@ -137,6 +145,107 @@
     </form>
 
     <script>
+        // ── Clipboard paste support ──
+        (function () {
+            const fileInput = document.getElementById('image-file-input');
+            const urlInput = document.getElementById('image-url-input');
+            const pasteZone = document.getElementById('paste-zone');
+            const pasteZoneText = document.getElementById('paste-zone-text');
+            const pastePreview = document.getElementById('paste-preview');
+            const pastePreviewImg = document.getElementById('paste-preview-img');
+            const pasteClearBtn = document.getElementById('paste-clear-btn');
+
+            function setPastedFile(file) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+                // Clear URL input since we're using a file
+                if (urlInput) urlInput.value = '';
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    pastePreviewImg.src = e.target.result;
+                    pastePreview.classList.remove('hidden');
+                    pasteZoneText.classList.add('hidden');
+                    pasteZone.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function clearPastedImage() {
+                fileInput.value = '';
+                pastePreviewImg.src = '';
+                pastePreview.classList.add('hidden');
+                pasteZoneText.classList.remove('hidden');
+                pasteZone.classList.remove('has-image');
+            }
+
+            // Handle paste event on the document
+            document.addEventListener('paste', function (e) {
+                // Don't intercept paste into text inputs/textareas
+                const target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    // But if it's the paste zone or file input itself, handle it
+                    if (target !== pasteZone && target !== fileInput) return;
+                }
+
+                const items = e.clipboardData?.items;
+                if (!items) return;
+
+                for (const item of items) {
+                    if (item.type.match(/^image\/(jpeg|png|webp|gif|avif)$/)) {
+                        e.preventDefault();
+                        const blob = item.getAsFile();
+                        // Create a proper File with a meaningful name
+                        const ext = item.type.split('/')[1] === 'jpeg' ? 'jpg' : item.type.split('/')[1];
+                        const file = new File([blob], 'clipboard-image.' + ext, { type: item.type });
+                        setPastedFile(file);
+                        return;
+                    }
+                }
+            });
+
+            // Click on paste zone focuses it and gives user hint
+            pasteZone.addEventListener('click', function () {
+                pasteZone.focus();
+            });
+
+            // Clear button
+            pasteClearBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                clearPastedImage();
+            });
+
+            // When file is selected via file input, clear the paste preview
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files?.length) {
+                    // File selected via native picker — keep it, hide paste preview
+                    pastePreview.classList.add('hidden');
+                    pasteZoneText.classList.remove('hidden');
+                    pasteZone.classList.remove('has-image');
+                }
+            });
+
+            // Drag and drop support on the paste zone
+            pasteZone.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                pasteZone.classList.add('drag-over');
+            });
+            pasteZone.addEventListener('dragleave', function () {
+                pasteZone.classList.remove('drag-over');
+            });
+            pasteZone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                pasteZone.classList.remove('drag-over');
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0 && files[0].type.match(/^image\//)) {
+                    setPastedFile(files[0]);
+                }
+            });
+        })();
+
+        // ── Sources & AI ──
         (function () {
             const wrap = document.getElementById('sources');
             const addBtn = document.getElementById('add-source');

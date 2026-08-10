@@ -13,14 +13,38 @@
         </div>
     @endif
 
-    <div class="mt-4 bg-card border border-card-border rounded p-3 inline-block">
-        <img src="{{ $image->public_url }}" alt="" class="max-h-48 w-auto bg-black">
-    </div>
-
-    <form method="post" action="{{ route('admin.images.update', ['uuid' => $image->uuid]) }}"
+    <form method="post" action="{{ route('admin.images.update', ['uuid' => $image->uuid]) }}" enctype="multipart/form-data"
           class="mt-6 space-y-4 bg-card border border-card-border rounded p-5">
         @csrf
         @method('PUT')
+
+        {{-- Image change section --}}
+        <div>
+            <label class="block text-sm text-muted mb-2">{{ __('messages.change_image_label') }}</label>
+            <div class="image-change-section">
+                <div class="current-image">
+                    <p class="text-xs text-muted mb-2">{{ __('messages.current_image') }}</p>
+                    <img src="{{ $image->public_url }}" alt="" class="w-full bg-black">
+                </div>
+                <div class="new-image">
+                    <p class="text-xs text-muted mb-2">{{ __('messages.new_image_preview') }}</p>
+                    <input type="file" name="image" id="image-file-input" accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                           class="block w-full text-sm text-muted mb-2">
+                    <p class="text-xs text-muted my-2">— {{ __('messages.or') }} —</p>
+                    <input type="url" name="image_url" id="image-url-input" value="{{ old('image_url') }}"
+                           class="block w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy"
+                           placeholder="https://example.com/photo.jpg">
+                    <p class="text-xs text-muted my-2">— {{ __('messages.or') }} —</p>
+                    <div id="paste-zone" class="paste-zone" tabindex="0">
+                        <span id="paste-zone-text" class="text-sm text-muted">{{ __('messages.paste_image_placeholder') }}</span>
+                        <div id="paste-preview" class="paste-preview hidden mt-2">
+                            <img id="paste-preview-img" src="" alt="{{ __('messages.new_image_preview') }}">
+                            <button type="button" id="paste-clear-btn" class="clear-preview" title="{{ __('messages.clear_image') }}">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {{-- AI Generate input --}}
         <div class="border border-card-border rounded p-4 bg-card-hover/20">
@@ -135,6 +159,96 @@
     </form>
 
     <script>
+        // ── Clipboard paste support ──
+        (function () {
+            const fileInput = document.getElementById('image-file-input');
+            const urlInput = document.getElementById('image-url-input');
+            const pasteZone = document.getElementById('paste-zone');
+            const pasteZoneText = document.getElementById('paste-zone-text');
+            const pastePreview = document.getElementById('paste-preview');
+            const pastePreviewImg = document.getElementById('paste-preview-img');
+            const pasteClearBtn = document.getElementById('paste-clear-btn');
+
+            function setPastedFile(file) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+                if (urlInput) urlInput.value = '';
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    pastePreviewImg.src = e.target.result;
+                    pastePreview.classList.remove('hidden');
+                    pasteZoneText.classList.add('hidden');
+                    pasteZone.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function clearPastedImage() {
+                fileInput.value = '';
+                pastePreviewImg.src = '';
+                pastePreview.classList.add('hidden');
+                pasteZoneText.classList.remove('hidden');
+                pasteZone.classList.remove('has-image');
+            }
+
+            document.addEventListener('paste', function (e) {
+                const target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    if (target !== pasteZone && target !== fileInput) return;
+                }
+
+                const items = e.clipboardData?.items;
+                if (!items) return;
+
+                for (const item of items) {
+                    if (item.type.match(/^image\/(jpeg|png|webp|gif|avif)$/)) {
+                        e.preventDefault();
+                        const blob = item.getAsFile();
+                        const ext = item.type.split('/')[1] === 'jpeg' ? 'jpg' : item.type.split('/')[1];
+                        const file = new File([blob], 'clipboard-image.' + ext, { type: item.type });
+                        setPastedFile(file);
+                        return;
+                    }
+                }
+            });
+
+            pasteZone.addEventListener('click', function () {
+                pasteZone.focus();
+            });
+
+            pasteClearBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                clearPastedImage();
+            });
+
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files?.length) {
+                    pastePreview.classList.add('hidden');
+                    pasteZoneText.classList.remove('hidden');
+                    pasteZone.classList.remove('has-image');
+                }
+            });
+
+            pasteZone.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                pasteZone.classList.add('drag-over');
+            });
+            pasteZone.addEventListener('dragleave', function () {
+                pasteZone.classList.remove('drag-over');
+            });
+            pasteZone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                pasteZone.classList.remove('drag-over');
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0 && files[0].type.match(/^image\//)) {
+                    setPastedFile(files[0]);
+                }
+            });
+        })();
+
+        // ── Sources & AI ──
         (function () {
             const wrap = document.getElementById('sources');
             const addBtn = document.getElementById('add-source');

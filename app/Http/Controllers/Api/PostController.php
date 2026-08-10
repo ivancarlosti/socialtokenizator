@@ -259,6 +259,146 @@ class PostController extends Controller
     }
 
     /**
+     * Update a post by UUID — metadata and optionally the image (file or URL).
+     */
+    public function update(Request $request, string $uuid): JsonResponse
+    {
+        $image = Image::where('uuid', $uuid)->first();
+
+        if (! $image) {
+            return response()->json(['error' => 'Post not found.'], 404);
+        }
+
+        try {
+            $validated = $request->validate([
+                'image'     => ['nullable', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+                'image_url' => ['nullable', 'string', 'url:http,https', 'max:2048'],
+                'headline_en_US' => ['nullable', 'string', 'max:300'],
+                'headline_es_MX' => ['nullable', 'string', 'max:300'],
+                'headline_pt_BR' => ['nullable', 'string', 'max:300'],
+                'description_en_US' => ['nullable', 'string', 'max:5000'],
+                'description_es_MX' => ['nullable', 'string', 'max:5000'],
+                'description_pt_BR' => ['nullable', 'string', 'max:5000'],
+                'categories' => ['nullable', 'string'],
+                'tags' => ['nullable', 'string', 'max:500'],
+                'sources' => ['nullable', 'json'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed.',
+                'messages' => $e->errors(),
+            ], 422);
+        }
+
+        DB::transaction(function () use ($image, $validated, $request) {
+            // ── Image replacement ──
+            if ($request->hasFile('image')) {
+                $oldR2Key = $image->r2_key;
+
+                $file = $request->file('image');
+                $newUuid = (string) Str::uuid();
+                $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+                $r2Key = 'images/' . $newUuid . '.' . $ext;
+
+                Storage::disk('r2')->putFileAs('', $file, $r2Key, [
+                    'visibility'  => 'public',
+                    'ContentType' => $file->getMimeType(),
+                ]);
+
+                [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+
+                $image->update([
+                    'uuid'              => $newUuid,
+                    'r2_key'            => $r2Key,
+                    'original_filename' => $file->getClientOriginalName(),
+                    'mime_type'         => $file->getMimeType(),
+                    'width'             => $width,
+                    'height'            => $height,
+                ]);
+
+                Storage::disk('r2')->delete($oldR2Key);
+            } elseif (! empty($validated['image_url'])) {
+                $oldR2Key = $image->r2_key;
+
+                $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
+
+                $image->update([
+                    'uuid'              => $imageMeta['uuid'],
+                    'r2_key'            => $imageMeta['r2_key'],
+                    'original_filename' => $imageMeta['original_filename'],
+                    'mime_type'         => $imageMeta['mime_type'],
+                    'width'             => $imageMeta['width'],
+                    'height'            => $imageMeta['height'],
+                ]);
+
+                Storage::disk('r2')->delete($oldR2Key);
+            }
+
+            // ── Metadata update ──
+            $image->update(array_filter([
+                'headline_en_US' => $validated['headline_en_US'] ?? null,
+                'headline_es_MX' => $validated['headline_es_MX'] ?? null,
+                'headline_pt_BR' => $validated['headline_pt_BR'] ?? null,
+                'description_en_US' => $validated['description_en_US'] ?? null,
+                'description_es_MX' => $validated['description_es_MX'] ?? null,
+                'description_pt_BR' => $validated['description_pt_BR'] ?? null,
+            ], fn ($v) => $v !== null));
+
+            // Sync categories
+            $categoryInput = trim((string) ($validated['categories'] ?? ''));
+            if ($categoryInput !== '') {
+                $categoryIds = $this->resolveCategories($categoryInput);
+                if ($categoryIds) {
+                    $image->categories()->sync($categoryIds);
+                }
+            }
+
+            // Sync tags
+            $tagInput = trim((string) ($validated['tags'] ?? ''));
+            if ($tagInput !== '') {
+                $tagIds = [];
+                foreach (explode(',', $tagInput) as $rawTag) {
+                    $name = Tag::normalize($rawTag);
+                    if ($name === '') {
+                        continue;
+                    }
+                    $tag = Tag::firstOrCreate(['name' => $name]);
+                    $tagIds[$tag->id] = true;
+                }
+                if ($tagIds) {
+                    $image->tags()->sync(array_keys($tagIds));
+                }
+            }
+
+            // Sources (JSON array)
+            $sourcesInput = trim((string) ($validated['sources'] ?? ''));
+            if ($sourcesInput !== '') {
+                $image->sources()->delete();
+                $sources = json_decode($sourcesInput, true);
+                if (is_array($sources)) {
+                    $position = 0;
+                    foreach ($sources as $row) {
+                        $url = trim((string) ($row['url'] ?? ''));
+                        if ($url === '') {
+                            continue;
+                        }
+                        Source::create([
+                            'image_id' => $image->id,
+                            'url'      => $url,
+                            'label'    => trim((string) ($row['label'] ?? '')) ?: null,
+                            'position' => $position++,
+                        ]);
+                    }
+                }
+            }
+        });
+
+        $image->load(['categories', 'tags', 'sources']);
+
+        return response()->json($this->formatPost($image));
+    }
+
+    /**
      * Format a post for JSON response.
      */
     private function formatPost(Image $image): array

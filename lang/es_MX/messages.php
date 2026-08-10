@@ -188,4 +188,14 @@ return [
     'settings_llms_full_enabled_help'    => 'Proporciona el contenido completo de los posts en /llms-full.txt. Se regenera automáticamente cuando los posts cambian.',
     'settings_sitemap_enabled'           => 'Habilitar sitemap.xml',
     'settings_sitemap_enabled_help'      => 'Proporciona un sitemap XML en /sitemap.xml. Se regenera automáticamente cuando los posts cambian.',
+
+    // Image paste & change
+    'paste_image_clipboard'     => 'O pega una imagen del portapapeles (Ctrl+V)',
+    'paste_image_placeholder'   => 'Haz clic aquí y presiona Ctrl+V para pegar una imagen',
+    'change_image_label'        => 'Cambiar imagen (opcional)',
+    'current_image'             => 'Imagen actual',
+    'new_image_preview'         => 'Vista previa de la nueva imagen',
+    'clear_image'               => 'Limpiar imagen seleccionada',
+    'paste_image_not_image'     => 'No se encontró imagen en el portapapeles. Copia una imagen primero.',
+    'paste_image_unsupported'   => 'Pegar del portapapeles no es compatible con este navegador.',
 ];
