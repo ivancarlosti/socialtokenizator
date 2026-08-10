@@ -29,8 +29,10 @@ chmod -R ug+rwX storage bootstrap/cache || true
 
 # 3. Generate APP_KEY if missing (helps first-run; user can set their own in .env)
 if [ -z "${APP_KEY:-}" ] || [ "${APP_KEY}" = "" ]; then
-    echo "[entrypoint] APP_KEY is empty — generating an ephemeral one for this container."
     export APP_KEY="base64:$(php -r 'echo base64_encode(random_bytes(32));')"
+    echo "[entrypoint] APP_KEY was empty — auto-generated one for this container:"
+    echo "[entrypoint]   ${APP_KEY}"
+    echo "[entrypoint] Copy the line above into docker/.env to make it permanent."
 fi
 
 # 4. Apply DB migrations

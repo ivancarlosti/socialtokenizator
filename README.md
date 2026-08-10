@@ -95,9 +95,8 @@ cp .env.example .env
 $EDITOR .env       # fill in MySQL passwords, R2 keys, AUTH_METHOD, etc.
 
 # 3. Generate APP_KEY (one-off)
-docker run --rm ghcr.io/ivancarlosti/socialtokenizator:latest \
-    php -r 'echo "base64:".base64_encode(random_bytes(32))."\n";'
-# Paste the output into APP_KEY= in your .env
+echo "base64:$(openssl rand -base64 32)"
+# Paste the output into APP_KEY= in your .env (include the "base64:" prefix!)
 
 # 4. Pull and run
 docker compose pull
@@ -539,6 +538,7 @@ Both tools should show the image and description from your image detail page.
 | Login at `/auth/login` returns 404 | `AUTH_METHOD` is not set to `account`, or the container hasn't been restarted after editing `.env`. |
 | Keycloak callback returns `Invalid redirect_uri` | The URI configured in the Keycloak client must **exactly** match `KEYCLOAK_REDIRECT_URI` (scheme + host + path). |
 | `419 Page Expired` on form posts | Likely a cookie / proxy issue. Make sure `APP_URL` matches the public scheme/host and `SESSION_SECURE_COOKIE` is `true` only over HTTPS. |
+| `Unsupported cipher or incorrect key length` | The `APP_KEY` in your `.env` is missing the `base64:` prefix. It must be exactly `APP_KEY=base64:<key>`, not `APP_KEY=<key>`. Run `echo "base64:$(openssl rand -base64 32)"` to generate a valid one. After fixing, run `docker compose up -d` (not restart) to recreate the container. |
 
 ---
 

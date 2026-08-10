@@ -2,7 +2,7 @@ name: socialtokenizator
 
 services:
   socialtokenizator:
-    image: ghcr.io/ivancarlosti/.socialtokenizator:latest
+    image: ghcr.io/ivancarlosti/socialtokenizator:latest
     env_file:
       - .env
     ports:
