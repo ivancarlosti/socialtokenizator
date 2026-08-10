@@ -38,7 +38,7 @@
                     <div id="paste-zone" class="paste-zone" tabindex="0">
                         <span id="paste-zone-text" class="text-sm text-muted">{{ __('messages.paste_image_placeholder') }}</span>
                         <div id="paste-preview" class="paste-preview hidden mt-2">
-                            <img id="paste-preview-img" src="" alt="{{ __('messages.new_image_preview') }}">
+                            <img id="paste-preview-img" alt="{{ __('messages.new_image_preview') }}">
                             <button type="button" id="paste-clear-btn" class="clear-preview" title="{{ __('messages.clear_image') }}">×</button>
                         </div>
                     </div>
@@ -187,7 +187,7 @@
 
             function clearPastedImage() {
                 fileInput.value = '';
-                pastePreviewImg.src = '';
+                pastePreviewImg.removeAttribute('src');
                 pastePreview.classList.add('hidden');
                 pasteZoneText.classList.remove('hidden');
                 pasteZone.classList.remove('has-image');

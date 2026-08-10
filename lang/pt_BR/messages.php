@@ -124,7 +124,7 @@ return [
     'settings_post_path_prefix_help'=> 'Segmento da URL para páginas de detalhe (padrão: p). Alterar requer limpar o cache de rotas. Reinicie o container (`docker compose restart`) após salvar.',
     'settings_footer_text'          => 'Texto esquerdo do rodapé',
     'settings_footer_text_help'     => 'Texto ou HTML personalizado exibido no lado esquerdo do rodapé. Aceita tags HTML.',
-    'settings_footer_html'          => 'HTML do rodapé (direito)',
+    'settings_footer_html'          => 'Texto direito do rodapé',
     'settings_footer_html_help'     => 'Texto ou HTML personalizado exibido no lado direito do rodapé. Aceita tags HTML.',
     'settings_site_title_subtitle'  => 'Título & subtítulo do site (por idioma)',
     'settings_site_title'           => 'Título',

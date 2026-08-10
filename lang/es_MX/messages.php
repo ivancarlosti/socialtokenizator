@@ -124,7 +124,7 @@ return [
     'settings_post_path_prefix_help'=> 'Segmento de URL para páginas de detalle (predeterminado: p). Cambiar requiere limpiar la caché de rutas. Reinicie el contenedor (`docker compose restart`) después de guardar.',
     'settings_footer_text'          => 'Texto izquierdo del pie',
     'settings_footer_text_help'     => 'Texto o HTML personalizado mostrado en el lado izquierdo del pie de página. Acepta etiquetas HTML.',
-    'settings_footer_html'          => 'HTML del pie (derecho)',
+    'settings_footer_html'          => 'Texto derecho del pie',
     'settings_footer_html_help'     => 'Texto o HTML personalizado mostrado en el lado derecho del pie de página. Acepta etiquetas HTML.',
     'settings_site_title_subtitle'  => 'Título & subtítulo del sitio (por idioma)',
     'settings_site_title'           => 'Título',

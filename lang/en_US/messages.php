@@ -124,7 +124,7 @@ return [
     'settings_post_path_prefix_help'=> 'URL segment for post detail pages (default: p). Changing requires clearing the route cache. Restart the container (`docker compose restart`) after saving.',
     'settings_footer_text'          => 'Footer left text',
     'settings_footer_text_help'     => 'Custom HTML or text displayed on the left side of the footer. Accepts HTML tags.',
-    'settings_footer_html'          => 'Footer HTML (right)',
+    'settings_footer_html'          => 'Footer right text',
     'settings_footer_html_help'     => 'Custom HTML or text displayed on the right side of the footer. Accepts HTML tags.',
     'settings_site_title_subtitle'  => 'Site title & subtitle (per language)',
     'settings_site_title'           => 'Title',

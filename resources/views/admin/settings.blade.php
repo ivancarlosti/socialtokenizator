@@ -196,27 +196,61 @@
                 <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_text_help') }}</p>
                 <div class="space-y-4">
                     @foreach($locales as $code => $info)
+                        @php
+                            $allLocales = \App\Support\Locales::supported();
+                            $otherLocales = array_filter($allLocales, fn($l, $k) => $k !== $code, ARRAY_FILTER_USE_BOTH);
+                        @endphp
                         <div class="border border-card-border rounded p-3">
                             <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
                             <textarea name="footer_text_{{ $code }}" rows="4" maxlength="10000"
-                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono footer-text-field"
+                                      data-locale="{{ $code }}"
                                       placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_text_{$code}", $footerTextRows[$code] ?? '') }}</textarea>
+                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                @foreach($otherLocales as $srcCode => $srcInfo)
+                                    <button type="button" class="ai-translate-link text-xs text-accent inline-block"
+                                            data-target="footer_text_{{ $code }}"
+                                            data-target-locale="{{ $code }}"
+                                            data-source-locale="{{ $srcCode }}"
+                                            data-field-type="footer_text">
+                                        {{ __('messages.translate_with_ai_from', ['locale' => $srcInfo['name']]) }}
+                                    </button>
+                                @endforeach
+                                <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
             </div>
 
-            {{-- Footer HTML per locale --}}
+            {{-- Footer right text per locale --}}
             <div>
                 <label class="block text-sm text-muted mb-3">{{ __('messages.settings_footer_html') }}</label>
                 <p class="text-xs text-muted mb-2">{{ __('messages.settings_footer_html_help') }}</p>
                 <div class="space-y-4">
                     @foreach($locales as $code => $info)
+                        @php
+                            $allLocales = \App\Support\Locales::supported();
+                            $otherLocales = array_filter($allLocales, fn($l, $k) => $k !== $code, ARRAY_FILTER_USE_BOTH);
+                        @endphp
                         <div class="border border-card-border rounded p-3">
                             <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
                             <textarea name="footer_html_{{ $code }}" rows="4" maxlength="10000"
-                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                                      class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono footer-html-field"
+                                      data-locale="{{ $code }}"
                                       placeholder="<p>Your custom footer text or HTML</p>">{{ old("footer_html_{$code}", $footerHtmlRows[$code] ?? '') }}</textarea>
+                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                @foreach($otherLocales as $srcCode => $srcInfo)
+                                    <button type="button" class="ai-translate-link text-xs text-accent inline-block"
+                                            data-target="footer_html_{{ $code }}"
+                                            data-target-locale="{{ $code }}"
+                                            data-source-locale="{{ $srcCode }}"
+                                            data-field-type="footer_html">
+                                        {{ __('messages.translate_with_ai_from', ['locale' => $srcInfo['name']]) }}
+                                    </button>
+                                @endforeach
+                                <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -232,18 +266,28 @@
                 <p class="text-xs text-muted mb-2">{{ __('messages.about_page_help') }}</p>
                 <div class="space-y-4">
                     @foreach($locales as $code => $info)
+                        @php
+                            $allLocales = \App\Support\Locales::supported();
+                            $otherLocales = array_filter($allLocales, fn($l, $k) => $k !== $code, ARRAY_FILTER_USE_BOTH);
+                        @endphp
                         <div class="border border-card-border rounded p-3">
                             <p class="text-xs font-semibold text-muted mb-2">{{ $info['name'] }}</p>
                             <textarea name="about_page_{{ $code }}" rows="10" maxlength="20000"
                                       class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono about-field"
                                       data-locale="{{ $code }}"
                                       placeholder="<h2>{{ __('messages.about_page_heading') }}</h2><p>...</p>">{{ old("about_page_{$code}", $aboutRows[$code] ?? '') }}</textarea>
-                            <button type="button" class="ai-translate-link text-xs text-accent mt-1 inline-block"
-                                    data-target="about_page_{{ $code }}"
-                                    data-target-locale="{{ $code }}">
-                                {{ __('messages.translate_with_ai') }}
-                            </button>
-                            <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                @foreach($otherLocales as $srcCode => $srcInfo)
+                                    <button type="button" class="ai-translate-link text-xs text-accent inline-block"
+                                            data-target="about_page_{{ $code }}"
+                                            data-target-locale="{{ $code }}"
+                                            data-source-locale="{{ $srcCode }}"
+                                            data-field-type="about">
+                                        {{ __('messages.translate_with_ai_from', ['locale' => $srcInfo['name']]) }}
+                                    </button>
+                                @endforeach
+                                <span class="ai-translate-status text-xs text-muted ml-2 hidden"></span>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -423,32 +467,41 @@
         })();
     </script>
 
-    {{-- AI Translate for about page content --}}
+    {{-- AI Translate for about & footer fields --}}
     <script>
         (function () {
+            const fieldSelectors = {
+                'about': '.about-field',
+                'footer_text': '.footer-text-field',
+                'footer_html': '.footer-html-field',
+            };
+
             document.querySelectorAll('.ai-translate-link').forEach(btn => {
                 btn.addEventListener('click', async function () {
                     const targetName = this.dataset.target;
                     const targetLocale = this.dataset.targetLocale;
+                    const sourceLocale = this.dataset.sourceLocale;
+                    const fieldType = this.dataset.fieldType;
                     const targetField = document.querySelector(`[name="${targetName}"]`);
-                    const statusEl = this.nextElementSibling;
+                    const statusEl = this.parentElement.querySelector('.ai-translate-status');
 
-                    let sourceText = '';
-                    const allFields = document.querySelectorAll('.about-field');
-                    for (const f of allFields) {
-                        if (f.name !== targetName && f.value.trim()) {
-                            sourceText = f.value.trim();
-                            break;
-                        }
-                    }
+                    // Find source field by matching locale and field type
+                    const srcSelector = fieldSelectors[fieldType] || '.about-field';
+                    const sourceField = document.querySelector(`${srcSelector}[data-locale="${sourceLocale}"]`);
+                    const sourceText = sourceField?.value.trim() || '';
+
                     if (!sourceText) {
-                        alert(@json(__('messages.translate_no_source')));
+                        const localeNames = @json(\App\Support\Locales::supported());
+                        const srcName = localeNames[sourceLocale]?.name || sourceLocale;
+                        alert(@json(__('messages.translate_no_source_for')).replace(':locale', srcName));
                         return;
                     }
 
                     this.classList.add('hidden');
-                    statusEl.classList.remove('hidden');
-                    statusEl.textContent = @json(__('messages.translating'));
+                    if (statusEl) {
+                        statusEl.classList.remove('hidden');
+                        statusEl.textContent = @json(__('messages.translating'));
+                    }
 
                     try {
                         const resp = await fetch('{{ route('admin.translate') }}', {
@@ -467,19 +520,26 @@
                         const data = await resp.json();
                         if (data.translated_text) {
                             targetField.value = data.translated_text;
-                            statusEl.textContent = @json(__('messages.translate_done'));
+                            if (statusEl) statusEl.textContent = @json(__('messages.translate_done'));
                         } else {
-                            statusEl.textContent = data.error || @json(__('messages.translate_error'));
+                            if (statusEl) statusEl.textContent = data.error || @json(__('messages.translate_error'));
                         }
                     } catch (e) {
-                        statusEl.textContent = @json(__('messages.translate_error'));
+                        const msg = e.name === 'TypeError' || (e.message && e.message.includes('fetch'))
+                            ? @json(__('messages.translate_error_network'))
+                            : e.name === 'AbortError'
+                                ? @json(__('messages.translate_error_timeout'))
+                                : @json(__('messages.translate_error'));
+                        if (statusEl) statusEl.textContent = msg;
                     }
 
                     this.classList.remove('hidden');
                     setTimeout(() => {
-                        statusEl.classList.add('hidden');
-                        statusEl.textContent = '';
-                    }, 3000);
+                        if (statusEl) {
+                            statusEl.classList.add('hidden');
+                            statusEl.textContent = '';
+                        }
+                    }, 5000);
                 });
             });
         })();
