@@ -148,7 +148,7 @@ a:hover {
     padding: 0.75rem;
 }
 
-.paste-preview {
+.paste-preview:not(.hidden) {
     position: relative;
     display: inline-block;
     max-width: 100%;
