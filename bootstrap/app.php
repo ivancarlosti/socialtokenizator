@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
+            'api.ip' => \App\Http\Middleware\ApiIpWhitelist::class,
             'api.token' => \App\Http\Middleware\ApiTokenAuth::class,
         ]);
     })

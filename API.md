@@ -43,6 +43,23 @@ Authorization: Bearer <your-api-token>
 
 > ⚠️ **Regenerating the token invalidates the previous one.** All API clients must be updated.
 
+### IP Address Allowlist
+
+By default, the API accepts requests from any IP address. To restrict access, configure an allowlist in **Settings → RestAPI**.
+
+- Add one address per line.
+- Supports IPv4 and IPv6, single addresses or CIDR ranges.
+- Leave the field empty to allow any IP.
+
+```
+203.0.113.10
+203.0.113.0/24
+2001:db8::1
+2001:db8::/48
+```
+
+Requests from IPs not on the list receive `403 Forbidden`.
+
 ---
 
 ## Base URL
@@ -343,6 +360,7 @@ All errors follow a consistent JSON format:
 | Status | Meaning |
 |---|---|
 | `401` | Missing or invalid API token |
+| `403` | IP address not allowed (when an IP allowlist is configured) |
 | `404` | Post not found |
 | `422` | Validation error (e.g. missing image, invalid file type) |
 
@@ -350,6 +368,12 @@ All errors follow a consistent JSON format:
 
 ```json
 {"error": "Missing API token. Provide it as: Authorization: Bearer <token>"}
+```
+
+### 403 — IP Not Allowed
+
+```json
+{"error": "IP address is not allowed to access the API."}
 ```
 
 ### 422 — Validation Error

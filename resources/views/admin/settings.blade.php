@@ -339,6 +339,14 @@
                     </button>
                 @endif
             </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_allowed_ips') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_api_allowed_ips_help') }}</p>
+                <textarea name="api_allowed_ips" rows="6"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                          placeholder="203.0.113.10&#10;203.0.113.0/24&#10;2001:db8::1&#10;2001:db8::/48">{{ old('api_allowed_ips', $apiAllowedIps) }}</textarea>
+            </div>
         </div>
 
         {{-- ============================================ --}}

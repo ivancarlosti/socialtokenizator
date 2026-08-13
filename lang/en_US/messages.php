@@ -144,6 +144,9 @@ return [
     'settings_api_token_generate'   => 'Generate Token',
     'settings_api_token_regenerate' => 'Regenerate',
     'settings_api_token_regenerate_confirm' => 'Regenerating the token will invalidate the current one. All API clients must be updated. Continue?',
+    'settings_api_allowed_ips'         => 'Allowed IP addresses',
+    'settings_api_allowed_ips_help'    => 'Restrict API access to specific IPs. Leave empty to allow any IP. One address per line. Supports IPv4 and IPv6, single addresses or CIDR ranges. Examples: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48.',
+    'settings_api_allowed_ips_invalid' => 'Invalid IP address or CIDR range: :ip.',
 
     // Errors
     'not_found'      => 'Nothing here.',

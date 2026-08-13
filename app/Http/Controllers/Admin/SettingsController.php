@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\IpWhitelist;
 use App\Support\Locales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SettingsController extends Controller
 {
@@ -48,6 +50,7 @@ class SettingsController extends Controller
             'aboutRows'          => $aboutRows,
             'locales'            => $locales,
             'apiToken'           => $apiToken,
+            'apiAllowedIps'      => Setting::get('api_allowed_ips', ''),
             'aiGeneratePrompt'   => Setting::get('ai_generate_prompt', ''),
             'robotsEnabled'      => (bool) Setting::get('robots_enabled', true),
             'robotsContent'      => Setting::get('robots_content', "User-agent: *\nDisallow: /admin\nDisallow: /auth"),
@@ -79,6 +82,7 @@ class SettingsController extends Controller
             'llms_enabled'          => ['nullable', 'boolean'],
             'llms_full_enabled'     => ['nullable', 'boolean'],
             'sitemap_enabled'       => ['nullable', 'boolean'],
+            'api_allowed_ips'       => ['nullable', 'string', 'max:10000'],
         ]);
 
         // Per-locale fields
@@ -90,6 +94,17 @@ class SettingsController extends Controller
                 "footer_html_{$locale}"   => ['nullable', 'string', 'max:10000'],
                 "about_page_{$locale}"    => ['nullable', 'string', 'max:20000'],
             ]);
+        }
+
+        // API IP allowlist — validate each entry before any settings are persisted
+        $allowedIps = trim((string) ($validated['api_allowed_ips'] ?? ''));
+
+        foreach (IpWhitelist::normalize($allowedIps) as $entry) {
+            if (! IpWhitelist::isValidEntry($entry)) {
+                throw ValidationException::withMessages([
+                    'api_allowed_ips' => [__('messages.settings_api_allowed_ips_invalid', ['ip' => $entry])],
+                ]);
+            }
         }
 
         if ($request->boolean('remove_logo')) {
@@ -175,6 +190,13 @@ class SettingsController extends Controller
         $apiTokenAction = trim((string) ($request->input('api_token_action', '')));
         if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
             Setting::put('api_token', Str::random(64));
+        }
+
+        // API IP allowlist
+        if ($allowedIps !== '') {
+            Setting::put('api_allowed_ips', $allowedIps);
+        } else {
+            Setting::forget('api_allowed_ips');
         }
 
         // AI Generate Prompt
