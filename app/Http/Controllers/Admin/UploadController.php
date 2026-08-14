@@ -7,6 +7,8 @@ use App\Models\Category;
 use App\Models\Image;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Rules\ImageFile;
+use App\Support\ImageMime;
 use App\Support\ImageUrlDownloader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +38,7 @@ class UploadController extends Controller
         }
 
         $validated = $request->validate([
-            'image'     => ['required_without:image_url', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+            'image'     => ['required_without:image_url', 'file', new ImageFile(['jpeg', 'png', 'webp', 'gif', 'avif']), 'max:10240'],
             'image_url' => ['nullable', 'required_without:image', 'string', 'url:http,https', 'max:2048'],
             'headline_en_US' => ['nullable', 'string', 'max:300'],
             'headline_es_MX' => ['nullable', 'string', 'max:300'],
@@ -55,13 +57,14 @@ class UploadController extends Controller
         // Process image: prefer file upload, fall back to URL download
         if ($request->hasFile('image')) {
             $file = $request->file('image');
+            $mime = ImageMime::ofUploadedFile($file) ?? $file->getMimeType();
+            $ext = ImageMime::extension($mime);
             $uuid = (string) Str::uuid();
-            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
             $r2Key = 'images/'.$uuid.'.'.$ext;
 
             Storage::disk('r2')->putFileAs('', $file, $r2Key, [
                 'visibility' => 'public',
-                'ContentType' => $file->getMimeType(),
+                'ContentType' => $mime,
             ]);
 
             [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
@@ -70,7 +73,7 @@ class UploadController extends Controller
                 'uuid'              => $uuid,
                 'r2_key'            => $r2Key,
                 'original_filename' => $file->getClientOriginalName(),
-                'mime_type'         => $file->getMimeType(),
+                'mime_type'         => $mime,
                 'width'             => $width,
                 'height'            => $height,
             ];
@@ -159,7 +162,7 @@ class UploadController extends Controller
         }
 
         $validated = $request->validate([
-            'image'     => ['nullable', 'file', 'mimes:jpeg,png,webp,gif,avif', 'max:10240'],
+            'image'     => ['nullable', 'file', new ImageFile(['jpeg', 'png', 'webp', 'gif', 'avif']), 'max:10240'],
             'image_url' => ['nullable', 'string', 'url:http,https', 'max:2048'],
             'headline_en_US' => ['nullable', 'string', 'max:300'],
             'headline_es_MX' => ['nullable', 'string', 'max:300'],
@@ -181,13 +184,14 @@ class UploadController extends Controller
                 $oldR2Key = $image->r2_key;
 
                 $file = $request->file('image');
+                $mime = ImageMime::ofUploadedFile($file) ?? $file->getMimeType();
+                $ext = ImageMime::extension($mime);
                 $uuid = (string) Str::uuid();
-                $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
                 $r2Key = 'images/' . $uuid . '.' . $ext;
 
                 Storage::disk('r2')->putFileAs('', $file, $r2Key, [
                     'visibility'  => 'public',
-                    'ContentType' => $file->getMimeType(),
+                    'ContentType' => $mime,
                 ]);
 
                 [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
@@ -196,7 +200,7 @@ class UploadController extends Controller
                     'uuid'              => $uuid,
                     'r2_key'            => $r2Key,
                     'original_filename' => $file->getClientOriginalName(),
-                    'mime_type'         => $file->getMimeType(),
+                    'mime_type'         => $mime,
                     'width'             => $width,
                     'height'            => $height,
                 ]);

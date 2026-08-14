@@ -64,13 +64,14 @@ RUN set -eux; \
         libpng-dev \
         libjpeg-turbo-dev \
         libwebp-dev \
+        libavif-dev \
         freetype-dev; \
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         autoconf \
         g++ \
         make; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-avif; \
     docker-php-ext-install -j"$(nproc)" \
         pdo_mysql \
         bcmath \

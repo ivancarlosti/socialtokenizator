@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Rules\ImageFile;
+use App\Support\ImageMime;
 use App\Support\IpWhitelist;
 use App\Support\Locales;
 use Illuminate\Http\Request;
@@ -65,9 +67,9 @@ class SettingsController extends Controller
         $supportedLocales = array_keys(Locales::supported());
 
         $validated = $request->validate([
-            'logo'                  => ['nullable', 'file', 'mimes:jpeg,png,webp,gif,svg', 'max:2048'],
+            'logo'                  => ['nullable', 'file', new ImageFile(['jpeg', 'png', 'webp', 'gif', 'svg', 'avif']), 'max:2048'],
             'remove_logo'           => ['nullable', 'boolean'],
-            'favicon'               => ['nullable', 'file', 'mimes:png,ico,svg,webp', 'max:512'],
+            'favicon'               => ['nullable', 'file', new ImageFile(['png', 'ico', 'svg', 'webp']), 'max:512'],
             'remove_favicon'        => ['nullable', 'boolean'],
             'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
@@ -271,11 +273,12 @@ class SettingsController extends Controller
 
     private function storeAsset(\Illuminate\Http\UploadedFile $file, string $prefix): string
     {
-        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+        $mime = ImageMime::ofUploadedFile($file) ?? $file->getMimeType();
+        $ext = ImageMime::extension($mime);
         $key = $prefix.'/'.Str::uuid().'.'.$ext;
         Storage::disk('r2')->putFileAs('', $file, $key, [
             'visibility'  => 'public',
-            'ContentType' => $file->getMimeType(),
+            'ContentType' => $mime,
         ]);
         return $key;
     }

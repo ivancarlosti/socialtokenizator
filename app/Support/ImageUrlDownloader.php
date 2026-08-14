@@ -4,6 +4,7 @@ namespace App\Support;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -21,7 +22,7 @@ trait ImageUrlDownloader
      */
     protected function allowedImageMimes(): array
     {
-        return ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+        return ImageMime::POST_TYPES;
     }
 
     /**
@@ -29,14 +30,7 @@ trait ImageUrlDownloader
      */
     protected function extensionFromMime(string $mime): string
     {
-        return match ($mime) {
-            'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
-            'image/webp' => 'webp',
-            'image/gif'  => 'gif',
-            'image/avif' => 'avif',
-            default      => 'jpg',
-        };
+        return ImageMime::extension($mime);
     }
 
     /**
@@ -66,17 +60,31 @@ trait ImageUrlDownloader
             ]);
         }
 
-        // Parse Content-Type — strip charset and other params
-        $contentType = strtolower((string) $response->header('Content-Type'));
-        $contentType = trim(explode(';', $contentType)[0]);
+        $contentTypeHeader = (string) $response->header('Content-Type');
+        $contentType = strtolower(trim(explode(';', $contentTypeHeader)[0]));
 
-        if (! in_array($contentType, $this->allowedImageMimes(), true)) {
+        $body = $response->body();
+
+        // Prefer magic-byte sniffing over the header: many hosts serve AVIF
+        // (and sometimes WebP) as application/octet-stream.
+        $mime = ImageMime::resolve($body, $contentTypeHeader, $this->extensionFromUrl($url));
+
+        Log::info('ImageUrlDownloader: validating downloaded image', [
+            'url'                     => $url,
+            'content_type_header'     => $contentTypeHeader,
+            'normalized_content_type' => $contentType,
+            'resolved_mime'           => $mime,
+            'first_bytes_hex'         => bin2hex(substr($body, 0, 16)),
+        ]);
+
+        if ($mime === null || ! in_array($mime, $this->allowedImageMimes(), true)) {
             throw ValidationException::withMessages([
-                'image_url' => [__('messages.image_url_not_image', ['type' => $contentType])],
+                'image_url' => [__('messages.image_url_not_image', [
+                    'type' => $contentType !== '' ? $contentType : 'application/octet-stream',
+                ])],
             ]);
         }
 
-        $body = $response->body();
         $size = strlen($body);
 
         if ($size > 10 * 1024 * 1024) { // 10 MB
@@ -85,13 +93,13 @@ trait ImageUrlDownloader
             ]);
         }
 
-        $ext = $this->extensionFromMime($contentType);
+        $ext = $this->extensionFromMime($mime);
         $uuid = (string) Str::uuid();
         $r2Key = 'images/' . $uuid . '.' . $ext;
 
         Storage::disk('r2')->put($r2Key, $body, [
             'visibility' => 'public',
-            'ContentType' => $contentType,
+            'ContentType' => $mime,
         ]);
 
         [$width, $height] = @getimagesizefromstring($body) ?: [null, null];
@@ -107,9 +115,24 @@ trait ImageUrlDownloader
             'uuid'              => $uuid,
             'r2_key'            => $r2Key,
             'original_filename' => $filename,
-            'mime_type'         => $contentType,
+            'mime_type'         => $mime,
             'width'             => $width,
             'height'            => $height,
         ];
+    }
+
+    /**
+     * Extract the file extension from the URL path, if any.
+     */
+    protected function extensionFromUrl(string $url): ?string
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (! is_string($path) || $path === '') {
+            return null;
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+        return $ext !== '' ? $ext : null;
     }
 }

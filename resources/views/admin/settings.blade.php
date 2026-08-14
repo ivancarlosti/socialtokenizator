@@ -61,7 +61,7 @@
                         {{ __('messages.settings_logo_remove') }}
                     </label>
                 @endif
-                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/avif"
                        class="block w-full text-sm text-muted">
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_logo_help') }}</p>
             </div>
