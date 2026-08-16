@@ -287,8 +287,8 @@ The system prompt instructs the AI to preserve formatting, line breaks, and HTML
 
 | Locale code | AI prompt target |
 |---|---|
-| `en` | en_US |
-| `es` | es_MX |
+| `en_US` | en_US |
+| `es_MX` | es_MX |
 | `pt_BR` | pt_BR |
 
 ---
