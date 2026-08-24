@@ -16,7 +16,7 @@
     $ogDesc = $image->getDescription($defaultLocale)
         ?: __('messages.shared_via', ['app' => $siteTitle]);
     $shortDesc = \Illuminate\Support\Str::limit((string) $ogDesc, 200);
-    $shareUrl = url()->current();
+    $shareUrl = route('image.show', ['slug' => $image->short_id]);
     $imgUrl = $image->public_url;
 @endphp
 

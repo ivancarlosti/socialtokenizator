@@ -46,7 +46,7 @@ class WebStandardsController extends Controller
             $lines[] = '';
 
             foreach ($images as $image) {
-                $url = route('image.show', ['uuid' => $image->uuid]);
+                $url = route('image.show', ['slug' => $image->short_id]);
 
                 foreach ($locales as $code => $info) {
                     $headline = $image->getHeadline($code);
@@ -89,7 +89,7 @@ class WebStandardsController extends Controller
             $lines[] = '';
 
             foreach ($images as $image) {
-                $url = route('image.show', ['uuid' => $image->uuid]);
+                $url = route('image.show', ['slug' => $image->short_id]);
 
                 foreach ($locales as $code => $info) {
                     $headline = $image->getHeadline($code);
@@ -165,7 +165,7 @@ class WebStandardsController extends Controller
 
             // Posts
             foreach ($images as $image) {
-                $url = route('image.show', ['uuid' => $image->uuid]);
+                $url = route('image.show', ['slug' => $image->short_id]);
                 $lastmod = $image->updated_at->toW3cString();
                 $this->appendSitemapUrl($dom, $urlset, $url, $lastmod, '0.7');
             }

@@ -151,7 +151,7 @@
             <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-medium px-4 py-2 rounded">
                 {{ __('messages.save_changes') }}
             </button>
-            <a href="{{ route('image.show', ['uuid' => $image->uuid]) }}"
+            <a href="{{ route('image.show', ['slug' => $image->short_id]) }}"
                class="text-muted hover:text-copy px-3 py-2 text-sm">
                 {{ __('messages.cancel') }}
             </a>

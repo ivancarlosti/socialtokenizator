@@ -138,7 +138,7 @@ class FeedController extends Controller
         foreach ($images as $image) {
             $entry = $dom->createElement('entry');
 
-            $entryId = route('image.show', ['uuid' => $image->uuid]);
+            $entryId = route('image.show', ['slug' => $image->short_id]);
             $this->appendElement($dom, $entry, 'id', $entryId);
 
             $headline = $image->getHeadline($locale);
@@ -236,7 +236,7 @@ class FeedController extends Controller
         foreach ($images as $image) {
             $item = $dom->createElement('item');
 
-            $entryUrl = route('image.show', ['uuid' => $image->uuid]);
+            $entryUrl = route('image.show', ['slug' => $image->short_id]);
             $headline = $image->getHeadline($locale);
             $description = $image->getDescription($locale);
             $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');
@@ -301,7 +301,7 @@ class FeedController extends Controller
 
         $items = [];
         foreach ($images as $image) {
-            $entryUrl = route('image.show', ['uuid' => $image->uuid]);
+            $entryUrl = route('image.show', ['slug' => $image->short_id]);
             $headline = $image->getHeadline($locale);
             $description = $image->getDescription($locale);
             $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');

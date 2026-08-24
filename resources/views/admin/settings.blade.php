@@ -133,6 +133,31 @@
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_path_prefix_help') }}</p>
             </div>
 
+            {{-- Short post ID --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_short_id_length') }}</label>
+                <input type="number" name="short_id_length" value="{{ old('short_id_length', $shortIdLength) }}"
+                       min="3" max="32" required
+                       class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_length_help') }}</p>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3">
+                    <input type="hidden" name="short_id_uppercase" value="0">
+                    <input type="checkbox" name="short_id_uppercase" value="1"
+                           @checked($shortIdUppercase)>
+                    {{ __('messages.settings_short_id_uppercase') }}
+                </label>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-2 block">
+                    <input type="hidden" name="short_id_numbers" value="0">
+                    <input type="checkbox" name="short_id_numbers" value="1"
+                           @checked($shortIdNumbers)>
+                    {{ __('messages.settings_short_id_numbers') }}
+                </label>
+
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_help') }}</p>
+            </div>
+
             {{-- Hide title section --}}
             <div>
                 <label class="inline-flex items-center gap-2 text-sm text-copy">

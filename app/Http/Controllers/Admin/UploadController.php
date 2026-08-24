@@ -130,7 +130,7 @@ class UploadController extends Controller
             return $image;
         });
 
-        return redirect()->route('image.show', ['uuid' => $image->uuid])
+        return redirect()->route('image.show', ['slug' => $image->short_id])
             ->with('status', 'Image uploaded.');
     }
 
@@ -262,7 +262,7 @@ class UploadController extends Controller
             }
         });
 
-        return redirect()->route('image.show', ['uuid' => $image->uuid])
+        return redirect()->route('image.show', ['slug' => $image->short_id])
             ->with('status', __('messages.image_updated'));
     }
 

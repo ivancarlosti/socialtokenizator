@@ -60,7 +60,7 @@
         <div class="space-y-8">
             @foreach($images as $img)
                 <article class="bg-card border border-card-border rounded-lg overflow-hidden">
-                    <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="block">
+                    <a href="{{ route('image.show', ['slug' => $img->short_id]) }}" class="block">
                         <img src="{{ $img->public_url }}" alt="{{ $img->getDescription($currentLocale) }}"
                              class="w-full max-h-[80vh] object-contain bg-black">
                     </a>
@@ -68,7 +68,7 @@
                         @php $headline = $img->getHeadline($currentLocale); @endphp
                         @if($headline)
                             <h2 class="text-lg font-semibold text-copy">
-                                <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="hover:underline">{{ $headline }}</a>
+                                <a href="{{ route('image.show', ['slug' => $img->short_id]) }}" class="hover:underline">{{ $headline }}</a>
                             </h2>
                         @endif
 
@@ -85,7 +85,7 @@
                         @endif
 
                         <div class="mt-4 text-xs text-muted">
-                            <a href="{{ route('image.show', ['uuid' => $img->uuid]) }}" class="text-link">
+                            <a href="{{ route('image.show', ['slug' => $img->short_id]) }}" class="text-link">
                                 {{ __('messages.view_detail') }}
                             </a>
                         </div>

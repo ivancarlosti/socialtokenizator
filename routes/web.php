@@ -14,6 +14,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\WebStandardsController;
+use App\Models\Image;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
 
@@ -41,11 +42,16 @@ try {
     // Settings table may not exist yet
 }
 
-Route::get('/'.$postPrefix.'/{uuid}', [ImageController::class, 'show'])->name('image.show');
+Route::get('/'.$postPrefix.'/{slug}', [ImageController::class, 'show'])->name('image.show');
 
 // Backwards-compatible redirect from old /image/ URLs
 Route::get('/image/{uuid}', function (string $uuid) {
-    return redirect()->route('image.show', ['uuid' => $uuid], 301);
+    $image = Image::where('uuid', $uuid)->first();
+    if (! $image) {
+        abort(404);
+    }
+
+    return redirect()->route('image.show', ['slug' => $image->short_id], 301);
 });
 
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');

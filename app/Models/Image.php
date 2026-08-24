@@ -11,6 +11,7 @@ class Image extends Model
 {
     protected $fillable = [
         'uuid',
+        'short_id',
         'r2_key',
         'original_filename',
         'mime_type',
@@ -29,6 +30,10 @@ class Image extends Model
         static::creating(function (Image $image) {
             if (empty($image->uuid)) {
                 $image->uuid = (string) Str::uuid();
+            }
+
+            if (empty($image->short_id)) {
+                $image->short_id = \App\Support\ShortId::unique();
             }
         });
 

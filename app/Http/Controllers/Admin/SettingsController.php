@@ -43,6 +43,9 @@ class SettingsController extends Controller
             'postsPerPage'     => Setting::get('posts_per_page', '12'),
             'feedPostsCount'   => Setting::get('feed_posts_count', '10'),
             'postPathPrefix'   => Setting::get('post_path_prefix', 'p'),
+            'shortIdLength'    => Setting::get('short_id_length', '6'),
+            'shortIdUppercase' => (bool) Setting::get('short_id_uppercase'),
+            'shortIdNumbers'   => (bool) Setting::get('short_id_numbers'),
             'hideTitleSection' => (bool) Setting::get('hide_title_section'),
             'hideFilterLabel'  => (bool) Setting::get('hide_filter_label'),
             'titleRows'          => $titleRows,
@@ -75,6 +78,9 @@ class SettingsController extends Controller
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
             'feed_posts_count'      => ['required', 'integer', 'min:1', 'max:100'],
             'post_path_prefix'      => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9_-]+$/'],
+            'short_id_length'       => ['required', 'integer', 'min:3', 'max:32'],
+            'short_id_uppercase'    => ['nullable', 'boolean'],
+            'short_id_numbers'      => ['nullable', 'boolean'],
             'hide_title_section'    => ['nullable', 'boolean'],
             'hide_filter_label'     => ['nullable', 'boolean'],
             'default_theme'         => ['required', 'string', 'in:dark,light'],
@@ -131,6 +137,19 @@ class SettingsController extends Controller
         Setting::put('default_theme', $validated['default_theme']);
         Setting::put('posts_per_page', (string) $validated['posts_per_page']);
         Setting::put('feed_posts_count', (string) $validated['feed_posts_count']);
+        Setting::put('short_id_length', (string) $validated['short_id_length']);
+
+        if ($request->has('short_id_uppercase') && $request->input('short_id_uppercase') === '1') {
+            Setting::put('short_id_uppercase', '1');
+        } else {
+            Setting::forget('short_id_uppercase');
+        }
+
+        if ($request->has('short_id_numbers') && $request->input('short_id_numbers') === '1') {
+            Setting::put('short_id_numbers', '1');
+        } else {
+            Setting::forget('short_id_numbers');
+        }
 
         // Post path prefix
         $prefix = trim((string) ($validated['post_path_prefix'] ?? ''));
