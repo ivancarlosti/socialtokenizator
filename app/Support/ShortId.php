@@ -64,20 +64,27 @@ class ShortId
 
     /**
      * Generate an ID that does not already exist in the images table.
+     *
+     * Tries $attempts random IDs at the configured length, then retries with
+     * +1 character per level for up to $extraLevels additional levels.
      */
-    public static function unique(?int $length = null, ?string $alphabet = null, int $attempts = 100): string
+    public static function unique(?int $length = null, ?string $alphabet = null, int $attempts = 100, int $extraLevels = 5): string
     {
-        $exists = false;
+        $baseLength = $length ?? self::length();
+        $alphabet ??= self::alphabet();
 
-        do {
-            $id = self::generate($length, $alphabet);
-            $exists = DB::table('images')->where('short_id', $id)->exists();
-        } while ($exists && --$attempts > 0);
+        for ($level = 0; $level <= $extraLevels; $level++) {
+            $currentLength = $baseLength + $level;
 
-        if ($exists) {
-            throw new \RuntimeException('Unable to generate a unique short post ID.');
+            for ($remaining = $attempts; $remaining > 0; $remaining--) {
+                $id = self::generate($currentLength, $alphabet);
+
+                if (! DB::table('images')->where('short_id', $id)->exists()) {
+                    return $id;
+                }
+            }
         }
 
-        return $id;
+        throw new \RuntimeException('Unable to generate a unique short post ID after retrying with longer lengths.');
     }
 }
