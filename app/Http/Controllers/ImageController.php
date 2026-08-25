@@ -12,13 +12,20 @@ class ImageController extends Controller
             ->where('short_id', $slug)
             ->first();
 
-        // Legacy fallback: posts previously lived at /p/{uuid}.
-        if (! $image) {
-            $image = Image::with(['categories', 'tags', 'sources'])
-                ->where('uuid', $slug)
-                ->firstOrFail();
+        if ($image) {
+            return view('image.show', compact('image'));
         }
 
-        return view('image.show', compact('image'));
+        // Legacy fallback: posts previously lived at /p/{uuid}.
+        // Redirect to the canonical /p/{short_id} URL.
+        $image = Image::with(['categories', 'tags', 'sources'])
+            ->where('uuid', $slug)
+            ->first();
+
+        if (! $image) {
+            abort(404);
+        }
+
+        return redirect()->route('image.show', ['slug' => $image->short_id], 301);
     }
 }

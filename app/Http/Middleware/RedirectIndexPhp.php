@@ -13,25 +13,38 @@ class RedirectIndexPhp
      *
      * - /index.php          -> /
      * - /index.php/p/{id}   -> /p/{id}
-     * - query strings are preserved.
+     * - query strings and subdirectory installs are preserved.
+     *
+     * Detection is based on Symfony's computed base URL rather than the raw
+     * REQUEST_URI, which avoids matching internal front-controller rewrites
+     * and therefore avoids redirect loops.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $uri = $request->getRequestUri();
+        $baseUrl = $request->getBaseUrl();
 
-        if (str_starts_with($uri, '/index.php')) {
-            $target = substr($uri, strlen('/index.php'));
-
-            if ($target === '') {
-                $target = '/';
-            } elseif ($target[0] !== '/') {
-                // Handles /index.php?foo=bar -> /?foo=bar
-                $target = '/' . $target;
-            }
-
-            return redirect($target, 301);
+        if (! str_ends_with($baseUrl, 'index.php')) {
+            return $next($request);
         }
 
-        return $next($request);
+        $root = rtrim(substr($baseUrl, 0, -strlen('index.php')), '/');
+        $pathInfo = $request->getPathInfo();
+
+        $target = $root;
+
+        if ($pathInfo !== '' && $pathInfo !== '/') {
+            $target .= '/' . ltrim($pathInfo, '/');
+        }
+
+        if ($target === '') {
+            $target = '/';
+        }
+
+        $query = $request->getQueryString();
+        if ($query !== null && $query !== '') {
+            $target .= '?' . $query;
+        }
+
+        return redirect($target, 301);
     }
 }
