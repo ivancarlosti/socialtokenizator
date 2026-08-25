@@ -9,15 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 class RedirectIndexPhp
 {
     /**
-     * Redirect /index.php and /index.php/... to their clean canonical URLs.
+     * Redirect the bare /index.php front-controller URL to /.
      *
-     * - /index.php          -> /
-     * - /index.php/p/{id}   -> /p/{id}
-     * - query strings and subdirectory installs are preserved.
-     *
-     * Detection is based on Symfony's computed base URL rather than the raw
-     * REQUEST_URI, which avoids matching internal front-controller rewrites
-     * and therefore avoids redirect loops.
+     * /index.php/... is handled by nginx (see build/nginx/default.conf), so
+     * this middleware intentionally only handles the root index.php case.
+     * Query strings are preserved.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -27,18 +23,13 @@ class RedirectIndexPhp
             return $next($request);
         }
 
-        $root = rtrim(substr($baseUrl, 0, -strlen('index.php')), '/');
         $pathInfo = $request->getPathInfo();
 
-        $target = $root;
-
         if ($pathInfo !== '' && $pathInfo !== '/') {
-            $target .= '/' . ltrim($pathInfo, '/');
+            return $next($request);
         }
 
-        if ($target === '') {
-            $target = '/';
-        }
+        $target = '/';
 
         $query = $request->getQueryString();
         if ($query !== null && $query !== '') {
