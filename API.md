@@ -132,9 +132,9 @@ Creates a new post with an image. You must provide **either** `image` (file uplo
 | `headline_en_US` | String | No | Headline in English (max 300 chars) |
 | `headline_es_MX` | String | No | Headline in Spanish (max 300 chars) |
 | `headline_pt_BR` | String | No | Headline in Brazilian Portuguese (max 300 chars) |
-| `description_en_US` | String | No | Description in English (max 5000 chars) |
-| `description_es_MX` | String | No | Description in Spanish (max 5000 chars) |
-| `description_pt_BR` | String | No | Description in Brazilian Portuguese (max 5000 chars) |
+| `description_en_US` | String | No | Description in English (max 20000 chars) |
+| `description_es_MX` | String | No | Description in Spanish (max 20000 chars) |
+| `description_pt_BR` | String | No | Description in Brazilian Portuguese (max 20000 chars) |
 | `categories` | String | No | Comma-separated category handles (e.g. `tech,gaming`) or IDs (e.g. `1,3`) |
 | `tags` | String | No | Comma-separated tags (e.g. `ai,opensource,linux`) |
 | `sources` | String (JSON) | No | JSON array of `{url, label?}` objects |

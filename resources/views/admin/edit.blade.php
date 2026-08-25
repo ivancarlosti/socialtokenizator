@@ -94,7 +94,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-muted mb-1">{{ __('messages.description') }}</label>
-                        <textarea name="{{ $colD }}" rows="4" maxlength="5000"
+                        <textarea name="{{ $colD }}" rows="4" maxlength="20000"
                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy desc-field"
                                   data-locale="{{ $code }}">{{ old($colD, $image->$colD) }}</textarea>
                         <div class="flex flex-wrap items-center gap-1 mt-1">
