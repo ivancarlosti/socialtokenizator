@@ -89,8 +89,8 @@ class GenerateController extends Controller
      */
     private static function extractJson(string $content): ?array
     {
-        // Strip code fences if present
-        if (preg_match('/```(?:json)?\s*\n?(.*?)\n?```/s', $content, $m)) {
+        // Strip code fences if present (case-insensitive, so ```JSON and ```json both work).
+        if (preg_match('/```(?:json)?\s*\n?(.*?)\n?```/is', $content, $m)) {
             $content = $m[1];
         }
 
@@ -98,6 +98,20 @@ class GenerateController extends Controller
 
         if (is_array($data)) {
             return $data;
+        }
+
+        // Fallback: the model may wrap the JSON object in prose/explanations.
+        // Extract the outermost JSON object and try to decode it.
+        $start = strpos($content, '{');
+        $end   = strrpos($content, '}');
+
+        if ($start !== false && $end !== false && $end > $start) {
+            $candidate = substr($content, $start, $end - $start + 1);
+            $data = json_decode($candidate, true);
+
+            if (is_array($data)) {
+                return $data;
+            }
         }
 
         return null;

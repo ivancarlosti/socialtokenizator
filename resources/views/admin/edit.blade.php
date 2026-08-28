@@ -405,10 +405,10 @@
 
                             generateStatus.textContent = @json(__('messages.generate_done'));
                         } else if (data.raw_text) {
-                            generateStatus.textContent = @json(__('messages.generate_done')) + ' (raw)';
-                            const firstDesc = document.querySelector('[name="description_en_US"]');
-                            if (firstDesc) firstDesc.value = data.raw_text;
-                            if (data.error) console.warn('Generate parse warning:', data.error);
+                            // AI returned something that still could not be parsed as JSON.
+                            // Do not dump raw text into the localized fields.
+                            generateStatus.textContent = @json(__('messages.generate_error'));
+                            if (data.error) console.warn('Generate parse warning:', data.error, data.raw_text);
                         } else {
                             generateStatus.textContent = data.error || @json(__('messages.generate_error'));
                         }
