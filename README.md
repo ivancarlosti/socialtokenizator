@@ -460,7 +460,7 @@ server {
     # ssl_certificate     /etc/letsencrypt/live/.../fullchain.pem;
     # ssl_certificate_key /etc/letsencrypt/live/.../privkey.pem;
 
-    client_max_body_size 12m;
+    client_max_body_size 32m;
 
     location / {
         proxy_pass         http://127.0.0.1:8767;
