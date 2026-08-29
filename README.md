@@ -69,7 +69,7 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
                                └── PUTs from app on upload                └── GETs from browsers
 ```
 
-- The app container exposes only port **80** internally; the host port (default `8767`) is set by `PORT`.
+- The app container exposes only port **80** internally; the host port (default `8080`) is set by `PORT`.
 - Image bytes never live in the container or in MySQL — only the R2 object key + metadata.
 - The compose file does **not** include a MySQL service — you point the app at an existing database via `DB_HOST`.
 
@@ -118,7 +118,7 @@ All variables live in `/docker/.env`. The full template with comments is `/docke
 | `APP_DEBUG` | `false` in production (otherwise stack traces leak) |
 | `APP_KEY` | Laravel encryption key. Generate as shown in *Quick start* |
 | `APP_URL` | Public URL; drives generated links and OG tags |
-| `PORT` | Host port mapped to the app container's port 80 (default `8767`) |
+| `PORT` | Host port mapped to the app container's port 80 (default `8080`) |
 | `DOMAIN` | Used by reverse-proxy snippets (Traefik labels, etc.) |
 | `LOG_CHANNEL` / `LOG_LEVEL` | Logs go to container stderr by default |
 | `SESSION_SECURE_COOKIE` | `true` when serving over HTTPS |
@@ -492,7 +492,7 @@ server {
     client_max_body_size 32m;
 
     location / {
-        proxy_pass         http://127.0.0.1:8767;
+        proxy_pass         http://127.0.0.1:8080;
         proxy_http_version 1.1;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
