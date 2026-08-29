@@ -36,6 +36,7 @@ class SettingsController extends Controller
         }
 
         $users = User::query()->orderBy('email')->get();
+        $currentUser = User::query()->find(session('admin_user_id'));
 
         return view('admin.settings', [
             'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
@@ -57,9 +58,21 @@ class SettingsController extends Controller
             'aboutRows'          => $aboutRows,
             'locales'            => $locales,
             'users'              => $users,
+            'currentUser'        => $currentUser,
             'showPostAuthor'     => (bool) Setting::get('show_post_author'),
             'showPostPublished'  => (bool) Setting::get('show_post_published'),
             'showPostUpdated'    => (bool) Setting::get('show_post_updated'),
+            'showPostAuthorInList'        => (bool) Setting::get('show_post_author_in_list'),
+            'showPostPublishedInList'     => (bool) Setting::get('show_post_published_in_list'),
+            'showPostUpdatedInList'       => (bool) Setting::get('show_post_updated_in_list'),
+            'showPostDescriptionInList'   => (bool) Setting::get('show_post_description_in_list'),
+            'postDescriptionInListMode'   => Setting::get('post_description_in_list_mode', 'excerpt'),
+            'postDescriptionInListLength' => (int) Setting::get('post_description_in_list_length', '300'),
+            'showPostDescriptionInFeed'   => (bool) Setting::get('show_post_description_in_feed', true),
+            'postDescriptionInFeedMode'   => Setting::get('post_description_in_feed_mode', 'full'),
+            'postDescriptionInFeedLength' => (int) Setting::get('post_description_in_feed_length', '300'),
+            'siteTimezone'      => Setting::get('site_timezone', config('app.timezone')),
+            'timezones'         => timezone_identifiers_list(),
             'apiAllowedIps'      => Setting::get('api_allowed_ips', ''),
             'aiGeneratePrompt'   => Setting::get('ai_generate_prompt', ''),
             'robotsEnabled'      => (bool) Setting::get('robots_enabled', true),
@@ -98,14 +111,26 @@ class SettingsController extends Controller
             'show_post_author'      => ['nullable', 'boolean'],
             'show_post_published'   => ['nullable', 'boolean'],
             'show_post_updated'     => ['nullable', 'boolean'],
+            'show_post_author_in_list'       => ['nullable', 'boolean'],
+            'show_post_published_in_list'    => ['nullable', 'boolean'],
+            'show_post_updated_in_list'      => ['nullable', 'boolean'],
+            'show_post_description_in_list'  => ['nullable', 'boolean'],
+            'post_description_in_list_mode'  => ['nullable', 'string', 'in:excerpt,full'],
+            'post_description_in_list_length'=> ['nullable', 'integer', 'min:1', 'max:2000'],
+            'show_post_description_in_feed'  => ['nullable', 'boolean'],
+            'post_description_in_feed_mode'  => ['nullable', 'string', 'in:excerpt,full'],
+            'post_description_in_feed_length'=> ['nullable', 'integer', 'min:1', 'max:2000'],
+            'site_timezone'          => ['nullable', 'string', 'max:64'],
+            'api_token_action'       => ['nullable', 'string', 'in:generate,regenerate,revoke'],
             'api_allowed_ips'       => ['nullable', 'string', 'max:10000'],
             'users'                 => ['nullable', 'array'],
             'users.*.email'         => ['nullable', 'string', 'max:255'],
             'users.*.display_name'  => ['nullable', 'string', 'max:255'],
+            'users.*.url'           => ['nullable', 'url:http,https', 'max:2048'],
             'users.*.remove'        => ['nullable', 'boolean'],
-            'users.*.api_token_action' => ['nullable', 'string', 'in:generate,regenerate,revoke'],
             'new_user_email'        => ['nullable', 'string', 'max:255'],
             'new_user_display_name' => ['nullable', 'string', 'max:255'],
+            'new_user_url'          => ['nullable', 'url:http,https', 'max:2048'],
         ]);
 
         // Per-locale fields
@@ -128,6 +153,14 @@ class SettingsController extends Controller
                     'api_allowed_ips' => [__('messages.settings_api_allowed_ips_invalid', ['ip' => $entry])],
                 ]);
             }
+        }
+
+        // Website timezone — validate against the PHP timezone list before persisting
+        $timezone = trim((string) ($validated['site_timezone'] ?? ''));
+        if ($timezone !== '' && ! in_array($timezone, timezone_identifiers_list(), true)) {
+            throw ValidationException::withMessages([
+                'site_timezone' => [__('messages.settings_site_timezone_invalid')],
+            ]);
         }
 
         if ($request->boolean('remove_logo')) {
@@ -290,8 +323,54 @@ class SettingsController extends Controller
             Setting::forget('show_post_updated');
         }
 
+        // List-page (front page & search) post author & date/time display
+        if ($request->has('show_post_author_in_list') && $request->input('show_post_author_in_list') === '1') {
+            Setting::put('show_post_author_in_list', '1');
+        } else {
+            Setting::forget('show_post_author_in_list');
+        }
+
+        if ($request->has('show_post_published_in_list') && $request->input('show_post_published_in_list') === '1') {
+            Setting::put('show_post_published_in_list', '1');
+        } else {
+            Setting::forget('show_post_published_in_list');
+        }
+
+        if ($request->has('show_post_updated_in_list') && $request->input('show_post_updated_in_list') === '1') {
+            Setting::put('show_post_updated_in_list', '1');
+        } else {
+            Setting::forget('show_post_updated_in_list');
+        }
+
+        // Post description on list pages (front page & search)
+        if ($request->has('show_post_description_in_list') && $request->input('show_post_description_in_list') === '1') {
+            Setting::put('show_post_description_in_list', '1');
+        } else {
+            Setting::forget('show_post_description_in_list');
+        }
+        Setting::put('post_description_in_list_mode', (string) ($validated['post_description_in_list_mode'] ?? 'excerpt'));
+        Setting::put('post_description_in_list_length', (string) ($validated['post_description_in_list_length'] ?? 300));
+
+        // Post description on feeds (Atom/RSS/JSON) — defaults to enabled, so store an explicit 0 when off
+        Setting::put(
+            'show_post_description_in_feed',
+            ($request->has('show_post_description_in_feed') && $request->input('show_post_description_in_feed') === '1') ? '1' : '0'
+        );
+        Setting::put('post_description_in_feed_mode', (string) ($validated['post_description_in_feed_mode'] ?? 'full'));
+        Setting::put('post_description_in_feed_length', (string) ($validated['post_description_in_feed_length'] ?? 300));
+
+        // Website timezone
+        if ($timezone !== '' && $timezone !== 'UTC') {
+            Setting::put('site_timezone', $timezone);
+        } else {
+            Setting::forget('site_timezone');
+        }
+
         // Users (authors) management
         $this->syncUsers($request);
+
+        // Current user's own API token (RestAPI tab)
+        $this->applyCurrentUserApiTokenAction($request);
 
         // Invalidate web-standards caches so they regenerate on next request
         \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
@@ -360,17 +439,11 @@ class SettingsController extends Controller
                 ]);
             }
 
-            $apiTokenAction = trim((string) ($row['api_token_action'] ?? ''));
             $updates = [
                 'email' => $email,
                 'display_name' => trim((string) ($row['display_name'] ?? '')) ?: null,
+                'url' => trim((string) ($row['url'] ?? '')) ?: null,
             ];
-
-            if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
-                $updates['api_token'] = Str::random(64);
-            } elseif ($apiTokenAction === 'revoke') {
-                $updates['api_token'] = null;
-            }
 
             $user->update($updates);
         }
@@ -391,7 +464,32 @@ class SettingsController extends Controller
             User::query()->create([
                 'email' => $newEmail,
                 'display_name' => trim((string) $request->input('new_user_display_name', '')) ?: null,
+                'url' => trim((string) $request->input('new_user_url', '')) ?: null,
             ]);
+        }
+    }
+
+    /**
+     * Apply a generate/regenerate/revoke action to the current admin user's
+     * own API token (managed from the RestAPI settings tab).
+     */
+    private function applyCurrentUserApiTokenAction(Request $request): void
+    {
+        $action = trim((string) $request->input('api_token_action', ''));
+
+        if (! in_array($action, ['generate', 'regenerate', 'revoke'], true)) {
+            return;
+        }
+
+        $user = User::query()->find($request->session()->get('admin_user_id'));
+        if (! $user) {
+            return;
+        }
+
+        if ($action === 'revoke') {
+            $user->revokeApiToken();
+        } else {
+            $user->generateApiToken();
         }
     }
 

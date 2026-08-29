@@ -28,6 +28,42 @@
                             </h2>
                         @endif
 
+                        @if(($showPostAuthorInList ?? false) || ($showPostPublishedInList ?? false) || ($showPostUpdatedInList ?? false))
+                            <div class="mt-2 text-xs text-muted space-y-1">
+                                @if(($showPostAuthorInList ?? false) && $img->author)
+                                    <p>{{ __('messages.post_author') }}:
+                                        @if($img->author->url)
+                                            <a href="{{ $img->author->url }}" target="_blank" rel="noopener noreferrer" class="text-link">{{ $img->author->displayName() }}</a>
+                                        @else
+                                            {{ $img->author->displayName() }}
+                                        @endif
+                                    </p>
+                                @endif
+                                @if($showPostPublishedInList ?? false)
+                                    <p>{{ __('messages.post_published') }}: {{ $img->created_at->setTimezone($siteTimezone)->format('Y-m-d H:i') }}</p>
+                                @endif
+                                @if(($showPostUpdatedInList ?? false) && $img->updated_at && $img->updated_at->greaterThan($img->created_at))
+                                    <p>{{ __('messages.post_updated') }}: {{ $img->updated_at->setTimezone($siteTimezone)->format('Y-m-d H:i') }}</p>
+                                @endif
+                            </div>
+                        @endif
+
+                        @if($showPostDescriptionInList ?? false)
+                            @php
+                                $listDesc = $img->getDescription($currentLocale);
+                                if ($listDesc) {
+                                    $listDesc = ($postDescriptionInListMode ?? 'excerpt') === 'full'
+                                        ? $listDesc
+                                        : \Illuminate\Support\Str::limit($listDesc, (int) ($postDescriptionInListLength ?? 300));
+                                }
+                            @endphp
+                            @if($listDesc)
+                                <div class="mt-3 text-sm text-muted leading-relaxed">
+                                    {!! nl2br(e($listDesc)) !!}
+                                </div>
+                            @endif
+                        @endif
+
                         {{-- Tags at bottom of post (lowercase, no translation) --}}
                         @if($img->tags->isNotEmpty())
                             <div class="mt-3 flex flex-wrap gap-2">

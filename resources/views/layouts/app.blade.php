@@ -6,8 +6,8 @@
     <title>@yield('title', $siteTitle)</title>
 
     @if($siteFaviconUrl)
-        <link rel="icon" href="{{ $siteFaviconUrl }}">
-        <link rel="shortcut icon" href="{{ $siteFaviconUrl }}">
+    <link rel="icon" href="{{ $siteFaviconUrl }}">
+    <link rel="shortcut icon" href="{{ $siteFaviconUrl }}">
     @endif
 
     @hasSection('meta')
@@ -26,11 +26,11 @@
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="{{ $siteTitle }}">
         @if($defaultImg)
-            <meta property="og:image" content="{{ $defaultImg }}">
-            <meta name="twitter:card" content="summary_large_image">
-            <meta name="twitter:image" content="{{ $defaultImg }}">
+        <meta property="og:image" content="{{ $defaultImg }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="{{ $defaultImg }}">
         @else
-            <meta name="twitter:card" content="summary">
+        <meta name="twitter:card" content="summary">
         @endif
         <meta name="twitter:title" content="{{ $defaultTitle }}">
         <meta name="twitter:description" content="{{ $defaultDesc }}">

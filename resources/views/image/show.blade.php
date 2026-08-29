@@ -23,19 +23,7 @@
     $publishedIso = optional($image->created_at)->toIso8601String();
     $modifiedIso = optional($image->updated_at)->toIso8601String();
 
-    $shareMeta = [];
-    if (($showPostAuthor ?? false) && $authorName) {
-        $shareMeta[] = $authorName;
-    }
-    if ($showPostPublished ?? false) {
-        if ($publishedIso) {
-            $shareMeta[] = $publishedIso;
-        }
-    }
-    if (($showPostUpdated ?? false) && $modifiedIso && $modifiedIso !== $publishedIso) {
-        $shareMeta[] = $modifiedIso;
-    }
-    $shareText = $shareMeta ? $shortDesc . ' — ' . implode(' · ', $shareMeta) : $shortDesc;
+    $shareText = $shortDesc;
 @endphp
 
 @section('title', $pageTitle)
@@ -46,8 +34,12 @@
     <meta property="og:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta property="og:description" content="{{ $shortDesc }}">
     <meta property="og:image" content="{{ $imgUrl }}">
-    @if($image->width)<meta property="og:image:width" content="{{ $image->width }}">@endif
-    @if($image->height)<meta property="og:image:height" content="{{ $image->height }}">@endif
+    @if($image->width)
+    <meta property="og:image:width" content="{{ $image->width }}">
+    @endif
+    @if($image->height)
+    <meta property="og:image:height" content="{{ $image->height }}">
+    @endif
     <meta property="og:url" content="{{ $shareUrl }}">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="{{ $siteTitle }}">
@@ -58,20 +50,20 @@
     <meta name="twitter:image" content="{{ $imgUrl }}">
 
     @if($authorName)
-        <meta name="author" content="{{ $authorName }}">
-        <meta property="og:article:author" content="{{ $authorName }}">
-        <meta name="twitter:label1" content="{{ __('messages.post_author') }}">
-        <meta name="twitter:data1" content="{{ $authorName }}">
+    <meta name="author" content="{{ $authorName }}">
+    <meta property="og:article:author" content="{{ $authorName }}">
+    <meta name="twitter:label1" content="{{ __('messages.post_author') }}">
+    <meta name="twitter:data1" content="{{ $authorName }}">
     @endif
     @if($publishedIso)
-        <meta property="article:published_time" content="{{ $publishedIso }}">
-        <meta property="og:article:published_time" content="{{ $publishedIso }}">
-        <meta name="twitter:label2" content="{{ __('messages.post_published') }}">
-        <meta name="twitter:data2" content="{{ $publishedIso }}">
+    <meta property="article:published_time" content="{{ $publishedIso }}">
+    <meta property="og:article:published_time" content="{{ $publishedIso }}">
+    <meta name="twitter:label2" content="{{ __('messages.post_published') }}">
+    <meta name="twitter:data2" content="{{ $publishedIso }}">
     @endif
     @if($modifiedIso)
-        <meta property="article:modified_time" content="{{ $modifiedIso }}">
-        <meta property="og:article:modified_time" content="{{ $modifiedIso }}">
+    <meta property="article:modified_time" content="{{ $modifiedIso }}">
+    <meta property="og:article:modified_time" content="{{ $modifiedIso }}">
     @endif
 
     <link rel="canonical" href="{{ $shareUrl }}">
@@ -99,13 +91,19 @@
             @if(($showPostAuthor ?? false) || ($showPostPublished ?? false) || ($showPostUpdated ?? false))
                 <div class="mt-4 text-xs text-muted space-y-1">
                     @if(($showPostAuthor ?? false) && $authorName)
-                        <p>{{ __('messages.post_author') }}: {{ $authorName }}</p>
+                        <p>{{ __('messages.post_author') }}:
+                            @if($image->author?->url)
+                                <a href="{{ $image->author->url }}" target="_blank" rel="noopener noreferrer" class="text-link">{{ $authorName }}</a>
+                            @else
+                                {{ $authorName }}
+                            @endif
+                        </p>
                     @endif
                     @if($showPostPublished ?? false)
-                        <p>{{ __('messages.post_published') }}: {{ $image->created_at->format('Y-m-d H:i') }}</p>
+                        <p>{{ __('messages.post_published') }}: {{ $image->created_at->setTimezone($siteTimezone)->format('Y-m-d H:i') }}</p>
                     @endif
                     @if(($showPostUpdated ?? false) && $image->updated_at && $image->updated_at->greaterThan($image->created_at))
-                        <p>{{ __('messages.post_updated') }}: {{ $image->updated_at->format('Y-m-d H:i') }}</p>
+                        <p>{{ __('messages.post_updated') }}: {{ $image->updated_at->setTimezone($siteTimezone)->format('Y-m-d H:i') }}</p>
                     @endif
                 </div>
             @endif

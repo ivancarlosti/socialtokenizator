@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class User extends Model
 {
-    protected $fillable = ['email', 'display_name', 'api_token'];
+    protected $fillable = ['email', 'display_name', 'api_token', 'url'];
 
     /**
      * Resolve the name shown for this author.

@@ -47,6 +47,17 @@ class AppServiceProvider extends ServiceProvider
             $showPostAuthor   = (bool) $this->safeSetting('show_post_author');
             $showPostPublished = (bool) $this->safeSetting('show_post_published');
             $showPostUpdated   = (bool) $this->safeSetting('show_post_updated');
+            $showPostAuthorInList    = (bool) $this->safeSetting('show_post_author_in_list');
+            $showPostPublishedInList = (bool) $this->safeSetting('show_post_published_in_list');
+            $showPostUpdatedInList   = (bool) $this->safeSetting('show_post_updated_in_list');
+            $showPostDescriptionInList = (bool) $this->safeSetting('show_post_description_in_list');
+            $postDescriptionInListMode = $this->safeSetting('post_description_in_list_mode') ?: 'excerpt';
+            $postDescriptionInListLength = (int) ($this->safeSetting('post_description_in_list_length') ?: 300);
+
+            $siteTimezone = $this->safeSetting('site_timezone') ?: config('app.timezone');
+            if (! in_array($siteTimezone, timezone_identifiers_list(), true)) {
+                $siteTimezone = 'UTC';
+            }
 
             // Compute context-aware feed URLs (per format) for the header icon and <link> tags
             $feedQueryParams = ['lang' => $locale];
@@ -80,6 +91,13 @@ class AppServiceProvider extends ServiceProvider
                 'showPostAuthor'    => $showPostAuthor,
                 'showPostPublished' => $showPostPublished,
                 'showPostUpdated'   => $showPostUpdated,
+                'showPostAuthorInList'    => $showPostAuthorInList,
+                'showPostPublishedInList' => $showPostPublishedInList,
+                'showPostUpdatedInList'   => $showPostUpdatedInList,
+                'showPostDescriptionInList' => $showPostDescriptionInList,
+                'postDescriptionInListMode' => $postDescriptionInListMode,
+                'postDescriptionInListLength' => $postDescriptionInListLength,
+                'siteTimezone'      => $siteTimezone,
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'feedUrl'          => $feedAtomUrl,

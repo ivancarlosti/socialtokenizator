@@ -184,8 +184,9 @@
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_filter_label_help') }}</p>
             </div>
 
-            {{-- Show post author & date/time --}}
+            {{-- Post author & date/time — single post page --}}
             <div>
+                <p class="text-sm font-semibold text-copy mb-2">{{ __('messages.settings_post_meta_single') }}</p>
                 <label class="inline-flex items-center gap-2 text-sm text-copy">
                     <input type="hidden" name="show_post_author" value="0">
                     <input type="checkbox" name="show_post_author" value="1"
@@ -209,6 +210,104 @@
                     {{ __('messages.settings_show_post_updated') }}
                 </label>
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_updated_help') }}</p>
+            </div>
+
+            {{-- Post author & date/time — list pages (front page & search) --}}
+            <div>
+                <p class="text-sm font-semibold text-copy mb-2">{{ __('messages.settings_post_meta_list') }}</p>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="show_post_author_in_list" value="0">
+                    <input type="checkbox" name="show_post_author_in_list" value="1"
+                           @checked($showPostAuthorInList)>
+                    {{ __('messages.settings_show_post_author_in_list') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_author_in_list_help') }}</p>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3 block">
+                    <input type="hidden" name="show_post_published_in_list" value="0">
+                    <input type="checkbox" name="show_post_published_in_list" value="1"
+                           @checked($showPostPublishedInList)>
+                    {{ __('messages.settings_show_post_published_in_list') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_published_in_list_help') }}</p>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3 block">
+                    <input type="hidden" name="show_post_updated_in_list" value="0">
+                    <input type="checkbox" name="show_post_updated_in_list" value="1"
+                           @checked($showPostUpdatedInList)>
+                    {{ __('messages.settings_show_post_updated_in_list') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_updated_in_list_help') }}</p>
+            </div>
+
+            {{-- Post description on list pages (front page & search) --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="show_post_description_in_list" value="0">
+                    <input type="checkbox" name="show_post_description_in_list" value="1"
+                           @checked($showPostDescriptionInList)>
+                    {{ __('messages.settings_show_post_description_in_list') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_description_in_list_help') }}</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_post_description_mode') }}</label>
+                        <select name="post_description_in_list_mode"
+                                class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                            <option value="excerpt" @selected($postDescriptionInListMode === 'excerpt')>{{ __('messages.settings_post_description_mode_excerpt') }}</option>
+                            <option value="full" @selected($postDescriptionInListMode === 'full')>{{ __('messages.settings_post_description_mode_full') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_post_description_length') }}</label>
+                        <input type="number" name="post_description_in_list_length" value="{{ old('post_description_in_list_length', $postDescriptionInListLength) }}"
+                               min="1" max="2000"
+                               class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_description_length_help') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Post description on feeds (Atom/RSS/JSON) --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="show_post_description_in_feed" value="0">
+                    <input type="checkbox" name="show_post_description_in_feed" value="1"
+                           @checked($showPostDescriptionInFeed)>
+                    {{ __('messages.settings_show_post_description_in_feed') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_description_in_feed_help') }}</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_post_description_mode') }}</label>
+                        <select name="post_description_in_feed_mode"
+                                class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                            <option value="excerpt" @selected($postDescriptionInFeedMode === 'excerpt')>{{ __('messages.settings_post_description_mode_excerpt') }}</option>
+                            <option value="full" @selected($postDescriptionInFeedMode === 'full')>{{ __('messages.settings_post_description_mode_full') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_post_description_length') }}</label>
+                        <input type="number" name="post_description_in_feed_length" value="{{ old('post_description_in_feed_length', $postDescriptionInFeedLength) }}"
+                               min="1" max="2000"
+                               class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        <p class="mt-1 text-xs text-muted">{{ __('messages.settings_post_description_length_help') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Website timezone --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_site_timezone') }}</label>
+                <select name="site_timezone"
+                        class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                    @foreach($timezones as $tz)
+                        <option value="{{ $tz }}" @selected($tz === $siteTimezone)>{{ $tz }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_site_timezone_help') }}</p>
             </div>
 
             {{-- Site title & subtitle per locale --}}
@@ -368,7 +467,41 @@
         {{-- ============================================ --}}
         <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="restapi" role="tabpanel">
             <div>
-                <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_per_user_note') }}</p>
+                <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>
+                <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_help') }}</p>
+
+                @if($currentUser)
+                    @if($currentUser->api_token)
+                        <div class="flex flex-wrap items-center gap-3">
+                            <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
+                                  id="api-token-display-current">{{ substr($currentUser->api_token, 0, 12) }}&hellip;</code>
+                            <button type="button" class="copy-api-token text-xs text-accent hover:underline whitespace-nowrap"
+                                    data-token="{{ $currentUser->api_token }}">
+                                {{ __('messages.settings_api_token_copy') }}
+                            </button>
+                            <button type="submit" name="api_token_action" value="regenerate"
+                                    class="bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded"
+                                    onclick="return confirm(@json(__('messages.settings_users_api_token_regenerate_confirm')))">
+                                {{ __('messages.settings_users_api_token_regenerate') }}
+                            </button>
+                            <button type="submit" name="api_token_action" value="revoke"
+                                    class="bg-neutral-700 hover:bg-neutral-600 text-white text-xs px-3 py-1.5 rounded"
+                                    onclick="return confirm(@json(__('messages.settings_users_api_token_revoke_confirm')))">
+                                {{ __('messages.settings_users_api_token_revoke') }}
+                            </button>
+                        </div>
+                    @else
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-xs text-muted italic">{{ __('messages.settings_users_api_token_none') }}</span>
+                            <button type="submit" name="api_token_action" value="generate"
+                                    class="bg-accent hover:bg-accent-hover text-white text-xs px-3 py-1.5 rounded">
+                                {{ __('messages.settings_users_api_token_generate') }}
+                            </button>
+                        </div>
+                    @endif
+                @else
+                    <p class="text-sm text-muted italic">{{ __('messages.settings_api_token_no_user') }}</p>
+                @endif
             </div>
 
             <div>
@@ -448,7 +581,7 @@
                     <div class="space-y-3">
                         @foreach($users as $user)
                             <div class="border border-card-border rounded p-3 space-y-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-start">
+                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-start">
                                     <div>
                                         <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
                                         <input type="email" name="users[{{ $user->id }}][email]"
@@ -461,39 +594,18 @@
                                                value="{{ old("users.{$user->id}.display_name", $user->display_name) }}"
                                                class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                                     </div>
+                                    <div>
+                                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_link') }}</label>
+                                        <input type="url" name="users[{{ $user->id }}][url]"
+                                               value="{{ old("users.{$user->id}.url", $user->url) }}"
+                                               placeholder="https://"
+                                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                    </div>
                                     <label class="inline-flex items-center gap-2 text-xs text-red-400 sm:mt-7">
                                         <input type="hidden" name="users[{{ $user->id }}][remove]" value="0">
                                         <input type="checkbox" name="users[{{ $user->id }}][remove]" value="1">
                                         {{ __('messages.settings_users_remove') }}
                                     </label>
-                                </div>
-
-                                <div class="flex flex-wrap items-center gap-3 border-t border-card-border pt-3">
-                                    <span class="text-xs text-muted font-semibold">{{ __('messages.settings_users_api_token') }}:</span>
-                                    @if($user->api_token)
-                                        <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
-                                              id="api-token-display-{{ $user->id }}">{{ substr($user->api_token, 0, 12) }}&hellip;</code>
-                                        <button type="button" class="copy-api-token text-xs text-accent hover:underline whitespace-nowrap"
-                                                data-token="{{ $user->api_token }}">
-                                            {{ __('messages.settings_api_token_copy') }}
-                                        </button>
-                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="regenerate"
-                                                class="bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded"
-                                                onclick="return confirm(@json(__('messages.settings_users_api_token_regenerate_confirm')))">
-                                            {{ __('messages.settings_users_api_token_regenerate') }}
-                                        </button>
-                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="revoke"
-                                                class="bg-neutral-700 hover:bg-neutral-600 text-white text-xs px-3 py-1.5 rounded"
-                                                onclick="return confirm(@json(__('messages.settings_users_api_token_revoke_confirm')))">
-                                            {{ __('messages.settings_users_api_token_revoke') }}
-                                        </button>
-                                    @else
-                                        <span class="text-xs text-muted italic">{{ __('messages.settings_users_api_token_none') }}</span>
-                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="generate"
-                                                class="bg-accent hover:bg-accent-hover text-white text-xs px-3 py-1.5 rounded">
-                                            {{ __('messages.settings_users_api_token_generate') }}
-                                        </button>
-                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -502,7 +614,7 @@
 
                 <div class="mt-5 border-t border-card-border pt-4">
                     <p class="text-sm font-semibold text-copy mb-2">{{ __('messages.settings_users_add') }}</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div>
                             <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
                             <input type="email" name="new_user_email" value="{{ old('new_user_email') }}"
@@ -511,6 +623,12 @@
                         <div>
                             <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_display_name') }}</label>
                             <input type="text" name="new_user_display_name" value="{{ old('new_user_display_name') }}"
+                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_link') }}</label>
+                            <input type="url" name="new_user_url" value="{{ old('new_user_url') }}"
+                                   placeholder="https://"
                                    class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                         </div>
                     </div>

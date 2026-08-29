@@ -84,6 +84,30 @@ class FeedController extends Controller
         return $title;
     }
 
+    /**
+     * Resolve the feed post description settings (enable/mode/length).
+     */
+    private function feedDescriptionSettings(): array
+    {
+        $enabled = (bool) Setting::get('show_post_description_in_feed', true);
+        $mode = Setting::get('post_description_in_feed_mode', 'full');
+        $length = (int) Setting::get('post_description_in_feed_length', '300');
+
+        if (! in_array($mode, ['excerpt', 'full'], true)) {
+            $mode = 'full';
+        }
+        if ($length < 1 || $length > 2000) {
+            $length = 300;
+        }
+
+        return [$enabled, $mode, $length];
+    }
+
+    private function feedDescriptionText(string $description, string $mode, int $length): string
+    {
+        return $mode === 'excerpt' ? \Illuminate\Support\Str::limit($description, $length) : $description;
+    }
+
     // ──────────────────────────────────────────────
     //  Atom feed
     // ──────────────────────────────────────────────
@@ -105,6 +129,7 @@ class FeedController extends Controller
 
     private function buildAtomXml($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): string
     {
+        [$showDescription, $descMode, $descLength] = $this->feedDescriptionSettings();
         $queryParams = ['lang' => $locale];
         if ($categoryHandle !== '') {
             $queryParams['category'] = $categoryHandle;
@@ -155,15 +180,16 @@ class FeedController extends Controller
 
             $this->appendElement($dom, $entry, 'updated', ($image->updated_at ?? $image->created_at)->toAtomString());
 
-            if ($description) {
+            if ($showDescription && $description) {
+                $descText = $this->feedDescriptionText($description, $descMode, $descLength);
                 $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
-                $htmlContent .= '<p>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</p></div>';
+                $htmlContent .= '<p>' . htmlspecialchars($descText, ENT_XML1, 'UTF-8') . '</p></div>';
                 $contentEl = $dom->createElement('content');
                 $contentEl->setAttribute('type', 'html');
                 $contentEl->appendChild($dom->createCDATASection($htmlContent));
                 $entry->appendChild($contentEl);
 
-                $summary = \Illuminate\Support\Str::limit($description, 300);
+                $summary = $descMode === 'excerpt' ? $descText : \Illuminate\Support\Str::limit($description, 300);
                 $this->appendElement($dom, $entry, 'summary', $summary);
             }
 
@@ -203,6 +229,7 @@ class FeedController extends Controller
 
     private function buildRssXml($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): string
     {
+        [$showDescription, $descMode, $descLength] = $this->feedDescriptionSettings();
         $queryParams = ['lang' => $locale];
         if ($categoryHandle !== '') {
             $queryParams['category'] = $categoryHandle;
@@ -259,9 +286,10 @@ class FeedController extends Controller
                 $this->appendElement($dom, $item, 'author', $image->author->email);
             }
 
-            if ($description) {
+            if ($showDescription && $description) {
+                $descText = $this->feedDescriptionText($description, $descMode, $descLength);
                 $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
-                $htmlContent .= '<p>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</p></div>';
+                $htmlContent .= '<p>' . htmlspecialchars($descText, ENT_XML1, 'UTF-8') . '</p></div>';
                 $descEl = $dom->createElement('description');
                 $descEl->appendChild($dom->createCDATASection($htmlContent));
                 $item->appendChild($descEl);
@@ -300,6 +328,7 @@ class FeedController extends Controller
 
     private function buildJsonFeed($images, string $feedTitle, string $locale, string $categoryHandle, string $tagFilter): array
     {
+        [$showDescription, $descMode, $descLength] = $this->feedDescriptionSettings();
         $queryParams = ['lang' => $locale];
         if ($categoryHandle !== '') {
             $queryParams['category'] = $categoryHandle;
@@ -329,9 +358,10 @@ class FeedController extends Controller
                 $item['date_modified'] = $image->updated_at->toIso8601String();
             }
 
-            if ($description) {
-                $item['content_html'] = '<div><img src="' . $image->public_url . '" alt="" /><p>' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '</p></div>';
-                $item['summary'] = \Illuminate\Support\Str::limit($description, 300);
+            if ($showDescription && $description) {
+                $descText = $this->feedDescriptionText($description, $descMode, $descLength);
+                $item['content_html'] = '<div><img src="' . $image->public_url . '" alt="" /><p>' . htmlspecialchars($descText, ENT_QUOTES, 'UTF-8') . '</p></div>';
+                $item['summary'] = $descMode === 'excerpt' ? $descText : \Illuminate\Support\Str::limit($description, 300);
             }
 
             $itemTags = [];
