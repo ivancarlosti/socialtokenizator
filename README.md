@@ -1,29 +1,23 @@
 # socialtokenizator
 
-A self-hosted, single-container image-sharing web app:
+A self-hosted, single-container image-sharing web app.
 
-- Public, anonymous browsing — every image gets a stable, shareable UUID URL.
-- Private uploads behind a pluggable auth layer (`account` / `keycloak`).
-- Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 32 MB).
-- Object storage on **Cloudflare R2** (S3-compatible).
-- MySQL for metadata, tags, categories, and source links.
-- Server-rendered Open Graph + Twitter Card tags so links unfurl perfectly on X and Facebook.
-- Three-language UI (en_US, es_MX, pt_BR) with AI-powered translation for post descriptions.
-- Dark and light theme with auto-detection and manual toggle.
-- Designed to live behind a reverse proxy (Nginx, Traefik, Caddy…).
-
-The Docker image is published from this repo's GitHub Actions to:
-
-```
-ghcr.io/ivancarlosti/socialtokenizator:latest
-```
-
-`docker compose` **pulls** that image — it does not build it.
-
----
+<!-- buttons -->
+[![Stars](https://img.shields.io/github/stars/ivancarlosti/dmarclyzer?label=⭐%20Stars&color=gold&style=flat)](https://github.com/ivancarlosti/dmarclyzer/stargazers)
+[![Watchers](https://img.shields.io/github/watchers/ivancarlosti/dmarclyzer?label=Watchers&style=flat&color=red)](https://github.com/sponsors/ivancarlosti)
+[![Forks](https://img.shields.io/github/forks/ivancarlosti/dmarclyzer?label=Forks&style=flat&color=ff69b4)](https://github.com/sponsors/ivancarlosti)
+[![Downloads](https://img.shields.io/github/downloads/ivancarlosti/dmarclyzer/total?label=Downloads&color=success)](https://github.com/ivancarlosti/dmarclyzer/releases)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ivancarlosti/dmarclyzer?label=Activity)](https://github.com/ivancarlosti/dmarclyzer/pulse)
+[![GitHub Issues](https://img.shields.io/github/issues/ivancarlosti/dmarclyzer?label=Issues&color=orange)](https://github.com/ivancarlosti/dmarclyzer/issues)  
+[![License](https://img.shields.io/github/license/ivancarlosti/dmarclyzer?label=License)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ivancarlosti/dmarclyzer?label=Last%20Commit)](https://github.com/ivancarlosti/dmarclyzer/commits)
+[![Security](https://img.shields.io/badge/Security-View%20Here-purple)](https://github.com/ivancarlosti/dmarclyzer/security)
+[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-2.1-4baaaa)](https://github.com/ivancarlosti/dmarclyzer?tab=coc-ov-file)
+<!-- endbuttons -->
 
 ## Table of contents
 
+0. [Overview](#overview)
 1. [Architecture](#architecture)
 2. [Quick start](#quick-start)
 3. [Configuration reference (`.env`)](#configuration-reference-env)
@@ -43,6 +37,28 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
 15. [Operating the app](#operating-the-app)
 16. [Troubleshooting](#troubleshooting)
 17. [Repository layout](#repository-layout)
+
+---
+
+## Overview
+
+- Public, anonymous browsing — every image gets a stable, shareable UUID URL.
+- Private uploads behind a pluggable auth layer (`account` / `keycloak`).
+- Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 32 MB).
+- Object storage on **Cloudflare R2** (S3-compatible).
+- MySQL for metadata, tags, categories, and source links.
+- Server-rendered Open Graph + Twitter Card tags so links unfurl perfectly on X and Facebook.
+- Three-language UI (en_US, es_MX, pt_BR) with AI-powered translation for post descriptions.
+- Dark and light theme with auto-detection and manual toggle.
+- Designed to live behind a reverse proxy (Nginx, Traefik, Caddy…).
+
+The Docker image is published from this repo's GitHub Actions to:
+
+```
+ghcr.io/ivancarlosti/socialtokenizator:latest
+```
+
+`docker compose` **pulls** that image — it does not build it.
 
 ---
 
