@@ -103,7 +103,7 @@ docker compose pull
 docker compose up -d
 ```
 
-Visit `http://<host>:8767` (or your proxied domain). On first boot the app waits for the database to be reachable, runs migrations, then starts serving.
+Visit `http://<host>:8080` (or your proxied domain). On first boot the app waits for the database to be reachable, runs migrations, then starts serving.
 
 ---
 
