@@ -54,6 +54,8 @@ class UploadController extends Controller
             'sources.*.label' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $authorId = $request->session()->get('admin_user_id');
+
         // Process image: prefer file upload, fall back to URL download
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -81,9 +83,10 @@ class UploadController extends Controller
             $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
         }
 
-        $image = DB::transaction(function () use ($imageMeta, $validated) {
+        $image = DB::transaction(function () use ($imageMeta, $validated, $authorId) {
             $image = Image::create([
                 'uuid'              => $imageMeta['uuid'],
+                'author_id'         => $authorId,
                 'r2_key'            => $imageMeta['r2_key'],
                 'original_filename' => $imageMeta['original_filename'],
                 'mime_type'         => $imageMeta['mime_type'],

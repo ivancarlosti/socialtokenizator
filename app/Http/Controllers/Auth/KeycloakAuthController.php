@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Auth\AuthMethodResolver;
 use App\Http\Controllers\Controller;
+use App\Support\UserAuthorizer;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -24,17 +25,22 @@ class KeycloakAuthController extends Controller
 
         $user = Socialite::driver('keycloak')->user();
 
-        $allowed = strtolower((string) config('auth_method.keycloak.allowed_email'));
-        $email = strtolower((string) ($user->getEmail() ?? ''));
+        $email = UserAuthorizer::normalizeEmail((string) ($user->getEmail() ?? ''));
 
-        if ($allowed === '' || $email === '' || $email !== $allowed) {
-            abort(403, 'This account is not authorized for admin access.');
+        if (! UserAuthorizer::isKeycloakEmailAllowed($email)) {
+            abort(403, __('messages.auth_user_not_authorized'));
+        }
+
+        $authorizedUser = UserAuthorizer::authorizeLogin($email);
+        if (! $authorizedUser) {
+            abort(403, __('messages.auth_user_not_registered'));
         }
 
         $request->session()->regenerate();
         $request->session()->put('admin', true);
         $request->session()->put('admin_method', 'keycloak');
-        $request->session()->put('admin_email', $email);
+        $request->session()->put('admin_email', $authorizedUser->email);
+        $request->session()->put('admin_user_id', $authorizedUser->id);
         $request->session()->put('admin_id_token', $user->accessTokenResponseBody['id_token'] ?? null);
 
         return redirect()->intended(route('admin.upload.create'));
@@ -43,7 +49,7 @@ class KeycloakAuthController extends Controller
     public function logout(Request $request)
     {
         $idToken = $request->session()->get('admin_id_token');
-        $request->session()->forget(['admin', 'admin_method', 'admin_email', 'admin_id_token']);
+        $request->session()->forget(['admin', 'admin_method', 'admin_email', 'admin_user_id', 'admin_id_token']);
         $request->session()->regenerate();
 
         $base = rtrim((string) config('auth_method.keycloak.base_url'), '/');

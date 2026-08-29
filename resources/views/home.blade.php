@@ -72,6 +72,20 @@
                             </h2>
                         @endif
 
+                        @if(($showPostAuthor ?? false) || ($showPostPublished ?? false) || ($showPostUpdated ?? false))
+                            <div class="mt-2 text-xs text-muted space-y-1">
+                                @if(($showPostAuthor ?? false) && $img->author)
+                                    <p>{{ __('messages.post_author') }}: {{ $img->author->displayName() }}</p>
+                                @endif
+                                @if($showPostPublished ?? false)
+                                    <p>{{ __('messages.post_published') }}: {{ $img->created_at->format('Y-m-d H:i') }}</p>
+                                @endif
+                                @if(($showPostUpdated ?? false) && $img->updated_at && $img->updated_at->greaterThan($img->created_at))
+                                    <p>{{ __('messages.post_updated') }}: {{ $img->updated_at->format('Y-m-d H:i') }}</p>
+                                @endif
+                            </div>
+                        @endif
+
                         {{-- Tags at bottom of post (lowercase, no translation) --}}
                         @if($img->tags->isNotEmpty())
                             <div class="mt-3 flex flex-wrap gap-2">

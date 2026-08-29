@@ -21,8 +21,8 @@
         <form method="post" action="{{ route('auth.login') }}" class="mt-4 space-y-3">
             @csrf
             <div>
-                <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.login_field') }}</label>
-                <input type="text" name="login" autocomplete="username" required value="{{ old('login') }}"
+                <label class="block text-sm text-neutral-300 mb-1">{{ __('messages.auth_email') }}</label>
+                <input type="email" name="email" autocomplete="email" required value="{{ old('email') }}"
                        class="w-full bg-neutral-950 border border-neutral-700 rounded px-3 py-2 text-sm">
             </div>
             <div>

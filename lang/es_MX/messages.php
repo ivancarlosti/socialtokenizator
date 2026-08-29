@@ -168,6 +168,12 @@ return [
     'login_field'    => 'Usuario',
     'password'       => 'Contraseña',
     'sign_in'        => 'Entrar',
+    'auth_email'     => 'Correo electrónico',
+    'auth_invalid_credentials' => 'Credenciales inválidas.',
+    'auth_user_not_registered' => 'Tu cuenta no está registrada. El administrador debe agregarte a la plataforma primero.',
+    'auth_user_not_authorized' => 'Esta cuenta no está autorizada para acceso administrativo.',
+    'auth_captcha_required' => 'Por favor completa el CAPTCHA.',
+    'auth_captcha_failed' => 'Falló la validación del CAPTCHA.',
 
     // About page
     'about_page_heading' => 'Sobre nosotros',
@@ -206,4 +212,28 @@ return [
     'clear_image'               => 'Limpiar imagen seleccionada',
     'paste_image_not_image'     => 'No se encontró imagen en el portapapeles. Copia una imagen primero.',
     'paste_image_unsupported'   => 'Pegar del portapapeles no es compatible con este navegador.',
+
+    // Post author & date display
+    'post_author'    => 'Autor',
+    'post_published' => 'Publicado',
+    'post_updated'   => 'Actualizado',
+    'settings_show_post_author' => 'Mostrar autor en las publicaciones',
+    'settings_show_post_author_help' => 'Muestra el autor de la publicación (nombre visible o correo) en las páginas de publicación y en el feed.',
+    'settings_show_post_published' => 'Mostrar fecha/hora de publicación',
+    'settings_show_post_published_help' => 'Muestra la fecha/hora de publicación en las páginas de publicación y en el feed.',
+    'settings_show_post_updated' => 'Mostrar fecha/hora de actualización',
+    'settings_show_post_updated_help' => 'Muestra la fecha/hora de actualización en publicaciones modificadas.',
+
+    // Users tab
+    'settings_tab_users' => 'Usuarios',
+    'settings_users_heading' => 'Usuarios (autores)',
+    'settings_users_help' => 'Gestiona los usuarios autorizados a iniciar sesión. El nombre visible se muestra como autor; cuando está vacío, se muestra el correo.',
+    'settings_users_empty' => 'Aún no hay usuarios.',
+    'settings_users_email' => 'Correo electrónico',
+    'settings_users_display_name' => 'Nombre visible',
+    'settings_users_remove' => 'Eliminar',
+    'settings_users_add' => 'Agregar nuevo usuario',
+    'settings_users_email_required' => 'El correo es obligatorio.',
+    'settings_users_email_invalid' => 'Ingresa un correo válido.',
+    'settings_users_email_taken' => 'Este correo ya está registrado.',
 ];

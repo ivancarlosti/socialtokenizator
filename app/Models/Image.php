@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -12,6 +13,7 @@ class Image extends Model
     protected $fillable = [
         'uuid',
         'short_id',
+        'author_id',
         'r2_key',
         'original_filename',
         'mime_type',
@@ -60,6 +62,11 @@ class Image extends Model
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function categories(): BelongsToMany

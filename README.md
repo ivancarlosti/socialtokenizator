@@ -3,7 +3,7 @@
 A self-hosted, single-container image-sharing web app:
 
 - Public, anonymous browsing — every image gets a stable, shareable UUID URL.
-- Private uploads behind a pluggable auth layer (`none` / `account` / `keycloak`).
+- Private uploads behind a pluggable auth layer (`account` / `keycloak`).
 - Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 10 MB).
 - Object storage on **Cloudflare R2** (S3-compatible).
 - MySQL for metadata, tags, categories, and source links.
@@ -29,20 +29,20 @@ ghcr.io/ivancarlosti/socialtokenizator:latest
 3. [Configuration reference (`.env`)](#configuration-reference-env)
 4. [Cloudflare R2 setup](#cloudflare-r2-setup)
 5. [Authentication modes](#authentication-modes)
-   - [`none`](#auth_methodnone)
    - [`account` + reCAPTCHA](#auth_methodaccount)
    - [`keycloak` (OIDC SSO)](#auth_methodkeycloak)
-6. [AI Translation](#ai-translation)
-7. [AI Generation](#ai-generation)
-8. [Post URL prefix](#post-url-prefix)
-9. [Categories](#categories)
-10. [Admin settings](#admin-settings)
-11. [REST API](#rest-api)
-12. [Dark / light mode](#dark--light-mode)
-13. [Reverse-proxy examples](#reverse-proxy-examples)
-14. [Operating the app](#operating-the-app)
-15. [Troubleshooting](#troubleshooting)
-16. [Repository layout](#repository-layout)
+6. [Users & authors](#users--authors)
+7. [AI Translation](#ai-translation)
+8. [AI Generation](#ai-generation)
+9. [Post URL prefix](#post-url-prefix)
+10. [Categories](#categories)
+11. [Admin settings](#admin-settings)
+12. [REST API](#rest-api)
+13. [Dark / light mode](#dark--light-mode)
+14. [Reverse-proxy examples](#reverse-proxy-examples)
+15. [Operating the app](#operating-the-app)
+16. [Troubleshooting](#troubleshooting)
+17. [Repository layout](#repository-layout)
 
 ---
 
@@ -129,10 +129,10 @@ All variables live in `/docker/.env`. The full template with comments is `/docke
 | `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
 | `R2_PUBLIC_URL` | Public read URL for the bucket (custom domain or `r2.dev`) |
 | `R2_REGION` | Always `auto` for R2 |
-| `AUTH_METHOD` | `none`, `account`, or `keycloak` — see [Authentication modes](#authentication-modes) |
-| `ACCOUNT_LOGIN` / `ACCOUNT_PASSWORD` | Single admin credentials (only when `AUTH_METHOD=account`) |
-| `RECAPTCHA_CLIENTID` / `RECAPTCHA_CLIENTSECRET` | Optional Google reCAPTCHA v2 keys |
-| `KEYCLOAK_*` | OIDC config (only when `AUTH_METHOD=keycloak`) |
+| `AUTH_METHOD` | `account` or `keycloak` (defaults to `account`) — see [Authentication modes](#authentication-modes) |
+| `ACCOUNT_LOGIN` / `ACCOUNT_PASSWORD` | Comma-separated, index-aligned email/password lists for multiple users (only when `AUTH_METHOD=account`) |
+| `RECAPTCHA_CLIENTID` / `RECAPTCHA_CLIENTSECRET` | Google reCAPTCHA v2 keys (only when `AUTH_METHOD=account`) |
+| `KEYCLOAK_*` | OIDC config (only when `AUTH_METHOD=keycloak`). `KEYCLOAK_EMAIL_ACCOUNT` is a comma-separated allowlist of full emails and/or bare domains |
 | `AI_API_KEY` | API key for AI translation (OpenAI-compatible; e.g. DeepSeek) |
 | `AI_API_URL` | Base URL for AI chat completions API (e.g. `https://api.deepseek.com/v1`) |
 | `AI_MODEL` | Model name for translation requests (e.g. `deepseek-v4-flash`) |
@@ -180,24 +180,23 @@ After changing `.env`, restart: `docker compose up -d` (Compose recreates the co
 
 ## Authentication modes
 
-Set with `AUTH_METHOD` in `.env`. Restart the app after changing it.
+Set with `AUTH_METHOD` in `.env`. Allowed values: `account` and `keycloak`. When unset or invalid, `account` is used. Restart the app after changing it.
 
-### `AUTH_METHOD=none`
-
-- Uploads are **disabled**. The `/admin/*` routes return `403`. There's no login UI.
-- Use this for read-only public archives, or before you've configured an auth provider.
+Both modes share a user allowlist managed in **Admin → Settings → Users** — see [Users & authors](#users--authors).
 
 ### `AUTH_METHOD=account`
 
-A single admin login backed by env vars.
+Email/password login backed by env vars. `ACCOUNT_LOGIN` and `ACCOUNT_PASSWORD` are comma-separated, index-aligned lists, so you can define several accounts:
 
 ```
 AUTH_METHOD=account
-ACCOUNT_LOGIN=admin
-ACCOUNT_PASSWORD=a-strong-password
+ACCOUNT_LOGIN=admin@example.com,editor@example.com
+ACCOUNT_PASSWORD=a-strong-password,another-strong-password
 ```
 
-`ACCOUNT_PASSWORD` accepts either plaintext (simplest) or a bcrypt hash. To generate a bcrypt hash locally:
+- `ACCOUNT_LOGIN[i]` is paired with `ACCOUNT_PASSWORD[i]`.
+- The login form asks for an **email** and a **password**.
+- Each password accepts plaintext (simplest) or a bcrypt hash. To generate a bcrypt hash locally:
 
 ```bash
 docker run --rm ghcr.io/ivancarlosti/socialtokenizator:latest \
@@ -216,7 +215,11 @@ Login URL: `https://<your-domain>/auth/login`.
 
 ### `AUTH_METHOD=keycloak`
 
-OIDC code flow against a Keycloak realm. Only one allow-listed email becomes admin.
+OIDC code flow against a Keycloak realm. `KEYCLOAK_EMAIL_ACCOUNT` is a comma-separated allowlist. Each entry is either a full email address or a bare domain (any address under that domain is allowed):
+
+```
+KEYCLOAK_EMAIL_ACCOUNT=youremail@example.com,domain2.com,othermail@otherprovider.com
+```
 
 1. In Keycloak, open your realm (or create one) → **Clients** → **Create client**.
    - Client type: **OpenID Connect**
@@ -234,10 +237,30 @@ OIDC code flow against a Keycloak realm. Only one allow-listed email becomes adm
    KEYCLOAK_CLIENT_ID=socialtokenizator
    KEYCLOAK_CLIENT_SECRET=...
    KEYCLOAK_REDIRECT_URI=https://socialtokenizator.example.com/auth/keycloak/callback
-   KEYCLOAK_EMAIL_ACCOUNT=admin@example.com
+   KEYCLOAK_EMAIL_ACCOUNT=youremail@example.com,domain2.com
    ```
-4. Restart. Visiting `/admin` (or clicking *Login*) bounces to Keycloak and back. Only the user whose email matches `KEYCLOAK_EMAIL_ACCOUNT` is granted admin; everyone else gets `403`.
+4. Restart. Visiting `/admin` (or clicking *Login*) bounces to Keycloak and back. Users whose email matches the allowlist proceed to the Users allowlist check; everyone else gets `403`.
 5. Logout uses RP-initiated logout (`/realms/<realm>/protocol/openid-connect/logout`).
+
+---
+
+## Users & authors
+
+Every post can have an author. Authors are managed in **Admin → Settings → Users**, where you can add a user (email + optional display name), edit an existing user's email/display name, or remove a user.
+
+- The **display name** is what appears on posts. When it's empty, the **email address** is shown instead.
+- On the **first ever login** (when the Users list is empty), the authenticated email is added automatically and all existing posts without an author are assigned to that first user (backward compatibility).
+- After that, in both `account` and `keycloak` modes, a login is only accepted if the email is already present in the Users list. Otherwise the app refuses with "the administrator must add this user first".
+
+You can independently control what appears on posts from **Admin → Settings → Appearance**:
+
+| Option | Effect |
+|---|---|
+| **Show author on posts** | Show the author (display name or email) on post pages and in the feed. |
+| **Show published date/time on posts** | Show the post's published date/time. |
+| **Show updated date/time on posts** | Show the "updated at" date/time on modified posts. |
+
+These details are also emitted as Open Graph/Twitter metadata (`article:author`, `article:published_time`, `article:modified_time`) and included in the X share text.
 
 ---
 
@@ -411,6 +434,10 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 | **Footer HTML** | Custom HTML or text displayed on the right side of the footer. Accepts HTML tags (max 10 000 characters). |
 | **Footer links** | Up to 3 labeled links displayed in the footer. Leave both label and URL empty to remove a link. |
 | **AI Generate Prompt** | Customizable system prompt for AI post generation. Uses `{{INPUT_TEXT}}` as placeholder. Leave empty to use the built-in default. See [AI Generation](#ai-generation) for the default prompt text. |
+| **Show author on posts** | Toggles the author (display name or email) shown on post pages and in the feed. |
+| **Show published date/time on posts** | Toggles the published date/time shown on posts. |
+| **Show updated date/time on posts** | Toggles the "updated at" date/time shown on modified posts. |
+| **Users** | Manages the login allowlist and author display names (email + optional display name). See [Users & authors](#users--authors). |
 
 ---
 
@@ -431,6 +458,8 @@ Quick overview:
 | `/api/posts/{uuid}` | `DELETE` | Delete a post and its image |
 
 Authentication: `Authorization: Bearer <token>` header.
+
+Each post response includes `author` (email + `display_name`) and `published_at` / `updated_at` timestamps. The legacy `created_at` / `updated_at` fields remain for backward compatibility.
 
 ### Image by URL
 
@@ -536,6 +565,7 @@ Both tools should show the image and description from your image detail page.
 | Images upload but display broken | `R2_PUBLIC_URL` mismatch with where the bucket is actually served. Open the image in a new tab — the URL should load directly. |
 | OG/Twitter previews stale | Social platforms cache aggressively. Use the *Sharing Debugger* / *Card Validator* and click "scrape again". |
 | Login at `/auth/login` returns 404 | `AUTH_METHOD` is not set to `account`, or the container hasn't been restarted after editing `.env`. |
+| Login refused with "must add this user first" | The email is not yet in **Admin → Settings → Users**. Add it there (or sign in with the first account before adding more). |
 | Keycloak callback returns `Invalid redirect_uri` | The URI configured in the Keycloak client must **exactly** match `KEYCLOAK_REDIRECT_URI` (scheme + host + path). |
 | `419 Page Expired` on form posts | Likely a cookie / proxy issue. Make sure `APP_URL` matches the public scheme/host and `SESSION_SECURE_COOKIE` is `true` only over HTTPS. |
 | `Unsupported cipher or incorrect key length` | The `APP_KEY` in your `.env` is missing the `base64:` prefix. It must be exactly `APP_KEY=base64:<key>`, not `APP_KEY=<key>`. Run `echo "base64:$(openssl rand -base64 32)"` to generate a valid one. After fixing, run `docker compose up -d` (not restart) to recreate the container. |

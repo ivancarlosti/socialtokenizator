@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Auth\AuthMethodResolver;
 use App\Http\Controllers\Controller;
+use App\Support\UserAuthorizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
@@ -23,46 +24,40 @@ class AccountAuthController extends Controller
         if (! AuthMethodResolver::isAccount()) abort(404);
 
         $data = $request->validate([
-            'login' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
             'g-recaptcha-response' => ['nullable', 'string'],
         ]);
 
         $this->verifyRecaptcha($request);
 
-        $expectedLogin = (string) config('auth_method.account.login');
-        $expectedPassword = (string) config('auth_method.account.password');
+        $email = UserAuthorizer::normalizeEmail((string) $data['email']);
 
-        if ($expectedLogin === '' || $expectedPassword === '') {
+        if (! UserAuthorizer::accountCredentialsMatch($email, (string) $data['password'])) {
             throw ValidationException::withMessages([
-                'login' => 'Account credentials are not configured on the server.',
+                'email' => __('messages.auth_invalid_credentials'),
             ]);
         }
 
-        $loginOk = hash_equals($expectedLogin, $data['login']);
-
-        $info = password_get_info($expectedPassword);
-        $passwordOk = ($info['algo'] ?? null)
-            ? password_verify($data['password'], $expectedPassword)
-            : hash_equals($expectedPassword, $data['password']);
-
-        if (! $loginOk || ! $passwordOk) {
+        $user = UserAuthorizer::authorizeLogin($email);
+        if (! $user) {
             throw ValidationException::withMessages([
-                'login' => 'Invalid credentials.',
+                'email' => __('messages.auth_user_not_registered'),
             ]);
         }
 
         $request->session()->regenerate();
         $request->session()->put('admin', true);
         $request->session()->put('admin_method', 'account');
-        $request->session()->put('admin_login', $data['login']);
+        $request->session()->put('admin_email', $user->email);
+        $request->session()->put('admin_user_id', $user->id);
 
         return redirect()->intended(route('admin.upload.create'));
     }
 
     public function logout(Request $request)
     {
-        $request->session()->forget(['admin', 'admin_method', 'admin_login']);
+        $request->session()->forget(['admin', 'admin_method', 'admin_email', 'admin_user_id']);
         $request->session()->regenerate();
         return redirect()->route('home');
     }
@@ -75,7 +70,7 @@ class AccountAuthController extends Controller
         $token = (string) $request->input('g-recaptcha-response');
         if ($token === '') {
             throw ValidationException::withMessages([
-                'login' => 'Please complete the CAPTCHA.',
+                'email' => __('messages.auth_captcha_required'),
             ]);
         }
 
@@ -87,7 +82,7 @@ class AccountAuthController extends Controller
 
         if (! ($resp['success'] ?? false)) {
             throw ValidationException::withMessages([
-                'login' => 'CAPTCHA validation failed.',
+                'email' => __('messages.auth_captcha_failed'),
             ]);
         }
     }

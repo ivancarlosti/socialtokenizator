@@ -15,7 +15,7 @@ class HomeController extends Controller
         $tagFilter = trim((string) $request->query('tag', ''));
         $perPage = max(1, min(100, (int) Setting::get('posts_per_page', 12)));
 
-        $query = Image::query()->with(['categories', 'tags', 'sources']);
+        $query = Image::query()->with(['categories', 'tags', 'sources', 'author']);
 
         if ($categoryHandle !== '') {
             $query->whereHas('categories', function ($q) use ($categoryHandle) {
@@ -46,7 +46,7 @@ class HomeController extends Controller
         $q = trim((string) $request->query('q', ''));
         $perPage = max(1, min(100, (int) Setting::get('posts_per_page', 12)));
 
-        $query = Image::query()->with(['categories', 'tags']);
+        $query = Image::query()->with(['categories', 'tags', 'author']);
 
         if ($q !== '') {
             $query->where(function ($w) use ($q) {

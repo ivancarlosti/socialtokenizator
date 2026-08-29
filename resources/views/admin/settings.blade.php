@@ -42,6 +42,10 @@
                     data-tab="webstandards" role="tab" aria-selected="false">
                 {{ __('messages.settings_tab_web_standards') }}
             </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="users" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_users') }}
+            </button>
         </div>
 
         {{-- ============================================ --}}
@@ -178,6 +182,33 @@
                     {{ __('messages.settings_hide_filter_label') }}
                 </label>
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_hide_filter_label_help') }}</p>
+            </div>
+
+            {{-- Show post author & date/time --}}
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm text-copy">
+                    <input type="hidden" name="show_post_author" value="0">
+                    <input type="checkbox" name="show_post_author" value="1"
+                           @checked($showPostAuthor)>
+                    {{ __('messages.settings_show_post_author') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_author_help') }}</p>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3 block">
+                    <input type="hidden" name="show_post_published" value="0">
+                    <input type="checkbox" name="show_post_published" value="1"
+                           @checked($showPostPublished)>
+                    {{ __('messages.settings_show_post_published') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_published_help') }}</p>
+
+                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3 block">
+                    <input type="hidden" name="show_post_updated" value="0">
+                    <input type="checkbox" name="show_post_updated" value="1"
+                           @checked($showPostUpdated)>
+                    {{ __('messages.settings_show_post_updated') }}
+                </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_show_post_updated_help') }}</p>
             </div>
 
             {{-- Site title & subtitle per locale --}}
@@ -425,6 +456,60 @@
                     {{ __('messages.settings_sitemap_enabled') }}
                 </label>
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_sitemap_enabled_help') }}</p>
+            </div>
+        </div>
+
+        {{-- ============================================ --}}
+        {{-- TAB: Users --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="users" role="tabpanel">
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_users_heading') }}</label>
+                <p class="text-xs text-muted mb-4">{{ __('messages.settings_users_help') }}</p>
+
+                @if($users->isEmpty())
+                    <p class="text-sm text-muted italic">{{ __('messages.settings_users_empty') }}</p>
+                @else
+                    <div class="space-y-3">
+                        @foreach($users as $user)
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-start border border-card-border rounded p-3">
+                                <div>
+                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
+                                    <input type="email" name="users[{{ $user->id }}][email]"
+                                           value="{{ old("users.{$user->id}.email", $user->email) }}"
+                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_display_name') }}</label>
+                                    <input type="text" name="users[{{ $user->id }}][display_name]"
+                                           value="{{ old("users.{$user->id}.display_name", $user->display_name) }}"
+                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                </div>
+                                <label class="inline-flex items-center gap-2 text-xs text-red-400 sm:mt-7">
+                                    <input type="hidden" name="users[{{ $user->id }}][remove]" value="0">
+                                    <input type="checkbox" name="users[{{ $user->id }}][remove]" value="1">
+                                    {{ __('messages.settings_users_remove') }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <div class="mt-5 border-t border-card-border pt-4">
+                    <p class="text-sm font-semibold text-copy mb-2">{{ __('messages.settings_users_add') }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
+                            <input type="email" name="new_user_email" value="{{ old('new_user_email') }}"
+                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_display_name') }}</label>
+                            <input type="text" name="new_user_display_name" value="{{ old('new_user_display_name') }}"
+                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

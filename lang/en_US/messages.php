@@ -168,6 +168,12 @@ return [
     'login_field'    => 'Login',
     'password'       => 'Password',
     'sign_in'        => 'Sign in',
+    'auth_email'     => 'Email',
+    'auth_invalid_credentials' => 'Invalid credentials.',
+    'auth_user_not_registered' => 'Your account is not registered. The administrator must add you on the platform first.',
+    'auth_user_not_authorized' => 'This account is not authorized for admin access.',
+    'auth_captcha_required' => 'Please complete the CAPTCHA.',
+    'auth_captcha_failed' => 'CAPTCHA validation failed.',
 
     // About page
     'about_page_heading' => 'About',
@@ -206,4 +212,28 @@ return [
     'clear_image'               => 'Clear selected image',
     'paste_image_not_image'     => 'No image found in clipboard. Copy an image first.',
     'paste_image_unsupported'   => 'Clipboard paste is not supported in this browser.',
+
+    // Post author & date display
+    'post_author'    => 'Author',
+    'post_published' => 'Published',
+    'post_updated'   => 'Updated',
+    'settings_show_post_author' => 'Show author on posts',
+    'settings_show_post_author_help' => 'Display the post author (display name or email) on post pages and in the feed.',
+    'settings_show_post_published' => 'Show published date/time on posts',
+    'settings_show_post_published_help' => 'Display the published date/time on post pages and in the feed.',
+    'settings_show_post_updated' => 'Show updated date/time on posts',
+    'settings_show_post_updated_help' => 'Display the updated date/time on modified posts.',
+
+    // Users tab
+    'settings_tab_users' => 'Users',
+    'settings_users_heading' => 'Users (authors)',
+    'settings_users_help' => 'Manage the users allowed to log in. The display name is shown as the post author; when empty, the email address is shown.',
+    'settings_users_empty' => 'No users yet.',
+    'settings_users_email' => 'Email',
+    'settings_users_display_name' => 'Display name',
+    'settings_users_remove' => 'Remove',
+    'settings_users_add' => 'Add a new user',
+    'settings_users_email_required' => 'Email is required.',
+    'settings_users_email_invalid' => 'Enter a valid email address.',
+    'settings_users_email_taken' => 'This email is already registered.',
 ];

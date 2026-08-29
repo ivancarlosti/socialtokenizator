@@ -43,7 +43,7 @@ class FeedController extends Controller
         // Build locale column suffixes (e.g. en_US, pt_BR)
         $localeSuffix = str_replace('-', '_', $locale);
 
-        $query = Image::query()->with(['categories', 'tags']);
+        $query = Image::query()->with(['categories', 'tags', 'author']);
 
         // Only include images that have content in the requested locale
         $headlineCol = 'headline_' . $localeSuffix;
@@ -146,7 +146,14 @@ class FeedController extends Controller
             $title = $headline ?: ($description ? \Illuminate\Support\Str::limit($description, 80) : 'Untitled');
             $this->appendElement($dom, $entry, 'title', $title);
 
-            $this->appendElement($dom, $entry, 'updated', $image->created_at->toAtomString());
+            if ($image->author) {
+                $authorEl = $dom->createElement('author');
+                $this->appendElement($dom, $authorEl, 'name', $image->author->displayName());
+                $this->appendElement($dom, $authorEl, 'email', $image->author->email);
+                $entry->appendChild($authorEl);
+            }
+
+            $this->appendElement($dom, $entry, 'updated', ($image->updated_at ?? $image->created_at)->toAtomString());
 
             if ($description) {
                 $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
@@ -248,6 +255,10 @@ class FeedController extends Controller
             $pubDate = $image->created_at->toRssString();
             $this->appendElement($dom, $item, 'pubDate', $pubDate);
 
+            if ($image->author) {
+                $this->appendElement($dom, $item, 'author', $image->author->email);
+            }
+
             if ($description) {
                 $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
                 $htmlContent .= '<p>' . htmlspecialchars($description, ENT_XML1, 'UTF-8') . '</p></div>';
@@ -311,7 +322,12 @@ class FeedController extends Controller
                 'url' => $entryUrl,
                 'title' => $title,
                 'date_published' => $image->created_at->toIso8601String(),
+                'author' => $image->author ? ['name' => $image->author->displayName()] : null,
             ];
+
+            if ($image->updated_at && $image->updated_at->greaterThan($image->created_at)) {
+                $item['date_modified'] = $image->updated_at->toIso8601String();
+            }
 
             if ($description) {
                 $item['content_html'] = '<div><img src="' . $image->public_url . '" alt="" /><p>' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '</p></div>';

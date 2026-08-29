@@ -8,7 +8,7 @@ class ImageController extends Controller
 {
     public function show(string $slug)
     {
-        $image = Image::with(['categories', 'tags', 'sources'])
+        $image = Image::with(['categories', 'tags', 'sources', 'author'])
             ->where('short_id', $slug)
             ->first();
 
@@ -18,7 +18,7 @@ class ImageController extends Controller
 
         // Legacy fallback: posts previously lived at /p/{uuid}.
         // Redirect to the canonical /p/{short_id} URL.
-        $image = Image::with(['categories', 'tags', 'sources'])
+        $image = Image::with(['categories', 'tags', 'sources', 'author'])
             ->where('uuid', $slug)
             ->first();
 

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\User;
 use App\Rules\ImageFile;
 use App\Support\ImageMime;
 use App\Support\IpWhitelist;
 use App\Support\Locales;
+use App\Support\UserAuthorizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
@@ -34,6 +36,7 @@ class SettingsController extends Controller
         }
 
         $apiToken = Setting::get('api_token');
+        $users = User::query()->orderBy('email')->get();
 
         return view('admin.settings', [
             'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
@@ -54,6 +57,10 @@ class SettingsController extends Controller
             'footerHtmlRows'     => $footerHtmlRows,
             'aboutRows'          => $aboutRows,
             'locales'            => $locales,
+            'users'              => $users,
+            'showPostAuthor'     => (bool) Setting::get('show_post_author'),
+            'showPostPublished'  => (bool) Setting::get('show_post_published'),
+            'showPostUpdated'    => (bool) Setting::get('show_post_updated'),
             'apiToken'           => $apiToken,
             'apiAllowedIps'      => Setting::get('api_allowed_ips', ''),
             'aiGeneratePrompt'   => Setting::get('ai_generate_prompt', ''),
@@ -90,7 +97,16 @@ class SettingsController extends Controller
             'llms_enabled'          => ['nullable', 'boolean'],
             'llms_full_enabled'     => ['nullable', 'boolean'],
             'sitemap_enabled'       => ['nullable', 'boolean'],
+            'show_post_author'      => ['nullable', 'boolean'],
+            'show_post_published'   => ['nullable', 'boolean'],
+            'show_post_updated'     => ['nullable', 'boolean'],
             'api_allowed_ips'       => ['nullable', 'string', 'max:10000'],
+            'users'                 => ['nullable', 'array'],
+            'users.*.email'         => ['nullable', 'string', 'max:255'],
+            'users.*.display_name'  => ['nullable', 'string', 'max:255'],
+            'users.*.remove'        => ['nullable', 'boolean'],
+            'new_user_email'        => ['nullable', 'string', 'max:255'],
+            'new_user_display_name' => ['nullable', 'string', 'max:255'],
         ]);
 
         // Per-locale fields
@@ -262,6 +278,28 @@ class SettingsController extends Controller
             Setting::forget('sitemap_enabled');
         }
 
+        // Post author & date/time display
+        if ($request->has('show_post_author') && $request->input('show_post_author') === '1') {
+            Setting::put('show_post_author', '1');
+        } else {
+            Setting::forget('show_post_author');
+        }
+
+        if ($request->has('show_post_published') && $request->input('show_post_published') === '1') {
+            Setting::put('show_post_published', '1');
+        } else {
+            Setting::forget('show_post_published');
+        }
+
+        if ($request->has('show_post_updated') && $request->input('show_post_updated') === '1') {
+            Setting::put('show_post_updated', '1');
+        } else {
+            Setting::forget('show_post_updated');
+        }
+
+        // Users (authors) management
+        $this->syncUsers($request);
+
         // Invalidate web-standards caches so they regenerate on next request
         \Illuminate\Support\Facades\Cache::forget('web_standards.llms_txt');
         \Illuminate\Support\Facades\Cache::forget('web_standards.llms_full_txt');
@@ -287,6 +325,71 @@ class SettingsController extends Controller
         if ($existing) {
             Storage::disk('r2')->delete($existing);
             Setting::forget($settingKey);
+        }
+    }
+
+    private function syncUsers(Request $request): void
+    {
+        foreach ((array) $request->input('users', []) as $id => $row) {
+            if (! is_numeric($id)) {
+                continue;
+            }
+
+            $user = User::query()->find((int) $id);
+            if (! $user) {
+                continue;
+            }
+
+            if (! empty($row['remove'])) {
+                $user->delete();
+                continue;
+            }
+
+            $email = UserAuthorizer::normalizeEmail(trim((string) ($row['email'] ?? '')));
+            if ($email === '') {
+                throw ValidationException::withMessages([
+                    'users.'.$id.'.email' => [__('messages.settings_users_email_required')],
+                ]);
+            }
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw ValidationException::withMessages([
+                    'users.'.$id.'.email' => [__('messages.settings_users_email_invalid')],
+                ]);
+            }
+
+            $duplicate = User::query()
+                ->where('email', $email)
+                ->whereKeyNot($user->id)
+                ->exists();
+            if ($duplicate) {
+                throw ValidationException::withMessages([
+                    'users.'.$id.'.email' => [__('messages.settings_users_email_taken')],
+                ]);
+            }
+
+            $user->update([
+                'email' => $email,
+                'display_name' => trim((string) ($row['display_name'] ?? '')) ?: null,
+            ]);
+        }
+
+        $newEmail = UserAuthorizer::normalizeEmail(trim((string) $request->input('new_user_email', '')));
+        if ($newEmail !== '') {
+            if (! filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                throw ValidationException::withMessages([
+                    'new_user_email' => [__('messages.settings_users_email_invalid')],
+                ]);
+            }
+            if (User::query()->where('email', $newEmail)->exists()) {
+                throw ValidationException::withMessages([
+                    'new_user_email' => [__('messages.settings_users_email_taken')],
+                ]);
+            }
+
+            User::query()->create([
+                'email' => $newEmail,
+                'display_name' => trim((string) $request->input('new_user_display_name', '')) ?: null,
+            ]);
         }
     }
 

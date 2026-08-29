@@ -4,21 +4,15 @@ namespace App\Auth;
 
 class AuthMethodResolver
 {
-    public const NONE = 'none';
     public const ACCOUNT = 'account';
     public const KEYCLOAK = 'keycloak';
 
     public static function current(): string
     {
-        $method = strtolower((string) config('auth_method.method', self::NONE));
-        return in_array($method, [self::NONE, self::ACCOUNT, self::KEYCLOAK], true)
+        $method = strtolower((string) config('auth_method.method', self::ACCOUNT));
+        return in_array($method, [self::ACCOUNT, self::KEYCLOAK], true)
             ? $method
-            : self::NONE;
-    }
-
-    public static function isNone(): bool
-    {
-        return self::current() === self::NONE;
+            : self::ACCOUNT;
     }
 
     public static function isAccount(): bool
@@ -41,7 +35,6 @@ class AuthMethodResolver
         return match (self::current()) {
             self::ACCOUNT => route('auth.login.show'),
             self::KEYCLOAK => route('auth.keycloak.redirect'),
-            default => null,
         };
     }
 }

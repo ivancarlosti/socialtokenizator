@@ -140,7 +140,7 @@ class PostController extends Controller
             return $image;
         });
 
-        $image->load(['categories', 'tags', 'sources']);
+        $image->load(['categories', 'tags', 'sources', 'author']);
 
         return response()->json($this->formatPost($image), 201);
     }
@@ -153,7 +153,7 @@ class PostController extends Controller
         $perPage = max(1, min(100, (int) $request->query('per_page', 50)));
         $limit = (int) $request->query('limit');
 
-        $query = Image::query()->with(['categories', 'tags', 'sources']);
+        $query = Image::query()->with(['categories', 'tags', 'sources', 'author']);
 
         // Filter by category handle
         $categoryHandle = trim((string) $request->query('category', ''));
@@ -235,7 +235,7 @@ class PostController extends Controller
      */
     public function show(string $uuid): JsonResponse
     {
-        $image = Image::with(['categories', 'tags', 'sources'])->where('uuid', $uuid)->first();
+        $image = Image::with(['categories', 'tags', 'sources', 'author'])->where('uuid', $uuid)->first();
 
         if (! $image) {
             return response()->json(['error' => 'Post not found.'], 404);
@@ -397,7 +397,7 @@ class PostController extends Controller
             }
         });
 
-        $image->load(['categories', 'tags', 'sources']);
+        $image->load(['categories', 'tags', 'sources', 'author']);
 
         return response()->json($this->formatPost($image));
     }
@@ -411,6 +411,10 @@ class PostController extends Controller
             'uuid' => $image->uuid,
             'public_url' => $image->public_url,
             'original_filename' => $image->original_filename,
+            'author' => $image->author ? [
+                'email' => $image->author->email,
+                'display_name' => $image->author->displayName(),
+            ] : null,
             'mime_type' => $image->mime_type,
             'width' => $image->width,
             'height' => $image->height,
@@ -439,6 +443,7 @@ class PostController extends Controller
             ])->values(),
             'created_at' => $image->created_at->toIso8601String(),
             'updated_at' => $image->updated_at->toIso8601String(),
+            'published_at' => $image->created_at->toIso8601String(),
         ];
     }
 

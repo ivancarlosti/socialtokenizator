@@ -168,6 +168,12 @@ return [
     'login_field'    => 'Usuário',
     'password'       => 'Senha',
     'sign_in'        => 'Entrar',
+    'auth_email'     => 'E-mail',
+    'auth_invalid_credentials' => 'Credenciais inválidas.',
+    'auth_user_not_registered' => 'Sua conta não está cadastrada. O administrador precisa adicionar você na plataforma primeiro.',
+    'auth_user_not_authorized' => 'Esta conta não está autorizada para acesso administrativo.',
+    'auth_captcha_required' => 'Por favor, complete o CAPTCHA.',
+    'auth_captcha_failed' => 'Falha na validação do CAPTCHA.',
 
     // About page
     'about_page_heading' => 'Sobre',
@@ -206,4 +212,28 @@ return [
     'clear_image'               => 'Limpar imagem selecionada',
     'paste_image_not_image'     => 'Nenhuma imagem encontrada no clipboard. Copie uma imagem primeiro.',
     'paste_image_unsupported'   => 'Colar do clipboard não é suportado neste navegador.',
+
+    // Post author & date display
+    'post_author'    => 'Autor',
+    'post_published' => 'Publicado',
+    'post_updated'   => 'Atualizado',
+    'settings_show_post_author' => 'Mostrar autor nos posts',
+    'settings_show_post_author_help' => 'Exibe o autor do post (nome de exibição ou e-mail) nas páginas de post e no feed.',
+    'settings_show_post_published' => 'Mostrar data/hora de publicação nos posts',
+    'settings_show_post_published_help' => 'Exibe a data/hora de publicação nas páginas de post e no feed.',
+    'settings_show_post_updated' => 'Mostrar data/hora de atualização nos posts',
+    'settings_show_post_updated_help' => 'Exibe a data/hora de atualização em posts modificados.',
+
+    // Users tab
+    'settings_tab_users' => 'Usuários',
+    'settings_users_heading' => 'Usuários (autores)',
+    'settings_users_help' => 'Gerencie os usuários autorizados a entrar. O nome de exibição é mostrado como autor do post; quando vazio, o e-mail é mostrado.',
+    'settings_users_empty' => 'Nenhum usuário ainda.',
+    'settings_users_email' => 'E-mail',
+    'settings_users_display_name' => 'Nome de exibição',
+    'settings_users_remove' => 'Remover',
+    'settings_users_add' => 'Adicionar novo usuário',
+    'settings_users_email_required' => 'O e-mail é obrigatório.',
+    'settings_users_email_invalid' => 'Informe um e-mail válido.',
+    'settings_users_email_taken' => 'Este e-mail já está cadastrado.',
 ];

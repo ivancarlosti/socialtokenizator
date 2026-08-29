@@ -111,7 +111,7 @@
                             <button type="submit" class="text-muted hover:text-copy">{{ __('messages.logout') }}</button>
                         </form>
                     @endif
-                @elseif($authMethod !== 'none')
+                @else
                     @if($authMethod === 'account' && \Illuminate\Support\Facades\Route::has('auth.login.show'))
                         <a href="{{ route('auth.login.show') }}" class="text-muted hover:text-copy">{{ __('messages.login') }}</a>
                     @elseif($authMethod === 'keycloak' && \Illuminate\Support\Facades\Route::has('auth.keycloak.redirect'))

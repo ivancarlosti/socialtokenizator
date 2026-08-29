@@ -44,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
             $defaultTheme    = $this->safeSetting('default_theme') ?: 'dark';
             $hideTitleSection = (bool) $this->safeSetting('hide_title_section');
             $hideFilterLabel  = (bool) $this->safeSetting('hide_filter_label');
+            $showPostAuthor   = (bool) $this->safeSetting('show_post_author');
+            $showPostPublished = (bool) $this->safeSetting('show_post_published');
+            $showPostUpdated   = (bool) $this->safeSetting('show_post_updated');
 
             // Compute context-aware feed URLs (per format) for the header icon and <link> tags
             $feedQueryParams = ['lang' => $locale];
@@ -74,6 +77,9 @@ class AppServiceProvider extends ServiceProvider
                 'postPathPrefix'   => $postPathPrefix,
                 'hideTitleSection' => $hideTitleSection,
                 'hideFilterLabel'  => $hideFilterLabel,
+                'showPostAuthor'    => $showPostAuthor,
+                'showPostPublished' => $showPostPublished,
+                'showPostUpdated'   => $showPostUpdated,
                 'currentLocale'    => $locale,
                 'supportedLocales' => Locales::supported(),
                 'feedUrl'          => $feedAtomUrl,

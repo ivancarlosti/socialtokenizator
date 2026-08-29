@@ -173,6 +173,10 @@ curl -X POST https://example.com/api/posts \
   "uuid": "550e8400-e29b-41d4-a716-446655440000",
   "public_url": "https://images.example.com/images/550e8400-e29b-41d4-a716-446655440000.jpg",
   "original_filename": "photo.jpg",
+  "author": {
+    "email": "admin@example.com",
+    "display_name": "Admin"
+  },
   "mime_type": "image/jpeg",
   "width": 1920,
   "height": 1080,
@@ -195,7 +199,8 @@ curl -X POST https://example.com/api/posts \
     {"id": 7, "label": "Unsplash", "url": "https://unsplash.com/photos/abc", "position": 0}
   ],
   "created_at": "2026-08-06T01:30:00.000000Z",
-  "updated_at": "2026-08-06T01:30:00.000000Z"
+  "updated_at": "2026-08-06T01:30:00.000000Z",
+  "published_at": "2026-08-06T01:30:00.000000Z"
 }
 ```
 
@@ -252,6 +257,10 @@ curl -X GET "https://example.com/api/posts?category=tech&search=ai&per_page=20" 
       "uuid": "550e8400-e29b-41d4-a716-446655440000",
       "public_url": "https://images.example.com/images/550e8400-....jpg",
       "original_filename": "photo.jpg",
+      "author": {
+        "email": "admin@example.com",
+        "display_name": "Admin"
+      },
       "mime_type": "image/jpeg",
       "width": 1920,
       "height": 1080,
@@ -265,7 +274,8 @@ curl -X GET "https://example.com/api/posts?category=tech&search=ai&per_page=20" 
       "tags": [{"id": 1, "name": "ai"}, {"id": 2, "name": "conference"}],
       "sources": [],
       "created_at": "2026-08-05T12:00:00.000000Z",
-      "updated_at": "2026-08-05T12:00:00.000000Z"
+      "updated_at": "2026-08-05T12:00:00.000000Z",
+      "published_at": "2026-08-05T12:00:00.000000Z"
     }
   ],
   "meta": {
