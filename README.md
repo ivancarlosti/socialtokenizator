@@ -1,4 +1,4 @@
-# socialtokenizator
+# Social Tokenizator
 
 A self-hosted, single-container image-sharing web app.
 
