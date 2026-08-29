@@ -74,9 +74,10 @@ class PostController extends Controller
             $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
         }
 
-        $image = DB::transaction(function () use ($imageMeta, $validated) {
+        $image = DB::transaction(function () use ($imageMeta, $validated, $request) {
             $image = Image::create([
                 'uuid'              => $imageMeta['uuid'],
+                'author_id'         => $request->user()?->id,
                 'r2_key'            => $imageMeta['r2_key'],
                 'original_filename' => $imageMeta['original_filename'],
                 'mime_type'         => $imageMeta['mime_type'],

@@ -47,13 +47,13 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Subir imagen',
-    'upload_image_label'   => 'Imagen (jpg, png, webp, gif, avif — máx 10 MB)',
+    'upload_image_label'   => 'Imagen (jpg, png, webp, gif, avif — máx 32 MB)',
     'or'                   => 'o',
     'upload_image_url_help' => 'O pega una URL de imagen — se descargará y almacenará en este servidor.',
     'image_url_download_failed' => 'Error al descargar la imagen desde la URL proporcionada.',
     'image_url_http_error' => 'La URL devolvió HTTP :code.',
     'image_url_not_image'  => 'La URL no apunta a una imagen válida (detectado: :type).',
-    'image_url_too_large'  => 'La imagen en la URL excede el límite de 10 MB.',
+    'image_url_too_large'  => 'La imagen en la URL excede el límite de 32 MB.',
     'headline'             => 'Titular',
     'headline_help'        => 'Un título corto para esta publicación (aparece en la pestaña del navegador y en el encabezado)',
     'description'          => 'Descripción',
@@ -150,8 +150,9 @@ return [
     'settings_api_token_regenerate' => 'Regenerar',
     'settings_api_token_regenerate_confirm' => 'Regenerar el token invalidará el actual. Todos los clientes de la API deberán actualizarse. ¿Continuar?',
     'settings_api_allowed_ips'         => 'Direcciones IP permitidas',
-    'settings_api_allowed_ips_help'    => 'Restringe el acceso a la API a IPs específicas. Deja vacío para permitir cualquier IP. Una dirección por línea. Acepta IPv4 e IPv6, direcciones únicas o rangos CIDR. Ejemplos: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48.',
+    'settings_api_allowed_ips_help'    => 'Restringe el acceso a la API a IPs específicas. Deja vacío para permitir cualquier IP. Una dirección por línea. Acepta IPv4 e IPv6, direcciones únicas o rangos CIDR. Ejemplos: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48. Es una configuración global: aplica a todos los tokens de API y afecta a todos los clientes de la API.',
     'settings_api_allowed_ips_invalid' => 'Dirección IP o rango CIDR inválido: :ip.',
+    'settings_api_token_per_user_note' => 'Los tokens de API se gestionan por usuario. Ve a la pestaña Usuarios para generar, regenerar o revocar el token de cada usuario. Las publicaciones creadas vía API se atribuyen al usuario propietario del token.',
 
     // Errors
     'not_found'      => 'Aquí no hay nada.',
@@ -227,7 +228,14 @@ return [
     // Users tab
     'settings_tab_users' => 'Usuarios',
     'settings_users_heading' => 'Usuarios (autores)',
-    'settings_users_help' => 'Gestiona los usuarios autorizados a iniciar sesión. El nombre visible se muestra como autor; cuando está vacío, se muestra el correo.',
+    'settings_users_help' => 'Gestiona los usuarios autorizados a iniciar sesión y sus tokens de API. El nombre visible se muestra como autor; cuando está vacío, se muestra el correo.',
+    'settings_users_api_token' => 'Token de API',
+    'settings_users_api_token_none' => 'Sin token',
+    'settings_users_api_token_generate' => 'Generar',
+    'settings_users_api_token_regenerate' => 'Regenerar',
+    'settings_users_api_token_regenerate_confirm' => 'Regenerar el token invalidará el actual. Todos los clientes de la API de este usuario deberán actualizarse. ¿Continuar?',
+    'settings_users_api_token_revoke' => 'Revocar',
+    'settings_users_api_token_revoke_confirm' => 'Revocar el token detendrá de inmediato el acceso a la API de este usuario. ¿Continuar?',
     'settings_users_empty' => 'Aún no hay usuarios.',
     'settings_users_email' => 'Correo electrónico',
     'settings_users_display_name' => 'Nombre visible',

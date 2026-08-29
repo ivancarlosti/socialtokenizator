@@ -47,13 +47,13 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Enviar imagem',
-    'upload_image_label'   => 'Imagem (jpg, png, webp, gif, avif — máx 10 MB)',
+    'upload_image_label'   => 'Imagem (jpg, png, webp, gif, avif — máx 32 MB)',
     'or'                   => 'ou',
     'upload_image_url_help' => 'Ou cole uma URL de imagem — ela será baixada e armazenada neste servidor.',
     'image_url_download_failed' => 'Falha ao baixar a imagem da URL fornecida.',
     'image_url_http_error' => 'A URL retornou HTTP :code.',
     'image_url_not_image'  => 'A URL não aponta para uma imagem válida (detectado: :type).',
-    'image_url_too_large'  => 'A imagem na URL excede o limite de 10 MB.',
+    'image_url_too_large'  => 'A imagem na URL excede o limite de 32 MB.',
     'headline'             => 'Manchete',
     'headline_help'        => 'Um título curto para este post (aparece na aba do navegador e no topo da página)',
     'description'          => 'Descrição',
@@ -150,8 +150,9 @@ return [
     'settings_api_token_regenerate' => 'Regenerar',
     'settings_api_token_regenerate_confirm' => 'Regenerar o token invalidará o atual. Todos os clientes da API precisarão ser atualizados. Continuar?',
     'settings_api_allowed_ips'         => 'Endereços IP permitidos',
-    'settings_api_allowed_ips_help'    => 'Restrinja o acesso à API a IPs específicos. Deixe vazio para permitir qualquer IP. Um endereço por linha. Aceita IPv4 e IPv6, endereços únicos ou faixas CIDR. Exemplos: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48.',
+    'settings_api_allowed_ips_help'    => 'Restrinja o acesso à API a IPs específicos. Deixe vazio para permitir qualquer IP. Um endereço por linha. Aceita IPv4 e IPv6, endereços únicos ou faixas CIDR. Exemplos: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48. Esta é uma configuração global: aplica-se a todos os tokens de API e afeta todos os clientes da API.',
     'settings_api_allowed_ips_invalid' => 'Endereço IP ou faixa CIDR inválido: :ip.',
+    'settings_api_token_per_user_note' => 'Os tokens da API são gerenciados por usuário. Acesse a aba Usuários para gerar, regenerar ou revogar o token de cada usuário. Posts criados via API são atribuídos ao usuário dono do token.',
 
     // Errors
     'not_found'      => 'Nada aqui.',
@@ -227,7 +228,14 @@ return [
     // Users tab
     'settings_tab_users' => 'Usuários',
     'settings_users_heading' => 'Usuários (autores)',
-    'settings_users_help' => 'Gerencie os usuários autorizados a entrar. O nome de exibição é mostrado como autor do post; quando vazio, o e-mail é mostrado.',
+    'settings_users_help' => 'Gerencie os usuários autorizados a entrar e seus tokens de API. O nome de exibição é mostrado como autor do post; quando vazio, o e-mail é mostrado.',
+    'settings_users_api_token' => 'Token da API',
+    'settings_users_api_token_none' => 'Sem token',
+    'settings_users_api_token_generate' => 'Gerar',
+    'settings_users_api_token_regenerate' => 'Regenerar',
+    'settings_users_api_token_regenerate_confirm' => 'Regenerar o token invalidará o atual. Todos os clientes da API deste usuário precisarão ser atualizados. Continuar?',
+    'settings_users_api_token_revoke' => 'Revogar',
+    'settings_users_api_token_revoke_confirm' => 'Revogar o token interromperá imediatamente o acesso à API deste usuário. Continuar?',
     'settings_users_empty' => 'Nenhum usuário ainda.',
     'settings_users_email' => 'E-mail',
     'settings_users_display_name' => 'Nome de exibição',

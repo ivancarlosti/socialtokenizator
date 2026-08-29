@@ -4,7 +4,7 @@ A self-hosted, single-container image-sharing web app:
 
 - Public, anonymous browsing — every image gets a stable, shareable UUID URL.
 - Private uploads behind a pluggable auth layer (`account` / `keycloak`).
-- Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 10 MB).
+- Uploads accept **JPG, PNG, WebP, GIF, and AVIF** images (max 32 MB).
 - Object storage on **Cloudflare R2** (S3-compatible).
 - MySQL for metadata, tags, categories, and source links.
 - Server-rendered Open Graph + Twitter Card tags so links unfurl perfectly on X and Facebook.
@@ -246,7 +246,7 @@ KEYCLOAK_EMAIL_ACCOUNT=youremail@example.com,domain2.com,othermail@otherprovider
 
 ## Users & authors
 
-Every post can have an author. Authors are managed in **Admin → Settings → Users**, where you can add a user (email + optional display name), edit an existing user's email/display name, or remove a user.
+Every post can have an author. Authors are managed in **Admin → Settings → Users**, where you can add a user (email + optional display name), edit an existing user's email/display name, or remove a user. Each user can also have their own **API token** — generated, regenerated, or revoked from the same Users tab. Posts created through the REST API are attributed to the user whose token is used.
 
 - The **display name** is what appears on posts. When it's empty, the **email address** is shown instead.
 - On the **first ever login** (when the Users list is empty), the authenticated email is added automatically and all existing posts without an author are assigned to that first user (backward compatibility).
@@ -437,13 +437,13 @@ All configurable options are in **Admin → Settings**. Changes take effect imme
 | **Show author on posts** | Toggles the author (display name or email) shown on post pages and in the feed. |
 | **Show published date/time on posts** | Toggles the published date/time shown on posts. |
 | **Show updated date/time on posts** | Toggles the "updated at" date/time shown on modified posts. |
-| **Users** | Manages the login allowlist and author display names (email + optional display name). See [Users & authors](#users--authors). |
+| **Users** | Manages the login allowlist, author display names, and per-user API tokens. See [Users & authors](#users--authors) and [REST API](#rest-api). |
 
 ---
 
 ## REST API
 
-SocialTokenizator provides a REST API for programmatic post creation, listing, and deletion. It uses Bearer token authentication — the token is generated in **Admin → Settings**.
+SocialTokenizator provides a REST API for programmatic post creation, listing, and deletion. It uses Bearer token authentication — each user's token is generated in **Admin → Settings → Users**.
 
 Full documentation: [**API.md**](API.md) — includes endpoint specs, request/response examples, and n8n workflow configurations.
 
@@ -459,7 +459,7 @@ Quick overview:
 
 Authentication: `Authorization: Bearer <token>` header.
 
-Each post response includes `author` (email + `display_name`) and `published_at` / `updated_at` timestamps. The legacy `created_at` / `updated_at` fields remain for backward compatibility.
+Posts created through the API are automatically attributed to the user who owns the token. Each post response includes `author` (email + `display_name`) and `published_at` / `updated_at` timestamps. The legacy `created_at` / `updated_at` fields remain for backward compatibility.
 
 ### Image by URL
 

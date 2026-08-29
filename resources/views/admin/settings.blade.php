@@ -368,32 +368,7 @@
         {{-- ============================================ --}}
         <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="restapi" role="tabpanel">
             <div>
-                <label class="block text-sm font-semibold text-copy mb-2">{{ __('messages.settings_api_token') }}</label>
-                <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_help') }}</p>
-
-                @if($apiToken)
-                    <div class="flex items-center gap-3 mb-3">
-                        <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
-                              id="api-token-display">{{ substr($apiToken, 0, 12) }}&hellip;</code>
-                        <button type="button" id="copy-api-token"
-                                class="text-xs text-accent hover:underline whitespace-nowrap"
-                                data-token="{{ $apiToken }}">
-                            {{ __('messages.settings_api_token_copy') }}
-                        </button>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <button type="submit" name="api_token_action" value="regenerate"
-                                class="bg-red-700 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded"
-                                onclick="return confirm(@json(__('messages.settings_api_token_regenerate_confirm')))">
-                            {{ __('messages.settings_api_token_regenerate') }}
-                        </button>
-                    </div>
-                @else
-                    <button type="submit" name="api_token_action" value="generate"
-                            class="bg-accent hover:bg-accent-hover text-white text-sm px-4 py-2 rounded">
-                        {{ __('messages.settings_api_token_generate') }}
-                    </button>
-                @endif
+                <p class="text-xs text-muted mb-3">{{ __('messages.settings_api_token_per_user_note') }}</p>
             </div>
 
             <div>
@@ -472,24 +447,54 @@
                 @else
                     <div class="space-y-3">
                         @foreach($users as $user)
-                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-start border border-card-border rounded p-3">
-                                <div>
-                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
-                                    <input type="email" name="users[{{ $user->id }}][email]"
-                                           value="{{ old("users.{$user->id}.email", $user->email) }}"
-                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                            <div class="border border-card-border rounded p-3 space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-start">
+                                    <div>
+                                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
+                                        <input type="email" name="users[{{ $user->id }}][email]"
+                                               value="{{ old("users.{$user->id}.email", $user->email) }}"
+                                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_display_name') }}</label>
+                                        <input type="text" name="users[{{ $user->id }}][display_name]"
+                                               value="{{ old("users.{$user->id}.display_name", $user->display_name) }}"
+                                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                    </div>
+                                    <label class="inline-flex items-center gap-2 text-xs text-red-400 sm:mt-7">
+                                        <input type="hidden" name="users[{{ $user->id }}][remove]" value="0">
+                                        <input type="checkbox" name="users[{{ $user->id }}][remove]" value="1">
+                                        {{ __('messages.settings_users_remove') }}
+                                    </label>
                                 </div>
-                                <div>
-                                    <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_display_name') }}</label>
-                                    <input type="text" name="users[{{ $user->id }}][display_name]"
-                                           value="{{ old("users.{$user->id}.display_name", $user->display_name) }}"
-                                           class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+
+                                <div class="flex flex-wrap items-center gap-3 border-t border-card-border pt-3">
+                                    <span class="text-xs text-muted font-semibold">{{ __('messages.settings_users_api_token') }}:</span>
+                                    @if($user->api_token)
+                                        <code class="bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono select-all"
+                                              id="api-token-display-{{ $user->id }}">{{ substr($user->api_token, 0, 12) }}&hellip;</code>
+                                        <button type="button" class="copy-api-token text-xs text-accent hover:underline whitespace-nowrap"
+                                                data-token="{{ $user->api_token }}">
+                                            {{ __('messages.settings_api_token_copy') }}
+                                        </button>
+                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="regenerate"
+                                                class="bg-red-700 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded"
+                                                onclick="return confirm(@json(__('messages.settings_users_api_token_regenerate_confirm')))">
+                                            {{ __('messages.settings_users_api_token_regenerate') }}
+                                        </button>
+                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="revoke"
+                                                class="bg-neutral-700 hover:bg-neutral-600 text-white text-xs px-3 py-1.5 rounded"
+                                                onclick="return confirm(@json(__('messages.settings_users_api_token_revoke_confirm')))">
+                                            {{ __('messages.settings_users_api_token_revoke') }}
+                                        </button>
+                                    @else
+                                        <span class="text-xs text-muted italic">{{ __('messages.settings_users_api_token_none') }}</span>
+                                        <button type="submit" name="users[{{ $user->id }}][api_token_action]" value="generate"
+                                                class="bg-accent hover:bg-accent-hover text-white text-xs px-3 py-1.5 rounded">
+                                            {{ __('messages.settings_users_api_token_generate') }}
+                                        </button>
+                                    @endif
                                 </div>
-                                <label class="inline-flex items-center gap-2 text-xs text-red-400 sm:mt-7">
-                                    <input type="hidden" name="users[{{ $user->id }}][remove]" value="0">
-                                    <input type="checkbox" name="users[{{ $user->id }}][remove]" value="1">
-                                    {{ __('messages.settings_users_remove') }}
-                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -666,8 +671,7 @@
     {{-- Copy API token --}}
     <script>
         (function () {
-            const copyBtn = document.getElementById('copy-api-token');
-            if (copyBtn) {
+            document.querySelectorAll('.copy-api-token').forEach(copyBtn => {
                 copyBtn.addEventListener('click', function () {
                     const token = this.dataset.token;
                     if (navigator.clipboard) {
@@ -678,7 +682,7 @@
                         });
                     }
                 });
-            }
+            });
         })();
     </script>
 @endsection

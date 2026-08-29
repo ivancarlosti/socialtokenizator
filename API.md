@@ -35,13 +35,15 @@ Authorization: Bearer <your-api-token>
 
 ### Obtaining a Token
 
-1. Log in to the admin panel (`/admin`).
-2. Go to **Settings**.
-3. Scroll to the **API Token** section.
-4. Click **Generate Token** (or **Regenerate** to replace an existing one).
-5. Copy the token — it will only be shown in full immediately after generation. You can copy it again later using the **Copy** button, but the full token is always available to the admin.
+Each user has their own API token. A post created via the API is automatically attributed to the user who owns the token used in the request.
 
-> ⚠️ **Regenerating the token invalidates the previous one.** All API clients must be updated.
+1. Log in to the admin panel (`/admin`).
+2. Go to **Settings → Users**.
+3. Find the user you want to create an API token for.
+4. Click **Generate** (or **Regenerate** to replace an existing token, **Revoke** to remove it).
+5. Copy the token using the **Copy** button. The full token is always available to the admin.
+
+> ⚠️ **Regenerating a token invalidates the previous one for that user.** Any API client using that token must be updated.
 
 ### IP Address Allowlist
 
@@ -127,7 +129,7 @@ Creates a new post with an image. You must provide **either** `image` (file uplo
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `image` | File | **One of these is required** | Image file (JPG, PNG, WebP, GIF, AVIF — max 10 MB) |
+| `image` | File | **One of these is required** | Image file (JPG, PNG, WebP, GIF, AVIF — max 32 MB) |
 | `image_url` | String | **One of these is required** | Publicly-accessible image URL to download and host locally |
 | `headline_en_US` | String | No | Headline in English (max 300 chars) |
 | `headline_es_MX` | String | No | Headline in Spanish (max 300 chars) |
@@ -139,7 +141,9 @@ Creates a new post with an image. You must provide **either** `image` (file uplo
 | `tags` | String | No | Comma-separated tags (e.g. `ai,opensource,linux`) |
 | `sources` | String (JSON) | No | JSON array of `{url, label?}` objects |
 
-> **About `image_url`:** The server downloads the image from the provided URL, validates it (MIME type, size ≤ 10 MB), and stores it in the same R2 bucket as file uploads. This avoids hotlinking — the image is self-hosted. If both `image` and `image_url` are sent, the file upload (`image`) takes precedence.
+> **About `image_url`:** The server downloads the image from the provided URL, validates it (MIME type, size ≤ 32 MB), and stores it in the same R2 bucket as file uploads. This avoids hotlinking — the image is self-hosted. If both `image` and `image_url` are sent, the file upload (`image`) takes precedence.
+
+> **Author attribution:** The post is automatically associated with the user who owns the API token used for the request. The `author` object in the response reflects that user.
 
 #### Example Request — File Upload (curl)
 

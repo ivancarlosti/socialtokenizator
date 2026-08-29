@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Setting;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,13 +19,15 @@ class ApiTokenAuth
             ], 401);
         }
 
-        $storedToken = Setting::get('api_token');
+        $user = User::query()->where('api_token', $token)->first();
 
-        if (! $storedToken || ! hash_equals($storedToken, $token)) {
+        if (! $user) {
             return response()->json([
                 'error' => 'Invalid API token.',
             ], 401);
         }
+
+        $request->setUserResolver(fn () => $user);
 
         return $next($request);
     }

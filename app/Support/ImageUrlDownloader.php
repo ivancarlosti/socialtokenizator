@@ -87,7 +87,7 @@ trait ImageUrlDownloader
 
         $size = strlen($body);
 
-        if ($size > 10 * 1024 * 1024) { // 10 MB
+        if ($size > 32 * 1024 * 1024) { // 32 MB
             throw ValidationException::withMessages([
                 'image_url' => [__('messages.image_url_too_large')],
             ]);

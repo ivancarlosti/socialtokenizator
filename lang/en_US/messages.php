@@ -47,13 +47,13 @@ return [
 
     // Admin upload
     'upload_heading'       => 'Upload image',
-    'upload_image_label'   => 'Image (jpg, png, webp, gif, avif — max 10 MB)',
+    'upload_image_label'   => 'Image (jpg, png, webp, gif, avif — max 32 MB)',
     'or'                   => 'or',
     'upload_image_url_help' => 'Or paste an image URL — it will be downloaded and stored on this server.',
     'image_url_download_failed' => 'Failed to download image from the provided URL.',
     'image_url_http_error' => 'The URL returned HTTP :code.',
     'image_url_not_image'  => 'The URL does not point to a valid image (detected: :type).',
-    'image_url_too_large'  => 'The image at the URL exceeds the 10 MB size limit.',
+    'image_url_too_large'  => 'The image at the URL exceeds the 32 MB size limit.',
     'headline'             => 'Headline',
     'headline_help'        => 'A short title for this post (shown in browser tab and page heading)',
     'description'          => 'Description',
@@ -150,8 +150,9 @@ return [
     'settings_api_token_regenerate' => 'Regenerate',
     'settings_api_token_regenerate_confirm' => 'Regenerating the token will invalidate the current one. All API clients must be updated. Continue?',
     'settings_api_allowed_ips'         => 'Allowed IP addresses',
-    'settings_api_allowed_ips_help'    => 'Restrict API access to specific IPs. Leave empty to allow any IP. One address per line. Supports IPv4 and IPv6, single addresses or CIDR ranges. Examples: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48.',
+    'settings_api_allowed_ips_help'    => 'Restrict API access to specific IPs. Leave empty to allow any IP. One address per line. Supports IPv4 and IPv6, single addresses or CIDR ranges. Examples: 203.0.113.10, 203.0.113.0/24, 2001:db8::1, 2001:db8::/48. This is a global setting — it applies to every API token and affects all API clients.',
     'settings_api_allowed_ips_invalid' => 'Invalid IP address or CIDR range: :ip.',
+    'settings_api_token_per_user_note' => 'API tokens are managed per user. Go to the Users tab to generate, regenerate, or revoke each user\'s token. Posts created via the API are attributed to the user who owns the token.',
 
     // Errors
     'not_found'      => 'Nothing here.',
@@ -227,7 +228,14 @@ return [
     // Users tab
     'settings_tab_users' => 'Users',
     'settings_users_heading' => 'Users (authors)',
-    'settings_users_help' => 'Manage the users allowed to log in. The display name is shown as the post author; when empty, the email address is shown.',
+    'settings_users_help' => 'Manage the users allowed to log in and their API tokens. The display name is shown as the post author; when empty, the email address is shown.',
+    'settings_users_api_token' => 'API token',
+    'settings_users_api_token_none' => 'No token',
+    'settings_users_api_token_generate' => 'Generate',
+    'settings_users_api_token_regenerate' => 'Regenerate',
+    'settings_users_api_token_regenerate_confirm' => 'Regenerating the token will invalidate the current one. All API clients for this user must be updated. Continue?',
+    'settings_users_api_token_revoke' => 'Revoke',
+    'settings_users_api_token_revoke_confirm' => 'Revoking the token will immediately stop API access for this user. Continue?',
     'settings_users_empty' => 'No users yet.',
     'settings_users_email' => 'Email',
     'settings_users_display_name' => 'Display name',

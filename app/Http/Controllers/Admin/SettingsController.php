@@ -35,7 +35,6 @@ class SettingsController extends Controller
             $aboutRows[$code] = Setting::get("about_page_{$code}", '');
         }
 
-        $apiToken = Setting::get('api_token');
         $users = User::query()->orderBy('email')->get();
 
         return view('admin.settings', [
@@ -61,7 +60,6 @@ class SettingsController extends Controller
             'showPostAuthor'     => (bool) Setting::get('show_post_author'),
             'showPostPublished'  => (bool) Setting::get('show_post_published'),
             'showPostUpdated'    => (bool) Setting::get('show_post_updated'),
-            'apiToken'           => $apiToken,
             'apiAllowedIps'      => Setting::get('api_allowed_ips', ''),
             'aiGeneratePrompt'   => Setting::get('ai_generate_prompt', ''),
             'robotsEnabled'      => (bool) Setting::get('robots_enabled', true),
@@ -105,6 +103,7 @@ class SettingsController extends Controller
             'users.*.email'         => ['nullable', 'string', 'max:255'],
             'users.*.display_name'  => ['nullable', 'string', 'max:255'],
             'users.*.remove'        => ['nullable', 'boolean'],
+            'users.*.api_token_action' => ['nullable', 'string', 'in:generate,regenerate,revoke'],
             'new_user_email'        => ['nullable', 'string', 'max:255'],
             'new_user_display_name' => ['nullable', 'string', 'max:255'],
         ]);
@@ -221,12 +220,6 @@ class SettingsController extends Controller
             } else {
                 Setting::forget("about_page_{$locale}");
             }
-        }
-
-        // API token management
-        $apiTokenAction = trim((string) ($request->input('api_token_action', '')));
-        if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
-            Setting::put('api_token', Str::random(64));
         }
 
         // API IP allowlist
@@ -367,10 +360,19 @@ class SettingsController extends Controller
                 ]);
             }
 
-            $user->update([
+            $apiTokenAction = trim((string) ($row['api_token_action'] ?? ''));
+            $updates = [
                 'email' => $email,
                 'display_name' => trim((string) ($row['display_name'] ?? '')) ?: null,
-            ]);
+            ];
+
+            if ($apiTokenAction === 'generate' || $apiTokenAction === 'regenerate') {
+                $updates['api_token'] = Str::random(64);
+            } elseif ($apiTokenAction === 'revoke') {
+                $updates['api_token'] = null;
+            }
+
+            $user->update($updates);
         }
 
         $newEmail = UserAuthorizer::normalizeEmail(trim((string) $request->input('new_user_email', '')));
