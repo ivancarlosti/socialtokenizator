@@ -43,6 +43,10 @@
                 {{ __('messages.settings_tab_web_standards') }}
             </button>
             <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
+                    data-tab="html" role="tab" aria-selected="false">
+                {{ __('messages.settings_tab_html') }}
+            </button>
+            <button type="button" class="tab-btn px-4 py-2 rounded-t text-sm font-medium transition-colors"
                     data-tab="users" role="tab" aria-selected="false">
                 {{ __('messages.settings_tab_users') }}
             </button>
@@ -145,19 +149,21 @@
                        class="w-24 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_length_help') }}</p>
 
-                <label class="inline-flex items-center gap-2 text-sm text-copy mt-3">
+                <label class="flex items-center gap-2 text-sm text-copy mt-3">
                     <input type="hidden" name="short_id_uppercase" value="0">
                     <input type="checkbox" name="short_id_uppercase" value="1"
                            @checked($shortIdUppercase)>
                     {{ __('messages.settings_short_id_uppercase') }}
                 </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_uppercase_help') }}</p>
 
-                <label class="inline-flex items-center gap-2 text-sm text-copy mt-2 block">
+                <label class="flex items-center gap-2 text-sm text-copy mt-3">
                     <input type="hidden" name="short_id_numbers" value="0">
                     <input type="checkbox" name="short_id_numbers" value="1"
                            @checked($shortIdNumbers)>
                     {{ __('messages.settings_short_id_numbers') }}
                 </label>
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_numbers_help') }}</p>
 
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_short_id_help') }}</p>
             </div>
@@ -564,6 +570,38 @@
                     {{ __('messages.settings_sitemap_enabled') }}
                 </label>
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_sitemap_enabled_help') }}</p>
+            </div>
+        </div>
+
+        {{-- ============================================ --}}
+        {{-- TAB: HTML --}}
+        {{-- ============================================ --}}
+        <div class="tab-panel hidden bg-card border border-card-border rounded p-5 space-y-6" data-tab="html" role="tabpanel">
+            {{-- Head injection --}}
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-1">{{ __('messages.settings_custom_head') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_custom_head_help') }}</p>
+                <textarea name="custom_head" rows="8" maxlength="50000"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                          placeholder="<!-- Google Analytics, <meta> tags, etc. -->">{{ old('custom_head', $customHead) }}</textarea>
+            </div>
+
+            {{-- Inline CSS --}}
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-1">{{ __('messages.settings_custom_css') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_custom_css_help') }}</p>
+                <textarea name="custom_css" rows="8" maxlength="50000"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                          placeholder="body { ... }">{{ old('custom_css', $customCss) }}</textarea>
+            </div>
+
+            {{-- Inline JavaScript --}}
+            <div>
+                <label class="block text-sm font-semibold text-copy mb-1">{{ __('messages.settings_custom_js') }}</label>
+                <p class="text-xs text-muted mb-2">{{ __('messages.settings_custom_js_help') }}</p>
+                <textarea name="custom_js" rows="8" maxlength="50000"
+                          class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy font-mono"
+                          placeholder="console.log('hello');">{{ old('custom_js', $customJs) }}</textarea>
             </div>
         </div>
 

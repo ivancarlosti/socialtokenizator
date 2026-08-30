@@ -127,6 +127,8 @@ return [
     'settings_short_id_uppercase'  => 'Permitir letras mayúsculas en los IDs cortos',
     'settings_short_id_numbers'    => 'Permitir números en los IDs cortos',
     'settings_short_id_help'       => 'Estas opciones solo afectan a los posts nuevos. Los IDs existentes nunca se regeneran.',
+    'settings_short_id_uppercase_help' => 'Permite letras A–Z en los IDs cortos generados para nuevas publicaciones.',
+    'settings_short_id_numbers_help'   => 'Permite dígitos 0–9 en los IDs cortos generados para nuevas publicaciones.',
     'settings_footer_text'          => 'Texto izquierdo del pie',
     'settings_footer_text_help'     => 'Texto o HTML personalizado mostrado en el lado izquierdo del pie de página. Acepta etiquetas HTML.',
     'settings_footer_html'          => 'Texto derecho del pie',
@@ -192,6 +194,7 @@ return [
     'settings_tab_ai'                    => 'Inteligencia Artificial',
     'settings_tab_restapi'               => 'RestAPI',
     'settings_tab_web_standards'         => 'Estándares Web',
+    'settings_tab_html'                  => 'HTML',
 
     // Web Standards fields
     'settings_robots_enabled'            => 'Habilitar robots.txt',
@@ -204,6 +207,14 @@ return [
     'settings_llms_full_enabled_help'    => 'Proporciona el contenido completo de los posts en /llms-full.txt. Se regenera automáticamente cuando los posts cambian.',
     'settings_sitemap_enabled'           => 'Habilitar sitemap.xml',
     'settings_sitemap_enabled_help'      => 'Proporciona un sitemap XML en /sitemap.xml. Se regenera automáticamente cuando los posts cambian.',
+
+    // HTML tab (custom head / CSS / JS)
+    'settings_custom_head'         => 'Inyección en el head',
+    'settings_custom_head_help'    => 'HTML inyectado dentro del <head> de todas las páginas. Úsalo para Google Analytics, etiquetas <meta> u otro código de seguimiento.',
+    'settings_custom_css'          => 'CSS personalizado',
+    'settings_custom_css_help'     => 'CSS en línea. Cuando se rellena, se agrega un bloque <style> a todas las páginas.',
+    'settings_custom_js'           => 'JavaScript personalizado',
+    'settings_custom_js_help'      => 'JavaScript en línea. Cuando se rellena, se agrega un bloque <script> antes de la etiqueta de cierre </body>.',
 
     // Image paste & change
     'paste_image_clipboard'     => 'O pega una imagen del portapapeles (Ctrl+V)',

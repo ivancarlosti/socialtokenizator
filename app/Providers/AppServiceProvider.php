@@ -54,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
             $postDescriptionInListMode = $this->safeSetting('post_description_in_list_mode') ?: 'excerpt';
             $postDescriptionInListLength = (int) ($this->safeSetting('post_description_in_list_length') ?: 300);
 
+            $customHead = $this->safeSetting('custom_head');
+            $customCss  = $this->safeSetting('custom_css');
+            $customJs   = $this->safeSetting('custom_js');
+
             $siteTimezone = $this->safeSetting('site_timezone') ?: config('app.timezone');
             if (! in_array($siteTimezone, timezone_identifiers_list(), true)) {
                 $siteTimezone = 'UTC';
@@ -105,6 +109,9 @@ class AppServiceProvider extends ServiceProvider
                 'feedRssUrl'       => $feedRssUrl,
                 'feedJsonUrl'      => $feedJsonUrl,
                 'defaultTheme'     => $defaultTheme,
+                'customHead'       => $customHead,
+                'customCss'        => $customCss,
+                'customJs'         => $customJs,
             ]);
         });
     }

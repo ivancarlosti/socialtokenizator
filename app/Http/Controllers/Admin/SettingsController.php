@@ -80,6 +80,9 @@ class SettingsController extends Controller
             'llmsEnabled'        => (bool) Setting::get('llms_enabled'),
             'llmsFullEnabled'    => (bool) Setting::get('llms_full_enabled'),
             'sitemapEnabled'     => (bool) Setting::get('sitemap_enabled'),
+            'customHead'         => Setting::get('custom_head', ''),
+            'customCss'          => Setting::get('custom_css', ''),
+            'customJs'           => Setting::get('custom_js', ''),
         ]);
     }
 
@@ -108,6 +111,9 @@ class SettingsController extends Controller
             'llms_enabled'          => ['nullable', 'boolean'],
             'llms_full_enabled'     => ['nullable', 'boolean'],
             'sitemap_enabled'       => ['nullable', 'boolean'],
+            'custom_head'           => ['nullable', 'string', 'max:50000'],
+            'custom_css'            => ['nullable', 'string', 'max:50000'],
+            'custom_js'             => ['nullable', 'string', 'max:50000'],
             'show_post_author'      => ['nullable', 'boolean'],
             'show_post_published'   => ['nullable', 'boolean'],
             'show_post_updated'     => ['nullable', 'boolean'],
@@ -268,6 +274,26 @@ class SettingsController extends Controller
             Setting::put('ai_generate_prompt', $aiPrompt);
         } else {
             Setting::forget('ai_generate_prompt');
+        }
+
+        // Custom HTML — head injection, inline CSS, inline JavaScript
+        $customHead = trim((string) ($request->input('custom_head', '')));
+        if ($customHead !== '') {
+            Setting::put('custom_head', $customHead);
+        } else {
+            Setting::forget('custom_head');
+        }
+        $customCss = trim((string) ($request->input('custom_css', '')));
+        if ($customCss !== '') {
+            Setting::put('custom_css', $customCss);
+        } else {
+            Setting::forget('custom_css');
+        }
+        $customJs = trim((string) ($request->input('custom_js', '')));
+        if ($customJs !== '') {
+            Setting::put('custom_js', $customJs);
+        } else {
+            Setting::forget('custom_js');
         }
 
         // Web Standards — robots.txt

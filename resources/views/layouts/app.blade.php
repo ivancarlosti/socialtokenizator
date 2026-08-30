@@ -43,6 +43,16 @@
     <link rel="alternate" type="application/feed+json" href="{{ $feedJsonUrl }}" title="{{ $siteTitle }} — JSON Feed">
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) ?: '0' }}">
+
+    @if($customHead)
+        {!! $customHead !!}
+    @endif
+
+    @if($customCss)
+        <style>
+        {!! $customCss !!}
+        </style>
+    @endif
 </head>
 <body class="min-h-screen">
     <header class="border-b" style="background: var(--color-header-bg); border-color: var(--color-header-border);">
@@ -190,5 +200,11 @@
             });
         })();
     </script>
+
+    @if($customJs)
+        <script>
+        {!! $customJs !!}
+        </script>
+    @endif
 </body>
 </html>

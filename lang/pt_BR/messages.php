@@ -127,6 +127,8 @@ return [
     'settings_short_id_uppercase'  => 'Permitir letras maiúsculas nos IDs curtos',
     'settings_short_id_numbers'    => 'Permitir números nos IDs curtos',
     'settings_short_id_help'       => 'Essas opções afetam apenas posts novos. IDs existentes nunca são regenerados.',
+    'settings_short_id_uppercase_help' => 'Permite letras A–Z nos IDs curtos gerados para novos posts.',
+    'settings_short_id_numbers_help'   => 'Permite dígitos 0–9 nos IDs curtos gerados para novos posts.',
     'settings_footer_text'          => 'Texto esquerdo do rodapé',
     'settings_footer_text_help'     => 'Texto ou HTML personalizado exibido no lado esquerdo do rodapé. Aceita tags HTML.',
     'settings_footer_html'          => 'Texto direito do rodapé',
@@ -192,6 +194,7 @@ return [
     'settings_tab_ai'                    => 'Inteligência Artificial',
     'settings_tab_restapi'               => 'RestAPI',
     'settings_tab_web_standards'         => 'Padrões Web',
+    'settings_tab_html'                  => 'HTML',
 
     // Web Standards fields
     'settings_robots_enabled'            => 'Habilitar robots.txt',
@@ -204,6 +207,14 @@ return [
     'settings_llms_full_enabled_help'    => 'Fornece o conteúdo completo dos posts em /llms-full.txt. Regenerado automaticamente quando os posts mudam.',
     'settings_sitemap_enabled'           => 'Habilitar sitemap.xml',
     'settings_sitemap_enabled_help'      => 'Fornece um sitemap XML em /sitemap.xml. Regenerado automaticamente quando os posts mudam.',
+
+    // HTML tab (custom head / CSS / JS)
+    'settings_custom_head'         => 'Injeção no head',
+    'settings_custom_head_help'    => 'HTML injetado dentro do <head> de todas as páginas. Use para Google Analytics, tags <meta> ou outros códigos de rastreamento.',
+    'settings_custom_css'          => 'CSS personalizado',
+    'settings_custom_css_help'     => 'CSS inline. Quando preenchido, um bloco <style> é adicionado a todas as páginas.',
+    'settings_custom_js'           => 'JavaScript personalizado',
+    'settings_custom_js_help'      => 'JavaScript inline. Quando preenchido, um bloco <script> é adicionado antes do fechamento da tag </body>.',
 
     // Image paste & change
     'paste_image_clipboard'     => 'Ou cole uma imagem do clipboard (Ctrl+V)',

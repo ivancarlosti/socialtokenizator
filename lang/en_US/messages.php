@@ -127,6 +127,8 @@ return [
     'settings_short_id_uppercase'  => 'Allow uppercase letters in short post IDs',
     'settings_short_id_numbers'    => 'Allow numbers in short post IDs',
     'settings_short_id_help'       => 'These options only affect newly created posts. Existing IDs are never regenerated.',
+    'settings_short_id_uppercase_help' => 'Allows A–Z letters in newly generated short post IDs.',
+    'settings_short_id_numbers_help'   => 'Allows 0–9 digits in newly generated short post IDs.',
     'settings_footer_text'          => 'Footer left text',
     'settings_footer_text_help'     => 'Custom HTML or text displayed on the left side of the footer. Accepts HTML tags.',
     'settings_footer_html'          => 'Footer right text',
@@ -192,6 +194,7 @@ return [
     'settings_tab_ai'                    => 'Artificial Intelligence',
     'settings_tab_restapi'               => 'RestAPI',
     'settings_tab_web_standards'         => 'Web Standards',
+    'settings_tab_html'                  => 'HTML',
 
     // Web Standards fields
     'settings_robots_enabled'            => 'Enable robots.txt',
@@ -204,6 +207,14 @@ return [
     'settings_llms_full_enabled_help'    => 'Provide full post content at /llms-full.txt. Auto-regenerated when posts change.',
     'settings_sitemap_enabled'           => 'Enable sitemap.xml',
     'settings_sitemap_enabled_help'      => 'Provide an XML sitemap at /sitemap.xml. Auto-regenerated when posts change.',
+
+    // HTML tab (custom head / CSS / JS)
+    'settings_custom_head'         => 'Head injection',
+    'settings_custom_head_help'    => 'HTML injected inside the <head> of every page. Use it for Google Analytics, <meta> tags, or other tracking code.',
+    'settings_custom_css'          => 'Custom CSS',
+    'settings_custom_css_help'     => 'Inline CSS. When filled, a <style> block is added to every page.',
+    'settings_custom_js'           => 'Custom JavaScript',
+    'settings_custom_js_help'      => 'Inline JavaScript. When filled, a <script> block is added before the closing </body> tag.',
 
     // Image paste & change
     'paste_image_clipboard'     => 'Or paste an image from clipboard (Ctrl+V)',
