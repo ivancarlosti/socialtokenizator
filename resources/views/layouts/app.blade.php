@@ -5,9 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', $siteTitle)</title>
 
+    {{-- Favicons: SVG (scalable), 32x32 PNG, legacy shortcut icon, apple-touch-icon --}}
+    @if($siteFaviconSvgUrl)
+    <link rel="icon" type="image/svg+xml" href="{{ $siteFaviconSvgUrl }}">
+    @endif
+    @if($siteFavicon32Url)
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $siteFavicon32Url }}">
+    @endif
     @if($siteFaviconUrl)
-    <link rel="icon" href="{{ $siteFaviconUrl }}">
     <link rel="shortcut icon" href="{{ $siteFaviconUrl }}">
+    @endif
+    @if($appleTouchIconUrl)
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ $appleTouchIconUrl }}">
+    @endif
+
+    {{-- Web app manifest (PWA / Android Add to Home Screen) --}}
+    <link rel="manifest" href="{{ $manifestUrl }}">
+
+    {{-- Theme color (server-side default; updated by the theme toggle JS) --}}
+    <meta name="theme-color" id="theme-color-meta" content="{{ $defaultTheme === 'light' ? $themeColorLight : $themeColorDark }}">
+
+    {{-- OpenGraph locale follows the default language configured in settings --}}
+    <meta property="og:locale" content="{{ $ogLocale }}">
+    @foreach($ogLocaleAlternates as $altLocale)
+    <meta property="og:locale:alternate" content="{{ $altLocale }}">
+    @endforeach
+
+    {{-- Site X/Twitter account --}}
+    @if($twitterSite)
+    <meta name="twitter:site" content="{{ $twitterSite }}">
     @endif
 
     @hasSection('meta')
@@ -27,6 +53,7 @@
         <meta property="og:site_name" content="{{ $siteTitle }}">
         @if($defaultImg)
         <meta property="og:image" content="{{ $defaultImg }}">
+        <meta property="og:image:alt" content="{{ $defaultTitle }}">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:image" content="{{ $defaultImg }}">
         @else
@@ -35,6 +62,10 @@
         <meta name="twitter:title" content="{{ $defaultTitle }}">
         <meta name="twitter:description" content="{{ $defaultDesc }}">
         <link rel="canonical" href="{{ $defaultUrl }}">
+    @endif
+
+    @hasSection('jsonld')
+        @yield('jsonld')
     @endif
 
     {{-- Feed auto-discovery links --}}
@@ -163,6 +194,8 @@
             const toggle = document.getElementById('theme-toggle');
             const sunIcon = document.getElementById('theme-icon-sun');
             const moonIcon = document.getElementById('theme-icon-moon');
+            const themeColorMeta = document.getElementById('theme-color-meta');
+            const themeColors = { light: @json($themeColorLight), dark: @json($themeColorDark) };
 
             function setTheme(dark) {
                 if (dark) {
@@ -175,6 +208,9 @@
                     sunIcon.classList.add('hidden');
                     moonIcon.classList.remove('hidden');
                     toggle.title = @json(__('messages.theme_toggle_dark'));
+                }
+                if (themeColorMeta) {
+                    themeColorMeta.setAttribute('content', dark ? themeColors.dark : themeColors.light);
                 }
             }
 

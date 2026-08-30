@@ -178,6 +178,47 @@ class WebStandardsController extends Controller
     }
 
     /**
+     * Serve the web app manifest (site.webmanifest) for PWA/Android support.
+     */
+    public function manifest(): Response
+    {
+        $locale = Locales::default();
+        $siteTitle = Setting::get('site_title_' . $locale) ?: config('app.name');
+
+        $icons = [];
+        foreach ([
+            '192' => 'site_favicon_192_key',
+            '512' => 'site_favicon_512_key',
+        ] as $size => $settingKey) {
+            $iconUrl = Setting::publicUrl(Setting::get($settingKey));
+            if ($iconUrl) {
+                $icons[] = [
+                    'src'   => $iconUrl,
+                    'sizes' => $size . 'x' . $size,
+                    'type'  => 'image/png',
+                ];
+            }
+        }
+
+        $manifest = [
+            'name'             => $siteTitle,
+            'short_name'       => Str::limit($siteTitle, 12, ''),
+            'description'      => Setting::get('site_subtitle_' . $locale),
+            'start_url'        => url('/'),
+            'scope'            => url('/'),
+            'display'          => 'standalone',
+            'background_color' => Setting::get('theme_color_dark', '#111827'),
+            'theme_color'      => Setting::get('theme_color_dark', '#111827'),
+            'icons'            => $icons,
+        ];
+
+        $json = json_encode($manifest, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        return response($json, 200)
+            ->header('Content-Type', 'application/manifest+json; charset=utf-8');
+    }
+
+    /**
      * Append a <url> element to the sitemap <urlset>.
      */
     private function appendSitemapUrl(\DOMDocument $dom, \DOMElement $urlset, string $loc, ?string $lastmod, string $priority): void

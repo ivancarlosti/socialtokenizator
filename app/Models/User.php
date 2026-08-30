@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class User extends Model
 {
-    protected $fillable = ['email', 'display_name', 'api_token', 'url'];
+    protected $fillable = ['email', 'display_name', 'api_token', 'url', 'twitter_username'];
 
     /**
      * Resolve the name shown for this author.
@@ -18,6 +18,19 @@ class User extends Model
     {
         $name = trim((string) $this->display_name);
         return $name !== '' ? $name : (string) $this->email;
+    }
+
+    /**
+     * Normalize the stored X/Twitter handle for meta tags (e.g. "@handle").
+     */
+    public function twitterHandle(): ?string
+    {
+        $handle = trim((string) $this->twitter_username);
+        if ($handle === '') {
+            return null;
+        }
+
+        return '@' . ltrim($handle, '@');
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\User;
 use App\Rules\ImageFile;
+use App\Support\FaviconProcessor;
 use App\Support\ImageMime;
 use App\Support\IpWhitelist;
 use App\Support\Locales;
@@ -41,6 +42,14 @@ class SettingsController extends Controller
         return view('admin.settings', [
             'logoUrl'          => Setting::publicUrl(Setting::get('site_logo_key')),
             'faviconUrl'       => Setting::publicUrl(Setting::get('site_favicon_key')),
+            'faviconSvgUrl'    => Setting::publicUrl(Setting::get('site_favicon_svg_key')),
+            'favicon32Url'     => Setting::publicUrl(Setting::get('site_favicon_32_key')),
+            'favicon180Url'    => Setting::publicUrl(Setting::get('site_favicon_180_key')),
+            'favicon192Url'    => Setting::publicUrl(Setting::get('site_favicon_192_key')),
+            'favicon512Url'    => Setting::publicUrl(Setting::get('site_favicon_512_key')),
+            'twitterSite'      => Setting::get('twitter_site', ''),
+            'themeColorLight'  => Setting::get('theme_color_light', '#f9fafb'),
+            'themeColorDark'   => Setting::get('theme_color_dark', '#111827'),
             'defaultLocale'    => Setting::get('default_locale', config('app.locale')),
             'defaultTheme'     => Setting::get('default_theme', 'dark'),
             'postsPerPage'     => Setting::get('posts_per_page', '12'),
@@ -95,6 +104,9 @@ class SettingsController extends Controller
             'remove_logo'           => ['nullable', 'boolean'],
             'favicon'               => ['nullable', 'file', new ImageFile(['png', 'ico', 'svg', 'webp']), 'max:512'],
             'remove_favicon'        => ['nullable', 'boolean'],
+            'twitter_site'          => ['nullable', 'string', 'max:64'],
+            'theme_color_light'     => ['nullable', 'string', 'max:7', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'theme_color_dark'      => ['nullable', 'string', 'max:7', 'regex:/^#[0-9a-fA-F]{6}$/'],
             'default_locale'        => ['required', 'string', 'in:'.implode(',', $supportedLocales)],
             'posts_per_page'        => ['required', 'integer', 'min:1', 'max:100'],
             'feed_posts_count'      => ['required', 'integer', 'min:1', 'max:100'],
@@ -133,10 +145,12 @@ class SettingsController extends Controller
             'users.*.email'         => ['nullable', 'string', 'max:255'],
             'users.*.display_name'  => ['nullable', 'string', 'max:255'],
             'users.*.url'           => ['nullable', 'url:http,https', 'max:2048'],
+            'users.*.twitter'       => ['nullable', 'string', 'max:64'],
             'users.*.remove'        => ['nullable', 'boolean'],
             'new_user_email'        => ['nullable', 'string', 'max:255'],
             'new_user_display_name' => ['nullable', 'string', 'max:255'],
             'new_user_url'          => ['nullable', 'url:http,https', 'max:2048'],
+            'new_user_twitter'      => ['nullable', 'string', 'max:64'],
         ]);
 
         // Per-locale fields
@@ -179,12 +193,28 @@ class SettingsController extends Controller
         }
 
         if ($request->boolean('remove_favicon')) {
-            $this->deleteCurrent('site_favicon_key');
+            $this->deleteFaviconSet();
+        } elseif ($request->hasFile('favicon')) {
+            $this->deleteFaviconSet();
+            $this->storeFavicon($request->file('favicon'));
         }
-        if ($request->hasFile('favicon')) {
-            $this->deleteCurrent('site_favicon_key');
-            $key = $this->storeAsset($request->file('favicon'), 'branding/favicon');
-            Setting::put('site_favicon_key', $key);
+
+        // X/Twitter site handle
+        $twitterSite = trim((string) ($validated['twitter_site'] ?? ''));
+        if ($twitterSite !== '') {
+            Setting::put('twitter_site', $twitterSite);
+        } else {
+            Setting::forget('twitter_site');
+        }
+
+        // Theme colors (empty resets to the default)
+        foreach (['theme_color_light', 'theme_color_dark'] as $colorKey) {
+            $colorValue = trim((string) ($validated[$colorKey] ?? ''));
+            if ($colorValue !== '') {
+                Setting::put($colorKey, $colorValue);
+            } else {
+                Setting::forget($colorKey);
+            }
         }
 
         Setting::put('default_locale', $validated['default_locale']);
@@ -426,6 +456,60 @@ class SettingsController extends Controller
         }
     }
 
+    /**
+     * Delete every favicon variant (original + generated sizes).
+     */
+    private function deleteFaviconSet(): void
+    {
+        foreach ([
+            'site_favicon_key',
+            'site_favicon_svg_key',
+            'site_favicon_32_key',
+            'site_favicon_180_key',
+            'site_favicon_192_key',
+            'site_favicon_512_key',
+        ] as $settingKey) {
+            $this->deleteCurrent($settingKey);
+        }
+    }
+
+    /**
+     * Store the uploaded favicon and all generated variants.
+     */
+    private function storeFavicon(\Illuminate\Http\UploadedFile $file): void
+    {
+        $variants = FaviconProcessor::process($file);
+
+        $map = [
+            'original' => 'site_favicon_key',
+            'svg'      => 'site_favicon_svg_key',
+            '32'       => 'site_favicon_32_key',
+            '180'      => 'site_favicon_180_key',
+            '192'      => 'site_favicon_192_key',
+            '512'      => 'site_favicon_512_key',
+        ];
+
+        foreach ($map as $variant => $settingKey) {
+            if (! empty($variants[$variant])) {
+                Setting::put($settingKey, $variants[$variant]);
+            }
+        }
+    }
+
+    /**
+     * Normalize a X/Twitter handle for storage (no leading "@").
+     */
+    private static function normalizeTwitterHandle(?string $handle): ?string
+    {
+        $handle = trim((string) $handle);
+        if ($handle === '') {
+            return null;
+        }
+
+        $handle = ltrim($handle, '@');
+        return $handle !== '' ? $handle : null;
+    }
+
     private function syncUsers(Request $request): void
     {
         foreach ((array) $request->input('users', []) as $id => $row) {
@@ -469,6 +553,7 @@ class SettingsController extends Controller
                 'email' => $email,
                 'display_name' => trim((string) ($row['display_name'] ?? '')) ?: null,
                 'url' => trim((string) ($row['url'] ?? '')) ?: null,
+                'twitter_username' => self::normalizeTwitterHandle($row['twitter'] ?? ''),
             ];
 
             $user->update($updates);
@@ -491,6 +576,7 @@ class SettingsController extends Controller
                 'email' => $newEmail,
                 'display_name' => trim((string) $request->input('new_user_display_name', '')) ?: null,
                 'url' => trim((string) $request->input('new_user_url', '')) ?: null,
+                'twitter_username' => self::normalizeTwitterHandle($request->input('new_user_twitter', '')),
             ]);
         }
     }

@@ -34,6 +34,7 @@
     <meta property="og:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta property="og:description" content="{{ $shortDesc }}">
     <meta property="og:image" content="{{ $imgUrl }}">
+    <meta property="og:image:alt" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     @if($image->width)
     <meta property="og:image:width" content="{{ $image->width }}">
     @endif
@@ -48,6 +49,10 @@
     <meta name="twitter:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta name="twitter:description" content="{{ $shortDesc }}">
     <meta name="twitter:image" content="{{ $imgUrl }}">
+
+    @if($image->author?->twitterHandle())
+    <meta name="twitter:creator" content="{{ $image->author->twitterHandle() }}">
+    @endif
 
     @if($authorName)
     <meta name="author" content="{{ $authorName }}">
@@ -67,6 +72,32 @@
     @endif
 
     <link rel="canonical" href="{{ $shareUrl }}">
+@endsection
+
+@section('jsonld')
+    @php
+        $authorJson = null;
+        if ($authorName) {
+            $authorJson = ['@type' => 'Person', 'name' => $authorName];
+            if ($image->author?->url) {
+                $authorJson['url'] = $image->author->url;
+            }
+        }
+
+        $imageJson = array_filter([
+            '@context'      => 'https://schema.org',
+            '@type'         => 'ImageObject',
+            'contentUrl'    => $imgUrl,
+            'url'           => $shareUrl,
+            'name'          => $ogHeadline ?: $siteTitle,
+            'description'   => $shortDesc,
+            'datePublished' => $publishedIso,
+            'dateModified'  => $modifiedIso,
+            'author'        => $authorJson,
+            'publisher'     => ['@type' => 'Organization', 'name' => $siteTitle],
+        ], fn ($value) => $value !== null);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($imageJson, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endsection
 
 @section('content')

@@ -9,6 +9,29 @@
 
 @section('title', $homeTitle)
 
+@section('jsonld')
+    @php
+        $websiteJson = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => $siteTitle,
+            'url' => url('/'),
+            'potentialAction' => [
+                '@type' => 'SearchAction',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => url('/search') . '?q={search_term_string}',
+                ],
+                'query-input' => 'required name=search_term_string',
+            ],
+        ];
+        if ($siteSubtitle) {
+            $websiteJson['description'] = $siteSubtitle;
+        }
+    @endphp
+    <script type="application/ld+json">{!! json_encode($websiteJson, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endsection
+
 @section('content')
     @if(!($hideTitleSection ?? false))
     <section class="text-center mb-8">

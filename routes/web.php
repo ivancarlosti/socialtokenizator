@@ -23,6 +23,7 @@ Route::get('/robots.txt', [WebStandardsController::class, 'robots']);
 Route::get('/llms.txt', [WebStandardsController::class, 'llms']);
 Route::get('/llms-full.txt', [WebStandardsController::class, 'llmsFull']);
 Route::get('/sitemap.xml', [WebStandardsController::class, 'sitemap']);
+Route::get('/site.webmanifest', [WebStandardsController::class, 'manifest']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/search', [HomeController::class, 'search'])->name('search');

@@ -92,6 +92,15 @@
                 <p class="mt-1 text-xs text-muted">{{ __('messages.settings_favicon_help') }}</p>
             </div>
 
+            {{-- X/Twitter site account --}}
+            <div>
+                <label class="block text-sm text-muted mb-1">{{ __('messages.settings_twitter_site') }}</label>
+                <input type="text" name="twitter_site" value="{{ old('twitter_site', $twitterSite) }}"
+                       placeholder="@yourusername" maxlength="64"
+                       class="w-64 bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                <p class="mt-1 text-xs text-muted">{{ __('messages.settings_twitter_site_help') }}</p>
+            </div>
+
             {{-- Default theme --}}
             <div>
                 <label class="block text-sm text-muted mb-1">{{ __('messages.settings_default_theme') }}</label>
@@ -100,6 +109,22 @@
                     <option value="dark" @selected($defaultTheme === 'dark')>{{ __('messages.theme_dark') }}</option>
                     <option value="light" @selected($defaultTheme === 'light')>{{ __('messages.theme_light') }}</option>
                 </select>
+            </div>
+
+            {{-- Theme colors (light/dark) --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-muted mb-1">{{ __('messages.settings_theme_color_light') }}</label>
+                    <input type="color" name="theme_color_light" value="{{ old('theme_color_light', $themeColorLight) }}"
+                           class="h-10 w-20 bg-input border border-input-border rounded">
+                    <p class="mt-1 text-xs text-muted">{{ __('messages.settings_theme_color_light_help') }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm text-muted mb-1">{{ __('messages.settings_theme_color_dark') }}</label>
+                    <input type="color" name="theme_color_dark" value="{{ old('theme_color_dark', $themeColorDark) }}"
+                           class="h-10 w-20 bg-input border border-input-border rounded">
+                    <p class="mt-1 text-xs text-muted">{{ __('messages.settings_theme_color_dark_help') }}</p>
+                </div>
             </div>
 
             {{-- Default locale --}}
@@ -619,7 +644,7 @@
                     <div class="space-y-3">
                         @foreach($users as $user)
                             <div class="border border-card-border rounded p-3 space-y-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-start">
+                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 items-start">
                                     <div>
                                         <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
                                         <input type="email" name="users[{{ $user->id }}][email]"
@@ -639,6 +664,13 @@
                                                placeholder="https://"
                                                class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                                     </div>
+                                    <div>
+                                        <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_twitter') }}</label>
+                                        <input type="text" name="users[{{ $user->id }}][twitter]"
+                                               value="{{ old("users.{$user->id}.twitter", $user->twitter_username) }}"
+                                               placeholder="@handle"
+                                               class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                                    </div>
                                     <label class="inline-flex items-center gap-2 text-xs text-red-400 sm:mt-7">
                                         <input type="hidden" name="users[{{ $user->id }}][remove]" value="0">
                                         <input type="checkbox" name="users[{{ $user->id }}][remove]" value="1">
@@ -652,7 +684,7 @@
 
                 <div class="mt-5 border-t border-card-border pt-4">
                     <p class="text-sm font-semibold text-copy mb-2">{{ __('messages.settings_users_add') }}</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                         <div>
                             <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_email') }}</label>
                             <input type="email" name="new_user_email" value="{{ old('new_user_email') }}"
@@ -667,6 +699,12 @@
                             <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_link') }}</label>
                             <input type="url" name="new_user_url" value="{{ old('new_user_url') }}"
                                    placeholder="https://"
+                                   class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-muted mb-1">{{ __('messages.settings_users_twitter') }}</label>
+                            <input type="text" name="new_user_twitter" value="{{ old('new_user_twitter') }}"
+                                   placeholder="@handle"
                                    class="w-full bg-input border border-input-border rounded px-3 py-2 text-sm text-copy">
                         </div>
                     </div>

@@ -34,6 +34,11 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $logoKey    = $this->safeSetting('site_logo_key');
             $faviconKey = $this->safeSetting('site_favicon_key');
+            $faviconSvgKey = $this->safeSetting('site_favicon_svg_key');
+            $favicon32Key  = $this->safeSetting('site_favicon_32_key');
+            $favicon180Key = $this->safeSetting('site_favicon_180_key');
+            $favicon192Key = $this->safeSetting('site_favicon_192_key');
+            $favicon512Key = $this->safeSetting('site_favicon_512_key');
 
             $locale        = app()->getLocale();
             $siteTitle     = $this->safeSetting("site_title_{$locale}") ?: config('app.name');
@@ -57,6 +62,15 @@ class AppServiceProvider extends ServiceProvider
             $customHead = $this->safeSetting('custom_head');
             $customCss  = $this->safeSetting('custom_css');
             $customJs   = $this->safeSetting('custom_js');
+
+            $twitterSite      = $this->safeSetting('twitter_site');
+            if ($twitterSite !== null && $twitterSite !== '') {
+                $twitterSite = '@' . ltrim($twitterSite, '@');
+            }
+            $themeColorLight  = $this->safeSetting('theme_color_light') ?: '#f9fafb';
+            $themeColorDark   = $this->safeSetting('theme_color_dark') ?: '#111827';
+            $ogLocale         = Locales::default();
+            $ogLocaleAlternates = array_values(array_diff(array_keys(Locales::supported()), [$ogLocale]));
 
             $siteTimezone = $this->safeSetting('site_timezone') ?: config('app.timezone');
             if (! in_array($siteTimezone, timezone_identifiers_list(), true)) {
@@ -85,6 +99,17 @@ class AppServiceProvider extends ServiceProvider
                 'isAdmin'          => AuthMethodResolver::isAdmin(),
                 'siteLogoUrl'      => Setting::publicUrl($logoKey),
                 'siteFaviconUrl'   => Setting::publicUrl($faviconKey),
+                'siteFaviconSvgUrl' => Setting::publicUrl($faviconSvgKey),
+                'siteFavicon32Url'  => Setting::publicUrl($favicon32Key),
+                'appleTouchIconUrl' => Setting::publicUrl($favicon180Key),
+                'siteFavicon192Url' => Setting::publicUrl($favicon192Key),
+                'siteFavicon512Url' => Setting::publicUrl($favicon512Key),
+                'manifestUrl'       => url('/site.webmanifest'),
+                'twitterSite'       => $twitterSite,
+                'themeColorLight'   => $themeColorLight,
+                'themeColorDark'    => $themeColorDark,
+                'ogLocale'          => $ogLocale,
+                'ogLocaleAlternates'=> $ogLocaleAlternates,
                 'siteTitle'        => $siteTitle,
                 'siteSubtitle'     => $siteSubtitle,
                 'footerText'       => $footerText,
