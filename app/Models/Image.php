@@ -15,6 +15,7 @@ class Image extends Model
         'short_id',
         'author_id',
         'r2_key',
+        'og_image_key',
         'original_filename',
         'mime_type',
         'width',
@@ -133,5 +134,20 @@ class Image extends Model
     {
         $base = rtrim((string) config('filesystems.disks.r2.url'), '/');
         return $base.'/'.ltrim($this->r2_key, '/');
+    }
+
+    /**
+     * Public URL for the generated OpenGraph/feed thumbnail.
+     *
+     * Falls back to the original full-size image when no thumbnail exists.
+     */
+    public function getOgImageUrlAttribute(): string
+    {
+        if (! empty($this->og_image_key)) {
+            $base = rtrim((string) config('filesystems.disks.r2.url'), '/');
+            return $base.'/'.ltrim($this->og_image_key, '/');
+        }
+
+        return $this->public_url;
     }
 }

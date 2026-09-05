@@ -18,6 +18,9 @@
     $shortDesc = \Illuminate\Support\Str::limit((string) $ogDesc, 200);
     $shareUrl = route('image.show', ['slug' => $image->short_id]);
     $imgUrl = $image->public_url;
+    $ogImgUrl = $image->og_image_url;
+    $ogWidth = $image->og_image_key ? \App\Support\OgImageProcessor::WIDTH : $image->width;
+    $ogHeight = $image->og_image_key ? \App\Support\OgImageProcessor::HEIGHT : $image->height;
 
     $authorName = $image->author?->displayName();
     $publishedIso = optional($image->created_at)->toIso8601String();
@@ -33,13 +36,16 @@
 
     <meta property="og:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta property="og:description" content="{{ $shortDesc }}">
-    <meta property="og:image" content="{{ $imgUrl }}">
+    <meta property="og:image" content="{{ $ogImgUrl }}">
     <meta property="og:image:alt" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
-    @if($image->width)
-    <meta property="og:image:width" content="{{ $image->width }}">
+    @if($image->og_image_key)
+    <meta property="og:image:type" content="image/jpeg">
     @endif
-    @if($image->height)
-    <meta property="og:image:height" content="{{ $image->height }}">
+    @if($ogWidth)
+    <meta property="og:image:width" content="{{ $ogWidth }}">
+    @endif
+    @if($ogHeight)
+    <meta property="og:image:height" content="{{ $ogHeight }}">
     @endif
     <meta property="og:url" content="{{ $shareUrl }}">
     <meta property="og:type" content="article">
@@ -48,7 +54,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $ogHeadline ? $siteTitle . ' — ' . $ogHeadline : $siteTitle }}">
     <meta name="twitter:description" content="{{ $shortDesc }}">
-    <meta name="twitter:image" content="{{ $imgUrl }}">
+    <meta name="twitter:image" content="{{ $ogImgUrl }}">
 
     @if($image->author?->twitterHandle())
     <meta name="twitter:creator" content="{{ $image->author->twitterHandle() }}">

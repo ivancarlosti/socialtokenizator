@@ -182,7 +182,7 @@ class FeedController extends Controller
 
             if ($showDescription && $description) {
                 $descText = $this->feedDescriptionText($description, $descMode, $descLength);
-                $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
+                $htmlContent = '<div><img src="' . htmlspecialchars($image->og_image_url, ENT_XML1, 'UTF-8') . '" alt="" />';
                 $htmlContent .= '<p>' . htmlspecialchars($descText, ENT_XML1, 'UTF-8') . '</p></div>';
                 $contentEl = $dom->createElement('content');
                 $contentEl->setAttribute('type', 'html');
@@ -288,7 +288,7 @@ class FeedController extends Controller
 
             if ($showDescription && $description) {
                 $descText = $this->feedDescriptionText($description, $descMode, $descLength);
-                $htmlContent = '<div><img src="' . htmlspecialchars($image->public_url, ENT_XML1, 'UTF-8') . '" alt="" />';
+                $htmlContent = '<div><img src="' . htmlspecialchars($image->og_image_url, ENT_XML1, 'UTF-8') . '" alt="" />';
                 $htmlContent .= '<p>' . htmlspecialchars($descText, ENT_XML1, 'UTF-8') . '</p></div>';
                 $descEl = $dom->createElement('description');
                 $descEl->appendChild($dom->createCDATASection($htmlContent));
@@ -350,6 +350,7 @@ class FeedController extends Controller
                 'id' => $entryUrl,
                 'url' => $entryUrl,
                 'title' => $title,
+                'image' => $image->og_image_url,
                 'date_published' => $image->created_at->toIso8601String(),
                 'author' => $image->author ? ['name' => $image->author->displayName()] : null,
             ];
@@ -360,7 +361,7 @@ class FeedController extends Controller
 
             if ($showDescription && $description) {
                 $descText = $this->feedDescriptionText($description, $descMode, $descLength);
-                $item['content_html'] = '<div><img src="' . $image->public_url . '" alt="" /><p>' . htmlspecialchars($descText, ENT_QUOTES, 'UTF-8') . '</p></div>';
+                $item['content_html'] = '<div><img src="' . $image->og_image_url . '" alt="" /><p>' . htmlspecialchars($descText, ENT_QUOTES, 'UTF-8') . '</p></div>';
                 $item['summary'] = $descMode === 'excerpt' ? $descText : \Illuminate\Support\Str::limit($description, 300);
             }
 

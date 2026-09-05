@@ -10,6 +10,7 @@ use App\Models\Tag;
 use App\Rules\ImageFile;
 use App\Support\ImageMime;
 use App\Support\ImageUrlDownloader;
+use App\Support\OgImageProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -133,6 +134,8 @@ class UploadController extends Controller
             return $image;
         });
 
+        $this->generateOgThumbnail($image);
+
         return redirect()->route('image.show', ['slug' => $image->short_id])
             ->with('status', 'Image uploaded.');
     }
@@ -181,9 +184,13 @@ class UploadController extends Controller
             'sources.*.label' => ['nullable', 'string', 'max:255'],
         ]);
 
-        DB::transaction(function () use ($image, $validated, $request) {
+        $replaced = false;
+        $oldOgKey = $image->og_image_key;
+
+        DB::transaction(function () use ($image, $validated, $request, &$replaced) {
             // ── Image replacement ──
             if ($request->hasFile('image')) {
+                $replaced = true;
                 $oldR2Key = $image->r2_key;
 
                 $file = $request->file('image');
@@ -202,6 +209,7 @@ class UploadController extends Controller
                 $image->update([
                     'uuid'              => $uuid,
                     'r2_key'            => $r2Key,
+                    'og_image_key'      => null,
                     'original_filename' => $file->getClientOriginalName(),
                     'mime_type'         => $mime,
                     'width'             => $width,
@@ -211,6 +219,7 @@ class UploadController extends Controller
                 // Delete old image from R2 after successful replacement
                 Storage::disk('r2')->delete($oldR2Key);
             } elseif (! empty($validated['image_url'])) {
+                $replaced = true;
                 $oldR2Key = $image->r2_key;
 
                 $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
@@ -218,6 +227,7 @@ class UploadController extends Controller
                 $image->update([
                     'uuid'              => $imageMeta['uuid'],
                     'r2_key'            => $imageMeta['r2_key'],
+                    'og_image_key'      => null,
                     'original_filename' => $imageMeta['original_filename'],
                     'mime_type'         => $imageMeta['mime_type'],
                     'width'             => $imageMeta['width'],
@@ -265,6 +275,13 @@ class UploadController extends Controller
             }
         });
 
+        if ($replaced) {
+            if ($oldOgKey) {
+                Storage::disk('r2')->delete($oldOgKey);
+            }
+            $this->generateOgThumbnail($image);
+        }
+
         return redirect()->route('image.show', ['slug' => $image->short_id])
             ->with('status', __('messages.image_updated'));
     }
@@ -273,7 +290,18 @@ class UploadController extends Controller
     {
         $image = Image::where('uuid', $uuid)->firstOrFail();
         Storage::disk('r2')->delete($image->r2_key);
+        if ($image->og_image_key) {
+            Storage::disk('r2')->delete($image->og_image_key);
+        }
         $image->delete();
         return redirect()->route('home')->with('status', 'Image deleted.');
+    }
+
+    private function generateOgThumbnail(Image $image): void
+    {
+        $key = OgImageProcessor::generate($image);
+        if ($key !== null) {
+            $image->update(['og_image_key' => $key]);
+        }
     }
 }

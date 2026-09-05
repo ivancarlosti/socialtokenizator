@@ -10,6 +10,7 @@ use App\Models\Tag;
 use App\Rules\ImageFile;
 use App\Support\ImageMime;
 use App\Support\ImageUrlDownloader;
+use App\Support\OgImageProcessor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -141,6 +142,8 @@ class PostController extends Controller
             return $image;
         });
 
+        $this->generateOgThumbnail($image);
+
         $image->load(['categories', 'tags', 'sources', 'author']);
 
         return response()->json($this->formatPost($image), 201);
@@ -257,6 +260,9 @@ class PostController extends Controller
         }
 
         Storage::disk('r2')->delete($image->r2_key);
+        if ($image->og_image_key) {
+            Storage::disk('r2')->delete($image->og_image_key);
+        }
         $image->delete();
 
         return response()->json(null, 204);
@@ -294,9 +300,13 @@ class PostController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($image, $validated, $request) {
+        $replaced = false;
+        $oldOgKey = $image->og_image_key;
+
+        DB::transaction(function () use ($image, $validated, $request, &$replaced) {
             // ── Image replacement ──
             if ($request->hasFile('image')) {
+                $replaced = true;
                 $oldR2Key = $image->r2_key;
 
                 $file = $request->file('image');
@@ -315,6 +325,7 @@ class PostController extends Controller
                 $image->update([
                     'uuid'              => $newUuid,
                     'r2_key'            => $r2Key,
+                    'og_image_key'      => null,
                     'original_filename' => $file->getClientOriginalName(),
                     'mime_type'         => $mime,
                     'width'             => $width,
@@ -323,6 +334,7 @@ class PostController extends Controller
 
                 Storage::disk('r2')->delete($oldR2Key);
             } elseif (! empty($validated['image_url'])) {
+                $replaced = true;
                 $oldR2Key = $image->r2_key;
 
                 $imageMeta = $this->downloadImageFromUrl($validated['image_url']);
@@ -330,6 +342,7 @@ class PostController extends Controller
                 $image->update([
                     'uuid'              => $imageMeta['uuid'],
                     'r2_key'            => $imageMeta['r2_key'],
+                    'og_image_key'      => null,
                     'original_filename' => $imageMeta['original_filename'],
                     'mime_type'         => $imageMeta['mime_type'],
                     'width'             => $imageMeta['width'],
@@ -398,6 +411,13 @@ class PostController extends Controller
             }
         });
 
+        if ($replaced) {
+            if ($oldOgKey) {
+                Storage::disk('r2')->delete($oldOgKey);
+            }
+            $this->generateOgThumbnail($image);
+        }
+
         $image->load(['categories', 'tags', 'sources', 'author']);
 
         return response()->json($this->formatPost($image));
@@ -411,6 +431,7 @@ class PostController extends Controller
         return [
             'uuid' => $image->uuid,
             'public_url' => $image->public_url,
+            'og_image_url' => $image->og_image_url,
             'original_filename' => $image->original_filename,
             'author' => $image->author ? [
                 'email' => $image->author->email,
@@ -446,6 +467,14 @@ class PostController extends Controller
             'updated_at' => $image->updated_at->toIso8601String(),
             'published_at' => $image->created_at->toIso8601String(),
         ];
+    }
+
+    private function generateOgThumbnail(Image $image): void
+    {
+        $key = OgImageProcessor::generate($image);
+        if ($key !== null) {
+            $image->update(['og_image_key' => $key]);
+        }
     }
 
     /**
