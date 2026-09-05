@@ -68,9 +68,17 @@ Important notes:
 
 - Backfill runs inside `php artisan migrate` and may take a long time for large
   catalogs because each post requires an R2 download, GD processing, and an R2 upload.
+- The migration prints `[done/total]` progress lines to the console so progress is
+  visible in Docker Compose logs.
+- `$withinTransaction = false` keeps each image update committed independently, so an
+  interrupted run does not roll back work already completed.
+- The schema change is idempotent, so an interrupted migration can be resumed safely by
+  running `php artisan migrate` again; remaining rows are picked up via `whereNull`.
 - Each image is processed in its own try/catch so one failure does not abort the
   migration; failures are logged and left with a null `og_image_key`.
 - If GD is unavailable, processing is skipped and the column remains null.
+- The equivalent manual command is `php artisan images:generate-og` (`--fresh` to
+  regenerate all posts).
 
 ## Upload and update integration
 

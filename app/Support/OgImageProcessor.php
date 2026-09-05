@@ -110,9 +110,9 @@ final class OgImageProcessor
         return $source;
     }
 
-    private static function createImageFromFile(string $path, ?string $mime)
+    private static function createImageFromFile(string $path, ?string $mime): ?\GdImage
     {
-        return match (strtolower((string) $mime)) {
+        $source = match (strtolower((string) $mime)) {
             'image/png'  => @imagecreatefrompng($path),
             'image/jpeg' => @imagecreatefromjpeg($path),
             'image/webp' => @imagecreatefromwebp($path),
@@ -120,6 +120,8 @@ final class OgImageProcessor
             'image/avif' => function_exists('imagecreatefromavif') ? @imagecreatefromavif($path) : null,
             default      => null,
         };
+
+        return $source === false ? null : $source;
     }
 
     /**
@@ -127,6 +129,10 @@ final class OgImageProcessor
      */
     private static function letterbox($source): ?string
     {
+        if (! $source instanceof \GdImage) {
+            return null;
+        }
+
         $srcWidth = imagesx($source);
         $srcHeight = imagesy($source);
         if ($srcWidth < 1 || $srcHeight < 1) {

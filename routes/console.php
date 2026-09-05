@@ -20,28 +20,34 @@ Artisan::command('images:generate-og {--fresh : Regenerate thumbnails for all po
     $total = (clone $query)->count();
     $this->info("Generating OpenGraph thumbnails for {$total} posts...");
 
-    $bar = $this->getOutput()->createProgressBar($total);
-    $bar->start();
+    if ($total === 0) {
+        $this->info('No OpenGraph thumbnails to generate.');
+
+        return 0;
+    }
+
+    $done = 0;
 
     $query
         ->select(['id', 'uuid', 'r2_key', 'mime_type', 'og_image_key'])
-        ->chunkById(50, function ($images) use ($bar) {
+        ->chunkById(50, function ($images) use ($total, &$done) {
             foreach ($images as $image) {
+                $done++;
+
                 try {
                     $key = OgImageProcessor::generate($image);
                     if ($key !== null) {
                         $image->update(['og_image_key' => $key]);
+                        $this->info("[{$done}/{$total}] Generated OpenGraph thumbnail for image #{$image->id}");
+                    } else {
+                        $this->warn("[{$done}/{$total}] Skipped image #{$image->id} (unable to decode/generate)");
                     }
                 } catch (\Throwable $e) {
-                    $this->error('Failed for image #'.$image->id.': '.$e->getMessage());
+                    $this->error("[{$done}/{$total}] Failed image #{$image->id}: {$e->getMessage()}");
                 }
-
-                $bar->advance();
             }
         });
 
-    $bar->finish();
-    $this->newLine();
     $this->info('Done.');
 
     return 0;
