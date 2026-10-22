@@ -45,12 +45,24 @@ RUN npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --minify
 
 
 # ---------- Stage 3: Runtime ----------
-FROM php:8.3-fpm-alpine AS runtime
+# PHP 8.5.12 is the first release patched for:
+#   CVE-2026-109618 / GHSA-w8hw-w9fx-j79w (RCE via OOM corruption)
+#   CVE-2026-109619 / GHSA-6wmf-4rv5-p3rp (RCE via stale global state)
+# Equivalent fixed releases on older branches: 8.2.35, 8.3.36, 8.4.27.
+# Do not lower this floor without checking those advisories.
+FROM php:8.5.12-fpm-alpine AS runtime
+
+# Fail the build if the resolved base image is older than the patched release.
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.5.12", ">=") ? 0 : 1);'
 
 ENV APP_ENV=production \
     APP_DEBUG=false \
     COMPOSER_ALLOW_SUPERUSER=1
 
+# NOTE: OPcache is compiled statically into the PHP 8.5 binary (there is no
+# modules/opcache.so), so it must NOT be passed to docker-php-ext-install.
+# It is tuned through build/php/php.ini and can be checked with
+# `php --ri 'Zend OPcache'`.
 RUN set -eux; \
     apk add --no-cache \
         nginx \
@@ -78,7 +90,6 @@ RUN set -eux; \
         intl \
         zip \
         gd \
-        opcache \
         exif; \
     apk del .build-deps; \
     mkdir -p /run/nginx /var/log/supervisor

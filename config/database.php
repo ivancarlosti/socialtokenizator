@@ -1,5 +1,20 @@
 <?php
 
+// pdo_mysql is optional at runtime, so driver-specific constants must only be
+// touched when the driver is actually loaded (a bare CLI may not have it).
+$mysqlOptions = [];
+
+if (extension_loaded('pdo_mysql')) {
+    // PDO::MYSQL_ATTR_SSL_CA is deprecated as of PHP 8.5. The replacement,
+    // Pdo\Mysql::ATTR_SSL_CA, only exists on PHP >= 8.4, so pick whichever
+    // constant is available (the project still supports PHP 8.3).
+    $sslCa = defined('Pdo\Mysql::ATTR_SSL_CA')
+        ? Pdo\Mysql::ATTR_SSL_CA
+        : PDO::MYSQL_ATTR_SSL_CA;
+
+    $mysqlOptions = array_filter([$sslCa => env('MYSQL_ATTR_SSL_CA')]);
+}
+
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
 
@@ -19,9 +34,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => 'InnoDB',
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => $mysqlOptions,
         ],
     ],
 
