@@ -7,6 +7,10 @@
     "watch": "tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  },
+  "overrides": {
+    "@parcel/watcher": "2.5.6"
   }
 }

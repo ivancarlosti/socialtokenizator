@@ -32,16 +32,15 @@ RUN composer dump-autoload --optimize --no-dev
 
 
 # ---------- Stage 2: Tailwind CSS build ----------
-FROM node:20-alpine AS assets
+FROM node:24-alpine AS assets
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --no-audit --no-fund
-COPY tailwind.config.js ./
 COPY resources/css ./resources/css
 COPY resources/views ./resources/views
 COPY app ./app
-RUN npx tailwindcss -i ./resources/css/app.css -o ./public/css/app.css --minify
+RUN npx @tailwindcss/cli -i ./resources/css/app.css -o ./public/css/app.css --minify
 
 
 # ---------- Stage 3: Runtime ----------
