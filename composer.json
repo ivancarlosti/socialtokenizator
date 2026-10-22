@@ -4,7 +4,7 @@
     "description": "Image-sharing web app with R2 storage, MySQL, and pluggable auth.",
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "laravel/framework": "^13.0",
         "laravel/socialite": "^5.16",
         "league/flysystem-aws-s3-v3": "^3.0",
