@@ -5,14 +5,11 @@
 $mysqlOptions = [];
 
 if (extension_loaded('pdo_mysql')) {
-    // PDO::MYSQL_ATTR_SSL_CA is deprecated as of PHP 8.5. The replacement,
-    // Pdo\Mysql::ATTR_SSL_CA, only exists on PHP >= 8.4, so pick whichever
-    // constant is available (the project still supports PHP 8.3).
-    $sslCa = defined('Pdo\Mysql::ATTR_SSL_CA')
-        ? Pdo\Mysql::ATTR_SSL_CA
-        : PDO::MYSQL_ATTR_SSL_CA;
-
-    $mysqlOptions = array_filter([$sslCa => env('MYSQL_ATTR_SSL_CA')]);
+    // PHP 8.5+ (see composer.json). Pdo\Mysql::ATTR_SSL_CA replaces
+    // PDO::MYSQL_ATTR_SSL_CA, which is deprecated as of PHP 8.5.
+    $mysqlOptions = array_filter([
+        Pdo\Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+    ]);
 }
 
 return [
