@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "laravel/framework": "^13.0",
+        "laravel/framework": "^13.43",
         "laravel/socialite": "^5.16",
         "league/flysystem-aws-s3-v3": "^3.0",
         "socialiteproviders/keycloak": "^5.3"
