@@ -224,7 +224,7 @@ return [
 
     // Image paste & change
     'paste_image_clipboard'     => 'Or paste an image from clipboard (Ctrl+V)',
-    'paste_image_placeholder'   => 'Click here and press Ctrl+V to paste an image',
+    'paste_image_placeholder'   => 'Click to choose a file or press Ctrl+V to paste an image',
     'change_image_label'        => 'Change image (optional)',
     'current_image'             => 'Current image',
     'new_image_preview'         => 'New image preview',

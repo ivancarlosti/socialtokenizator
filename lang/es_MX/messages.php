@@ -224,7 +224,7 @@ return [
 
     // Image paste & change
     'paste_image_clipboard'     => 'O pega una imagen del portapapeles (Ctrl+V)',
-    'paste_image_placeholder'   => 'Haz clic aquí y presiona Ctrl+V para pegar una imagen',
+    'paste_image_placeholder'   => 'Haz clic para elegir un archivo o presiona Ctrl+V para pegar una imagen',
     'change_image_label'        => 'Cambiar imagen (opcional)',
     'current_image'             => 'Imagen actual',
     'new_image_preview'         => 'Vista previa de la nueva imagen',

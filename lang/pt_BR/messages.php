@@ -224,7 +224,7 @@ return [
 
     // Image paste & change
     'paste_image_clipboard'     => 'Ou cole uma imagem do clipboard (Ctrl+V)',
-    'paste_image_placeholder'   => 'Clique aqui e pressione Ctrl+V para colar uma imagem',
+    'paste_image_placeholder'   => 'Clique para escolher um arquivo ou pressione Ctrl+V para colar uma imagem',
     'change_image_label'        => 'Alterar imagem (opcional)',
     'current_image'             => 'Imagem atual',
     'new_image_preview'         => 'Prévia da nova imagem',

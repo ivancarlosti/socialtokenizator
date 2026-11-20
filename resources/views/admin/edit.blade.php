@@ -214,8 +214,18 @@
                 }
             });
 
+            // Click on paste zone opens the native file picker (and keeps it focusable for Ctrl+V)
             pasteZone.addEventListener('click', function () {
                 pasteZone.focus();
+                fileInput.click();
+            });
+
+            // Keyboard accessibility: Enter/Space also open the native file picker
+            pasteZone.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput.click();
+                }
             });
 
             pasteClearBtn.addEventListener('click', function (e) {
